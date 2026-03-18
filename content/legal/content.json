@@ -1,0 +1,422 @@
+{
+  "site": {
+    "brandName": "つくろぐ",
+    "contactEmail": "support@createlog.app"
+  },
+  "ja": {
+    "privacy": {
+      "navigationTitle": "プライバシーポリシー",
+      "title": "プライバシーポリシー",
+      "lastUpdatedLabel": "最終更新日",
+      "lastUpdated": "2026年3月16日",
+      "sections": [
+        {
+          "type": "list",
+          "title": "1. 収集する情報",
+          "items": [
+            "アカウント情報（メールアドレス、プロフィール項目）",
+            "作業ログ・カテゴリ・収益などのユーザー入力データ",
+            "アプリ利用状況に関する分析データ（匿名化）",
+            "投稿内容（テキスト、ハッシュタグ）",
+            "ソーシャル情報（フォロー関係、いいね、リポスト）",
+            "プロフィール情報（表示名、ハンドル、アバター画像、自己紹介、外部リンク）",
+            "アプリショーケース情報（登録アプリの情報、レビュー内容）"
+          ]
+        },
+        {
+          "type": "list",
+          "title": "2. 利用目的",
+          "items": [
+            "サービス提供および機能改善",
+            "不正アクセスやスパム行為の防止",
+            "ユーザーからの問い合わせ対応",
+            "タイムライン・SNS機能の提供",
+            "コンテンツのモデレーションと安全性の確保"
+          ]
+        },
+        {
+          "type": "paragraphs",
+          "title": "3. 第三者提供",
+          "paragraphs": [
+            "法令に基づく場合を除き、本人の同意なく第三者へ提供しません。",
+            "インフラ・分析用の外部サービスを利用する場合は、最小限の情報のみ共有します。"
+          ]
+        },
+        {
+          "type": "paragraphs",
+          "title": "4. データの保存期間",
+          "paragraphs": [
+            "アカウントが存在する限りデータを保持します。退会後は速やかに削除します。"
+          ]
+        },
+        {
+          "type": "list",
+          "title": "5. ユーザーの権利",
+          "items": [
+            "アカウントの削除はアプリ内のプロフィール画面から行えます",
+            "データの開示・訂正についてはお問い合わせください",
+            "通知設定は設定画面からオフにできます"
+          ]
+        },
+        {
+          "type": "list",
+          "title": "6. ソーシャル機能について",
+          "items": [
+            "投稿は公開設定に基づき他のユーザーに表示されます",
+            "プロフィール情報（表示名、ハンドル、アバター）は他のユーザーに公開されます",
+            "ブロック機能を使用して特定のユーザーとの交流を制限できます",
+            "不適切なコンテンツは通報機能から報告できます"
+          ]
+        },
+        {
+          "type": "paragraphs",
+          "title": "7. セキュリティ",
+          "paragraphs": [
+            "SupabaseのRow Level Securityと最小権限APIキーでアクセスを制御しています。",
+            "通信経路はTLSで暗号化されています。"
+          ]
+        },
+        {
+          "type": "contact",
+          "title": "8. お問い合わせ",
+          "paragraphs": [
+            "プライバシーに関するご質問・ご要望は下記までご連絡ください。"
+          ],
+          "buttonLabel": "support@createlog.app",
+          "href": "mailto:support@createlog.app"
+        }
+      ]
+    },
+    "terms": {
+      "navigationTitle": "利用規約",
+      "title": "利用規約",
+      "lastUpdatedLabel": "最終更新日",
+      "lastUpdated": "2026年3月16日",
+      "sections": [
+        {
+          "type": "paragraphs",
+          "title": "1. 適用範囲",
+          "paragraphs": [
+            "本規約は「つくろぐ」アプリ（iOS / Web）および関連サービスに適用されます。",
+            "ユーザーは本サービスを利用することで本規約に同意したものとみなします。"
+          ]
+        },
+        {
+          "type": "list",
+          "title": "2. アカウント",
+          "items": [
+            "ユーザーは正確な情報を登録し、第三者と共有しないものとします",
+            "サインイン方法（メール、OAuth）の提供範囲は予告なく変更される場合があります"
+          ]
+        },
+        {
+          "type": "paragraphs",
+          "title": "3. 記録データの取り扱い",
+          "paragraphs": [
+            "ユーザーが記録した作業ログ・カテゴリ等のデータは本人のみが閲覧可能です。",
+            "運営者は匿名化された統計データを改善目的で利用する場合があります。"
+          ]
+        },
+        {
+          "type": "list",
+          "title": "4. 禁止事項",
+          "items": [
+            "法令や公序良俗に反する行為",
+            "サービスの運営を妨害する行為",
+            "取得した情報を不正に利用する行為"
+          ]
+        },
+        {
+          "type": "list",
+          "title": "5. コンテンツガイドライン",
+          "items": [
+            "他者への誹謗中傷、差別的発言の禁止",
+            "違法コンテンツの投稿禁止",
+            "スパム行為の禁止",
+            "知的財産権の侵害禁止",
+            "成人向けコンテンツの禁止"
+          ]
+        },
+        {
+          "type": "list",
+          "title": "6. ユーザーコンテンツ",
+          "items": [
+            "ユーザーは投稿内容の著作権を保持します",
+            "サービス提供のために投稿を表示・配信する権利をつくろぐに付与します",
+            "つくろぐはガイドライン違反のコンテンツを削除する権利を有します",
+            "アカウント削除時に投稿も削除されます"
+          ]
+        },
+        {
+          "type": "paragraphs",
+          "title": "7. 免責事項",
+          "paragraphs": [
+            "本サービスは現状有姿で提供され、特定目的適合性等を保証しません。",
+            "サービス停止・障害等により発生した損害について、運営者は責任を負いません。"
+          ]
+        },
+        {
+          "type": "paragraphs",
+          "title": "8. 規約の変更",
+          "paragraphs": [
+            "必要に応じて本規約を改定し、アプリ内およびWebサイトで告知します。",
+            "変更後にサービスを利用した場合、改定後の規約に同意したものとみなします。"
+          ]
+        },
+        {
+          "type": "contact",
+          "title": "9. お問い合わせ",
+          "paragraphs": [
+            "ご質問・ご要望は下記までご連絡ください。"
+          ],
+          "buttonLabel": "support@createlog.app",
+          "href": "mailto:support@createlog.app"
+        }
+      ]
+    },
+    "support": {
+      "navigationTitle": "サポート・お問い合わせ",
+      "title": "サポート",
+      "subtitle": "ご不明な点があればお気軽にお問い合わせください",
+      "contactCard": {
+        "title": "お問い合わせ",
+        "paragraphs": [
+          "アプリの不具合報告、ご要望、その他ご質問など、お気軽にご連絡ください。",
+          "通常2〜3営業日以内にご返信いたします。"
+        ],
+        "buttonLabel": "support@createlog.app",
+        "href": "mailto:support@createlog.app"
+      },
+      "faqTitle": "よくあるご質問",
+      "faqItems": [
+        {
+          "question": "Q. アカウントを削除したいのですが？",
+          "answer": "アプリ内のプロフィール画面にある「アカウントを削除」ボタンから削除できます。削除すると、すべてのデータが完全に削除され、復元できなくなります。"
+        },
+        {
+          "question": "Q. 機種変更時にデータは引き継げますか？",
+          "answer": "はい。同じアカウントでログインすれば、すべてのデータが自動的に同期されます。"
+        }
+      ],
+      "linksTitle": "関連リンク",
+      "links": [
+        {
+          "label": "プライバシーポリシー",
+          "href": "/legal/privacy"
+        },
+        {
+          "label": "利用規約",
+          "href": "/legal/terms"
+        }
+      ]
+    }
+  },
+  "en": {
+    "privacy": {
+      "navigationTitle": "Privacy Policy",
+      "title": "Privacy Policy",
+      "lastUpdatedLabel": "Last Updated",
+      "lastUpdated": "March 16, 2026",
+      "sections": [
+        {
+          "type": "list",
+          "title": "1. Information We Collect",
+          "items": [
+            "Account information (email address, profile details)",
+            "User-entered data such as work logs, categories, and revenue",
+            "Anonymized analytics data regarding app usage",
+            "Post content (text, hashtags)",
+            "Social information (follow relationships, likes, reposts)",
+            "Profile information (display name, handle, avatar image, bio, external links)",
+            "App showcase information (registered app details, review content)"
+          ]
+        },
+        {
+          "type": "list",
+          "title": "2. Purpose of Use",
+          "items": [
+            "Providing and improving our services",
+            "Preventing unauthorized access and spam",
+            "Responding to user inquiries",
+            "Providing timeline and social networking features",
+            "Content moderation and ensuring safety"
+          ]
+        },
+        {
+          "type": "paragraphs",
+          "title": "3. Disclosure to Third Parties",
+          "paragraphs": [
+            "We do not provide personal information to third parties without user consent, except as required by law.",
+            "When using external services for infrastructure or analytics, we share only the minimum necessary information."
+          ]
+        },
+        {
+          "type": "paragraphs",
+          "title": "4. Data Retention",
+          "paragraphs": [
+            "We retain your data as long as your account exists. Data is promptly deleted upon account termination."
+          ]
+        },
+        {
+          "type": "list",
+          "title": "5. User Rights",
+          "items": [
+            "You can delete your account from the profile screen within the app",
+            "For data disclosure or correction requests, please contact us",
+            "Notification settings can be turned off from the settings screen"
+          ]
+        },
+        {
+          "type": "list",
+          "title": "6. Social Features",
+          "items": [
+            "Posts are displayed to other users based on your visibility settings",
+            "Profile information (display name, handle, avatar) is visible to other users",
+            "You can use the block feature to restrict interactions with specific users",
+            "Inappropriate content can be reported using the report feature"
+          ]
+        },
+        {
+          "type": "paragraphs",
+          "title": "7. Security",
+          "paragraphs": [
+            "We control access using Supabase Row Level Security and least-privilege API keys.",
+            "All communications are encrypted with TLS."
+          ]
+        },
+        {
+          "type": "contact",
+          "title": "8. Contact Us",
+          "paragraphs": [
+            "For questions or requests regarding privacy, please contact us at the address below."
+          ],
+          "buttonLabel": "support@createlog.app",
+          "href": "mailto:support@createlog.app"
+        }
+      ]
+    },
+    "terms": {
+      "navigationTitle": "Terms of Service",
+      "title": "Terms of Service",
+      "lastUpdatedLabel": "Last Updated",
+      "lastUpdated": "March 16, 2026",
+      "sections": [
+        {
+          "type": "paragraphs",
+          "title": "1. Scope of Application",
+          "paragraphs": [
+            "These terms apply to the createlog app (iOS / Web) and related services.",
+            "By using this service, you agree to be bound by these terms."
+          ]
+        },
+        {
+          "type": "list",
+          "title": "2. Accounts",
+          "items": [
+            "Users must register accurate information and must not share their accounts with third parties",
+            "Available sign-in methods (email, OAuth) may change without prior notice"
+          ]
+        },
+        {
+          "type": "paragraphs",
+          "title": "3. Handling of Recorded Data",
+          "paragraphs": [
+            "Work logs, categories, and other data recorded by users are accessible only to the user.",
+            "The operator may use anonymized statistical data for service improvement purposes."
+          ]
+        },
+        {
+          "type": "list",
+          "title": "4. Prohibited Activities",
+          "items": [
+            "Activities that violate laws or public order and morals",
+            "Activities that interfere with service operations",
+            "Unauthorized use of obtained information"
+          ]
+        },
+        {
+          "type": "list",
+          "title": "5. Content Guidelines",
+          "items": [
+            "Defamation and discriminatory speech against others are prohibited",
+            "Posting illegal content is prohibited",
+            "Spam activities are prohibited",
+            "Infringement of intellectual property rights is prohibited",
+            "Adult content is prohibited"
+          ]
+        },
+        {
+          "type": "list",
+          "title": "6. User Content",
+          "items": [
+            "Users retain copyright of their posted content",
+            "Users grant createlog the right to display and distribute posts for service provision",
+            "createlog reserves the right to remove content that violates the guidelines",
+            "Posts are deleted when the associated account is deleted"
+          ]
+        },
+        {
+          "type": "paragraphs",
+          "title": "7. Disclaimer",
+          "paragraphs": [
+            "This service is provided as-is, without warranty of fitness for any particular purpose.",
+            "The operator shall not be liable for any damages arising from service interruptions or failures."
+          ]
+        },
+        {
+          "type": "paragraphs",
+          "title": "8. Changes to Terms",
+          "paragraphs": [
+            "We may revise these terms as necessary and will notify users within the app and on our website.",
+            "Continued use of the service after changes constitutes acceptance of the revised terms."
+          ]
+        },
+        {
+          "type": "contact",
+          "title": "9. Contact Us",
+          "paragraphs": [
+            "For questions or requests, please contact us at the address below."
+          ],
+          "buttonLabel": "support@createlog.app",
+          "href": "mailto:support@createlog.app"
+        }
+      ]
+    },
+    "support": {
+      "navigationTitle": "Support & Contact",
+      "title": "Support",
+      "subtitle": "Feel free to contact us if you have any questions",
+      "contactCard": {
+        "title": "Contact Us",
+        "paragraphs": [
+          "For bug reports, feature requests, or any other questions, please feel free to reach out.",
+          "We typically respond within 2-3 business days."
+        ],
+        "buttonLabel": "support@createlog.app",
+        "href": "mailto:support@createlog.app"
+      },
+      "faqTitle": "Frequently Asked Questions",
+      "faqItems": [
+        {
+          "question": "Q. How do I delete my account?",
+          "answer": "You can delete your account from the 'Delete Account' button on the profile screen within the app. Once deleted, all data is permanently removed and cannot be recovered."
+        },
+        {
+          "question": "Q. Can I transfer my data when changing devices?",
+          "answer": "Yes. Simply log in with the same account on your new device, and all data will be automatically synced."
+        }
+      ],
+      "linksTitle": "Related Links",
+      "links": [
+        {
+          "label": "Privacy Policy",
+          "href": "/legal/privacy"
+        },
+        {
+          "label": "Terms of Service",
+          "href": "/legal/terms"
+        }
+      ]
+    }
+  }
+}
