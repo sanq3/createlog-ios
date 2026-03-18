@@ -9,6 +9,9 @@ DROP POLICY IF EXISTS "Users can upload their own avatar" ON storage.objects;
 DROP POLICY IF EXISTS "Users can update their own avatar" ON storage.objects;
 DROP POLICY IF EXISTS "Users can delete their own avatar" ON storage.objects;
 DROP POLICY IF EXISTS "Users can read own avatar" ON storage.objects;
+DROP POLICY IF EXISTS "Users can upload own avatar" ON storage.objects;
+DROP POLICY IF EXISTS "Users can update own avatar" ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete own avatar" ON storage.objects;
 
 -- Owner-only policies
 CREATE POLICY "Users can read own avatar"

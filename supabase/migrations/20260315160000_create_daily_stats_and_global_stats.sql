@@ -5,80 +5,24 @@
 -- NOTE: daily_stats の正本は 20260315130000_daily_stats_table.sql
 -- NOTE: global_stats の正本は 20260315130001_global_stats_table.sql
 -- このファイルは IF NOT EXISTS で安全だが、上記が先に適用される前提
--- スキーマが異なる（カラム名: stat_date vs date, session_count vs log_count 等）ため
+-- スキーマが異なる（カラム名: date vs date, log_count vs log_count 等）ため
 -- 正本マイグレーションが先に適用済みの場合、CREATE TABLE は no-op となる
 
 -- ============================================================
 -- 1. daily_stats テーブル
+-- 正本: 20260315130000_daily_stats_table.sql（カラム名: date, log_count）
+-- このファイルでは CREATE TABLE をスキップ
 -- ============================================================
-CREATE TABLE IF NOT EXISTS daily_stats (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  stat_date DATE NOT NULL,
-  total_minutes INTEGER NOT NULL DEFAULT 0,
-  session_count INTEGER NOT NULL DEFAULT 0,
-  categories JSONB DEFAULT '{}'::jsonb,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
 
--- ユーザー×日付で一意
-CREATE UNIQUE INDEX IF NOT EXISTS daily_stats_user_date_idx
-  ON daily_stats (user_id, stat_date);
-
--- 日付でのフィルタリング用
-CREATE INDEX IF NOT EXISTS daily_stats_stat_date_idx
-  ON daily_stats (stat_date DESC);
-
--- RLS
-ALTER TABLE daily_stats ENABLE ROW LEVEL SECURITY;
-
--- ユーザーは自分のデータのみ参照可能
-CREATE POLICY "Users can view own daily_stats"
-  ON daily_stats FOR SELECT
-  USING ((select auth.uid()) = user_id);
-
--- service_role のみ書き込み可能（バッチ処理から）
-CREATE POLICY "Service role can manage daily_stats"
-  ON daily_stats FOR ALL
-  USING (auth.role() = 'service_role')
-  WITH CHECK (auth.role() = 'service_role');
+-- RLS は正本 20260315130000 で設定済み。スキップ。
 
 -- ============================================================
 -- 2. global_stats テーブル
+-- 正本: 20260315130001_global_stats_table.sql（カラム名: stat_type, period_start）
+-- このファイルでは CREATE TABLE をスキップ
 -- ============================================================
-CREATE TABLE IF NOT EXISTS global_stats (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  stat_key TEXT NOT NULL,
-  stat_date DATE NOT NULL,
-  data JSONB NOT NULL DEFAULT '{}'::jsonb,
-  total_users INTEGER NOT NULL DEFAULT 0,
-  computed_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
 
--- stat_key × stat_date で一意
-CREATE UNIQUE INDEX IF NOT EXISTS global_stats_key_date_idx
-  ON global_stats (stat_key, stat_date);
-
--- 最新のグローバル統計を引くためのインデックス
-CREATE INDEX IF NOT EXISTS global_stats_key_computed_idx
-  ON global_stats (stat_key, computed_at DESC);
-
--- RLS
-ALTER TABLE global_stats ENABLE ROW LEVEL SECURITY;
-
--- 認証ユーザーは参照可能（比較機能で使用）
-CREATE POLICY "Authenticated users can view global_stats"
-  ON global_stats FOR SELECT
-  USING (auth.role() = 'authenticated');
-
--- service_role のみ書き込み可能
-CREATE POLICY "Service role can manage global_stats"
-  ON global_stats FOR ALL
-  USING (auth.role() = 'service_role')
-  WITH CHECK (auth.role() = 'service_role');
+-- RLS は正本 20260315130001 で設定済み。スキップ。
 
 -- ============================================================
 -- 3. updated_at 自動更新トリガー
@@ -118,16 +62,16 @@ BEGIN
   WITH aggregated AS (
     SELECT
       l.user_id,
-      target_date AS stat_date,
+      target_date AS "date",
       COALESCE(SUM(l.duration_minutes), 0)::INTEGER AS total_minutes,
-      COUNT(*)::INTEGER AS session_count,
+      COUNT(*)::INTEGER AS log_count,
       COALESCE(
         jsonb_object_agg(
           COALESCE(c.name, 'その他'),
           cat_agg.cat_minutes
         ) FILTER (WHERE cat_agg.cat_minutes IS NOT NULL),
         '{}'::jsonb
-      ) AS categories
+      ) AS category_breakdown
     FROM logs l
     LEFT JOIN categories c ON l.category_id = c.id
     LEFT JOIN LATERAL (
@@ -140,14 +84,14 @@ BEGIN
     WHERE (l.started_at AT TIME ZONE 'Asia/Tokyo')::DATE = target_date
     GROUP BY l.user_id
   )
-  INSERT INTO daily_stats (user_id, stat_date, total_minutes, session_count, categories)
-  SELECT user_id, stat_date, total_minutes, session_count, categories
+  INSERT INTO daily_stats (user_id, "date", total_minutes, log_count, category_breakdown)
+  SELECT user_id, "date", total_minutes, log_count, category_breakdown
   FROM aggregated
-  ON CONFLICT (user_id, stat_date)
+  ON CONFLICT (user_id, "date")
   DO UPDATE SET
     total_minutes = EXCLUDED.total_minutes,
-    session_count = EXCLUDED.session_count,
-    categories = EXCLUDED.categories,
+    log_count = EXCLUDED.log_count,
+    category_breakdown = EXCLUDED.category_breakdown,
     updated_at = timezone('utc'::text, now());
 
   GET DIAGNOSTICS affected_rows = ROW_COUNT;
