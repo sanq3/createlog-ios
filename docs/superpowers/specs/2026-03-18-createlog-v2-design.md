@@ -456,3 +456,123 @@ NetworkClient（プロトコル）
 ## 補足: ウィジェット対応
 
 App Groupsを初期から設定し、将来的にロック画面ウィジェット（今日の作業時間、ストリーク等）を追加できる設計にしておく。
+
+---
+
+## 実装前に必要なDB修正
+
+### Critical
+
+1. **postsテーブルのマイグレーション統合**: `20260315150000`と`20260316100000`でpostsテーブルの定義が競合している。カラム名不一致（`likes_count` vs `like_count`）、RLSポリシーの競合（visibility/block対応 vs `USING(true)`）を解消し、1つの正規定義に統合する。
+
+2. **commentsテーブルの作成**: MVPにコメント機能を含めるため、以下のテーブルを追加する。
+   - `id`, `post_id`, `user_id`, `content`, `parent_comment_id`（スレッド対応）, `created_at`, `updated_at`
+   - RLSポリシー（block対応）
+   - `posts`テーブルに`comments_count`カラムを追加し、トリガーで自動更新
+
+3. **通知タイプの拡張**: notificationsテーブルのCHECK制約に`mention`, `comment`, `repost`, `quote`タイプを追加。メンション抽出トリガーをハッシュタグ同様に実装する。
+
+### Important
+
+4. **スキーマドキュメント更新**: `/docs/supabase-schema.md`を全32マイグレーション分に更新する。
+
+5. **Edge Functions作成**: MVP用に以下を開発する。
+   - `send-push-notification` — APNsへのプッシュ通知送信
+   - `aggregate-heartbeats` — heartbeatデータの集計処理
+   - `process-image-upload` — アップロード画像のサーバーサイドリサイズ（3サイズ生成）
+
+6. **Storage Buckets定義**: Supabase Storageに以下のバケットとRLSポリシーを設定する。
+   - `avatars` — ユーザーアバター
+   - `post-images` — 投稿画像
+   - `app-screenshots` — アプリスクリーンショット
+
+7. **画像パイプライン修正**: クライアントで3サイズ生成ではなく、原寸1枚をアップロードし、Edge Functionでサーバーサイドリサイズする方式に変更。
+
+---
+
+## オンボーディングフロー
+
+1. 認証（Apple / Google / GitHub / Email）
+2. ハンドル選択（@username、一意性チェック）
+3. 表示名 + アバター設定
+4. 職業 / 経験年数（任意）
+5. 興味のあるカテゴリ選択
+6. 初回チュートリアル（主要機能のハイライト）
+7. `onboarding_completed = true` に更新
+
+ステップ4-6はスキップ可能。最低限ハンドルと表示名のみ必須。
+
+---
+
+## アクセシビリティ
+
+- VoiceOver: 全インタラクティブ要素にaccessibilityLabelを設定
+- Dynamic Type: 全テキストがユーザーの文字サイズ設定に追従
+- カラーコントラスト: モノトーンパレットでWCAG AA基準（4.5:1以上）を満たす
+- Reduce Motion: ユーザーが「視差効果を減らす」設定時、アニメーションを簡素化
+
+---
+
+## ディープリンク
+
+URLスキーム: `createlog://`
+
+| パス | 遷移先 |
+|---|---|
+| `createlog://post/{id}` | 投稿詳細 |
+| `createlog://profile/{handle}` | ユーザープロフィール |
+| `createlog://notifications` | 通知一覧 |
+| `createlog://record` | 記録画面 |
+
+Universal Links: `https://createlog.app/` 配下で同様のパスに対応。Associated Domainsを設定。
+
+---
+
+## アナリティクス & クラッシュレポート
+
+- Firebase Analytics — ユーザー行動トラッキング、機能利用率
+- Firebase Crashlytics — クラッシュレポート、ANR検出
+- プライバシー重視: 最小限のデータ収集、ATT対応
+
+---
+
+## エラーハンドリング
+
+| エラー種別 | 対応 |
+|---|---|
+| ネットワークエラー | 指数バックオフで最大3回リトライ。インラインバナーで通知 |
+| 認証エラー | トークンリフレッシュ試行 → 失敗時はログイン画面へ |
+| コンフリクト（オフラインキュー） | Last-Write-Wins方式。復帰時にサーバーの最新状態を優先 |
+| オフラインキューオーバーフロー | 最大100件保持。超過分は古い順に破棄し、ユーザーに通知 |
+| Supabase障害 | ローカルキャッシュで閲覧は継続。書き込みはキューに保持 |
+
+---
+
+## セキュリティ（修正）
+
+- Certificate Pinningは採用しない（Supabaseの証明書ローテーションでアプリが壊れるリスクがあるため）
+- 標準TLS検証 + App Transport Securityで十分なセキュリティを確保
+- その他のセキュリティ方針は変更なし（Keychain、RLS、SHA-256ハッシュ等）
+
+---
+
+## ステータス管理の方針
+
+ユーザーのリアルタイムステータス（作業中等）は、DBに保存する方式（現行の実装）を採用する。Supabase Presenceは使用しない。理由: シンプル、再接続時もステータスが保持される、自動クリアトリガーが既に実装済み。
+
+---
+
+## ページネーション仕様
+
+- ページサイズ: 20件
+- プリフェッチ閾値: 残り5件で次ページ取得
+- カーソルフィールド: `created_at`
+- ソート: `created_at DESC`
+
+---
+
+## プロフィールフィールド整理
+
+- `display_name` — UI上の表示名
+- `handle` — 一意の@メンション用ID
+- `nickname`は使用しない（`display_name`と重複するため非推奨）
