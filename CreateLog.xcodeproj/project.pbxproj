@@ -24,6 +24,14 @@
 		E27B955607502E236BE0BE7C /* ActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82DF86062926ACBE5D38E992 /* ActionButton.swift */; };
 		E4E796F17F98341C0F40953C /* GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00A16462AAD3E29CA6CF04C1 /* GlassCard.swift */; };
 		EA9C30EDFA3C4954BB00703D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5C5D4B286351E93137A67B3A /* Assets.xcassets */; };
+		AA0001017000000000000001 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002017000000000000001 /* HomeView.swift */; };
+		AA0001017000000000000002 /* RecordingTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002017000000000000002 /* RecordingTabView.swift */; };
+		AA0001017000000000000003 /* RecordingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002017000000000000003 /* RecordingView.swift */; };
+		AA0001017000000000000004 /* ReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002017000000000000004 /* ReportView.swift */; };
+		AA0001017000000000000005 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002017000000000000005 /* CalendarView.swift */; };
+		AA0001017000000000000006 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002017000000000000006 /* DiscoverView.swift */; };
+		AA0001017000000000000007 /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002017000000000000007 /* NotificationsView.swift */; };
+		AA0001017000000000000008 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002017000000000000008 /* ProfileView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +53,14 @@
 		D9FC98E178D3909AF5CC19A3 /* GlassModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassModifier.swift; sourceTree = "<group>"; };
 		E61E9548F5C764F2824639E5 /* PostCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCardView.swift; sourceTree = "<group>"; };
 		F9D59D1827DADE6CD635B5E4 /* AvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
+		AA0002017000000000000001 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		AA0002017000000000000002 /* RecordingTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingTabView.swift; sourceTree = "<group>"; };
+		AA0002017000000000000003 /* RecordingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingView.swift; sourceTree = "<group>"; };
+		AA0002017000000000000004 /* ReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportView.swift; sourceTree = "<group>"; };
+		AA0002017000000000000005 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
+		AA0002017000000000000006 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
+		AA0002017000000000000007 /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
+		AA0002017000000000000008 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -96,8 +112,56 @@
 		47F112AF9E986838EE239791 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				AA0003017000000000000001 /* Home */,
+				AA0003017000000000000002 /* Discover */,
+				AA0003017000000000000003 /* Recording */,
+				AA0003017000000000000004 /* Notifications */,
+				AA0003017000000000000005 /* Profile */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		AA0003017000000000000001 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				AA0002017000000000000001 /* HomeView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		AA0003017000000000000002 /* Discover */ = {
+			isa = PBXGroup;
+			children = (
+				AA0002017000000000000006 /* DiscoverView.swift */,
+			);
+			path = Discover;
+			sourceTree = "<group>";
+		};
+		AA0003017000000000000003 /* Recording */ = {
+			isa = PBXGroup;
+			children = (
+				AA0002017000000000000002 /* RecordingTabView.swift */,
+				AA0002017000000000000003 /* RecordingView.swift */,
+				AA0002017000000000000004 /* ReportView.swift */,
+				AA0002017000000000000005 /* CalendarView.swift */,
+			);
+			path = Recording;
+			sourceTree = "<group>";
+		};
+		AA0003017000000000000004 /* Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				AA0002017000000000000007 /* NotificationsView.swift */,
+			);
+			path = Notifications;
+			sourceTree = "<group>";
+		};
+		AA0003017000000000000005 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				AA0002017000000000000008 /* ProfileView.swift */,
+			);
+			path = Profile;
 			sourceTree = "<group>";
 		};
 		ADB9452F66A5F1DC46673E2A /* CreateLog */ = {
@@ -203,6 +267,14 @@
 				C588F5467A90BC3F0AB00728 /* StreakCard.swift in Sources */,
 				036F36B32785FD1DC98D5C1E /* Typography.swift in Sources */,
 				E0C9CEC6DC31A6E68734DA60 /* WeeklyChart.swift in Sources */,
+				AA0001017000000000000001 /* HomeView.swift in Sources */,
+				AA0001017000000000000002 /* RecordingTabView.swift in Sources */,
+				AA0001017000000000000003 /* RecordingView.swift in Sources */,
+				AA0001017000000000000004 /* ReportView.swift in Sources */,
+				AA0001017000000000000005 /* CalendarView.swift in Sources */,
+				AA0001017000000000000006 /* DiscoverView.swift in Sources */,
+				AA0001017000000000000007 /* NotificationsView.swift in Sources */,
+				AA0001017000000000000008 /* ProfileView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
