@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>つくろぐ v2.0 - UIスタイル比較</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0a; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; padding: 40px; }
+  h1 { text-align: center; font-size: 28px; margin-bottom: 10px; }
+  .subtitle { text-align: center; color: #888; margin-bottom: 50px; font-size: 14px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 900px; margin: 0 auto; }
+  .label { text-align: center; font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .label-desc { text-align: center; font-size: 12px; color: #888; margin-bottom: 16px; }
+
+  /* iPhone frame */
+  .phone { width: 375px; height: 680px; margin: 0 auto; border-radius: 40px; overflow: hidden; position: relative; border: 3px solid #333; }
+
+  /* ===== STYLE A: Standard Dark ===== */
+  .style-a { background: #1c1c1e; }
+  .style-a .header { padding: 60px 20px 16px; }
+  .style-a .header h2 { font-size: 28px; font-weight: 700; }
+  .style-a .header p { color: #8e8e93; font-size: 13px; margin-top: 4px; }
+  .style-a .stats-row { display: flex; gap: 10px; padding: 0 20px; margin-top: 16px; }
+  .style-a .stat-card { flex: 1; background: #2c2c2e; border-radius: 12px; padding: 14px; }
+  .style-a .stat-card .num { font-size: 24px; font-weight: 700; }
+  .style-a .stat-card .lbl { font-size: 11px; color: #8e8e93; margin-top: 2px; }
+  .style-a .chart-area { margin: 16px 20px; background: #2c2c2e; border-radius: 12px; padding: 16px; height: 180px; display: flex; align-items: flex-end; gap: 8px; }
+  .style-a .bar { flex: 1; background: #0a84ff; border-radius: 4px; transition: height 0.3s; }
+  .style-a .tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: #1c1c1e; border-top: 1px solid #333; display: flex; align-items: center; justify-content: space-around; padding-bottom: 16px; }
+  .style-a .tab-item { font-size: 10px; color: #8e8e93; text-align: center; }
+  .style-a .tab-item.active { color: #0a84ff; }
+  .style-a .tab-dot { width: 24px; height: 24px; border-radius: 50%; background: #2c2c2e; margin: 0 auto 4px; }
+  .style-a .tab-item.active .tab-dot { background: #0a84ff; }
+
+  /* ===== STYLE B: Glassmorphism ===== */
+  .style-b { background: linear-gradient(145deg, #0f0c29, #302b63, #24243e); overflow: hidden; }
+  .style-b::before { content: ''; position: absolute; width: 200px; height: 200px; background: rgba(138, 43, 226, 0.4); border-radius: 50%; top: -40px; right: -40px; filter: blur(60px); }
+  .style-b::after { content: ''; position: absolute; width: 160px; height: 160px; background: rgba(0, 200, 255, 0.3); border-radius: 50%; bottom: 100px; left: -30px; filter: blur(50px); }
+  .style-b .header { padding: 60px 20px 16px; position: relative; z-index: 1; }
+  .style-b .header h2 { font-size: 28px; font-weight: 700; }
+  .style-b .header p { color: rgba(255,255,255,0.5); font-size: 13px; margin-top: 4px; }
+  .style-b .stats-row { display: flex; gap: 10px; padding: 0 20px; margin-top: 16px; position: relative; z-index: 1; }
+  .style-b .stat-card { flex: 1; background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 16px; padding: 14px; border: 1px solid rgba(255,255,255,0.1); }
+  .style-b .stat-card .num { font-size: 24px; font-weight: 700; }
+  .style-b .stat-card .lbl { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+  .style-b .chart-area { margin: 16px 20px; background: rgba(255,255,255,0.06); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 16px; padding: 16px; height: 180px; display: flex; align-items: flex-end; gap: 8px; position: relative; z-index: 1; border: 1px solid rgba(255,255,255,0.08); }
+  .style-b .bar { flex: 1; background: linear-gradient(180deg, #a78bfa, #6d28d9); border-radius: 6px; }
+  .style-b .tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: rgba(0,0,0,0.3); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-around; padding-bottom: 16px; z-index: 2; }
+  .style-b .tab-item { font-size: 10px; color: rgba(255,255,255,0.4); text-align: center; }
+  .style-b .tab-item.active { color: #a78bfa; }
+  .style-b .tab-dot { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.1); margin: 0 auto 4px; }
+  .style-b .tab-item.active .tab-dot { background: linear-gradient(135deg, #a78bfa, #6d28d9); box-shadow: 0 0 12px rgba(167, 139, 250, 0.5); }
+
+  /* ===== STYLE C: Neon Cyber ===== */
+  .style-c { background: #0a0a0f; overflow: hidden; }
+  .style-c::before { content: ''; position: absolute; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(0,255,200,0.03) 40px, rgba(0,255,200,0.03) 41px); z-index: 0; }
+  .style-c .header { padding: 60px 20px 16px; position: relative; z-index: 1; }
+  .style-c .header h2 { font-size: 28px; font-weight: 700; background: linear-gradient(90deg, #00ffc8, #00b4d8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .style-c .header p { color: #00ffc877; font-size: 13px; margin-top: 4px; }
+  .style-c .stats-row { display: flex; gap: 10px; padding: 0 20px; margin-top: 16px; position: relative; z-index: 1; }
+  .style-c .stat-card { flex: 1; background: rgba(0,255,200,0.05); border-radius: 12px; padding: 14px; border: 1px solid rgba(0,255,200,0.15); }
+  .style-c .stat-card .num { font-size: 24px; font-weight: 700; color: #00ffc8; text-shadow: 0 0 10px rgba(0,255,200,0.3); }
+  .style-c .stat-card .lbl { font-size: 11px; color: rgba(0,255,200,0.4); margin-top: 2px; }
+  .style-c .chart-area { margin: 16px 20px; background: rgba(0,255,200,0.03); border-radius: 12px; padding: 16px; height: 180px; display: flex; align-items: flex-end; gap: 8px; position: relative; z-index: 1; border: 1px solid rgba(0,255,200,0.1); }
+  .style-c .bar { flex: 1; background: linear-gradient(180deg, #00ffc8, #006b5a); border-radius: 4px; box-shadow: 0 0 8px rgba(0,255,200,0.3); }
+  .style-c .tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: #0a0a0f; border-top: 1px solid rgba(0,255,200,0.15); display: flex; align-items: center; justify-content: space-around; padding-bottom: 16px; z-index: 2; }
+  .style-c .tab-item { font-size: 10px; color: rgba(0,255,200,0.3); text-align: center; }
+  .style-c .tab-item.active { color: #00ffc8; text-shadow: 0 0 8px rgba(0,255,200,0.5); }
+  .style-c .tab-dot { width: 24px; height: 24px; border-radius: 50%; background: rgba(0,255,200,0.08); margin: 0 auto 4px; }
+  .style-c .tab-item.active .tab-dot { background: #00ffc8; box-shadow: 0 0 12px rgba(0,255,200,0.6); }
+
+  /* ===== STYLE D: 3D Immersive ===== */
+  .style-d { background: #0c0c14; overflow: hidden; }
+  .style-d .bg-orb { position: absolute; border-radius: 50%; filter: blur(40px); animation: float 6s ease-in-out infinite; }
+  .style-d .orb1 { width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,100,50,0.5), transparent); top: 20px; right: -20px; }
+  .style-d .orb2 { width: 140px; height: 140px; background: radial-gradient(circle, rgba(120,80,255,0.4), transparent); bottom: 140px; left: -20px; animation-delay: -3s; }
+  .style-d .orb3 { width: 100px; height: 100px; background: radial-gradient(circle, rgba(255,200,0,0.3), transparent); top: 280px; right: 60px; animation-delay: -1.5s; }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+  .style-d .header { padding: 60px 20px 16px; position: relative; z-index: 1; }
+  .style-d .header h2 { font-size: 28px; font-weight: 800; background: linear-gradient(135deg, #ff6432, #ff9f43, #ffd700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .style-d .header p { color: rgba(255,255,255,0.4); font-size: 13px; margin-top: 4px; }
+  .style-d .stats-row { display: flex; gap: 10px; padding: 0 20px; margin-top: 16px; position: relative; z-index: 1; }
+  .style-d .stat-card { flex: 1; background: rgba(255,255,255,0.05); border-radius: 20px; padding: 14px; border: 1px solid rgba(255,255,255,0.08); position: relative; overflow: hidden; }
+  .style-d .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #ff6432, #ffd700); }
+  .style-d .stat-card .num { font-size: 24px; font-weight: 800; background: linear-gradient(135deg, #fff, #ffd700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .style-d .stat-card .lbl { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+  .style-d .chart-area { margin: 16px 20px; background: rgba(255,255,255,0.03); border-radius: 20px; padding: 16px; height: 180px; display: flex; align-items: flex-end; gap: 8px; position: relative; z-index: 1; border: 1px solid rgba(255,255,255,0.06); }
+  .style-d .bar { flex: 1; background: linear-gradient(180deg, #ff6432, #ff9f43); border-radius: 8px; box-shadow: 0 4px 15px rgba(255,100,50,0.3); }
+  .style-d .tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: rgba(12,12,20,0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-around; padding-bottom: 16px; z-index: 2; }
+  .style-d .tab-item { font-size: 10px; color: rgba(255,255,255,0.3); text-align: center; }
+  .style-d .tab-item.active { color: #ff9f43; }
+  .style-d .tab-dot { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.06); margin: 0 auto 4px; }
+  .style-d .tab-item.active .tab-dot { background: linear-gradient(135deg, #ff6432, #ffd700); box-shadow: 0 0 16px rgba(255,100,50,0.5); }
+
+  /* Animation for bars */
+  .phone:hover .bar { animation: growBar 1s ease-out forwards; }
+  @keyframes growBar { from { transform: scaleY(0); transform-origin: bottom; } to { transform: scaleY(1); transform-origin: bottom; } }
+</style>
+</head>
+<body>
+
+<h1>つくろぐ v2.0 — UIスタイル比較</h1>
+<p class="subtitle">各スマホにマウスを乗せるとバーが動きます</p>
+
+<div class="grid">
+
+  <!-- Style A: Standard Dark -->
+  <div>
+    <div class="label">A: スタンダードダーク</div>
+    <div class="label-desc">シンプル・見やすい・Apple標準に近い</div>
+    <div class="phone style-a">
+      <div class="header">
+        <h2>ダッシュボード</h2>
+        <p>今日もコードを書こう</p>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="num">4.5h</div><div class="lbl">今日</div></div>
+        <div class="stat-card"><div class="num">28h</div><div class="lbl">今週</div></div>
+        <div class="stat-card"><div class="num">12</div><div class="lbl">連続日</div></div>
+      </div>
+      <div class="chart-area">
+        <div class="bar" style="height:40%"></div><div class="bar" style="height:65%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:85%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:45%"></div><div class="bar" style="height:90%"></div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item active"><div class="tab-dot"></div>ホーム</div>
+        <div class="tab-item"><div class="tab-dot"></div>記録</div>
+        <div class="tab-item"><div class="tab-dot"></div>SNS</div>
+        <div class="tab-item"><div class="tab-dot"></div>設定</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Style B: Glassmorphism -->
+  <div>
+    <div class="label">B: グラスモーフィズム</div>
+    <div class="label-desc">ぼかしガラス・奥行き感・モダン</div>
+    <div class="phone style-b">
+      <div class="header">
+        <h2>ダッシュボード</h2>
+        <p>今日もコードを書こう</p>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="num">4.5h</div><div class="lbl">今日</div></div>
+        <div class="stat-card"><div class="num">28h</div><div class="lbl">今週</div></div>
+        <div class="stat-card"><div class="num">12</div><div class="lbl">連続日</div></div>
+      </div>
+      <div class="chart-area">
+        <div class="bar" style="height:40%"></div><div class="bar" style="height:65%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:85%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:45%"></div><div class="bar" style="height:90%"></div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item active"><div class="tab-dot"></div>ホーム</div>
+        <div class="tab-item"><div class="tab-dot"></div>記録</div>
+        <div class="tab-item"><div class="tab-dot"></div>SNS</div>
+        <div class="tab-item"><div class="tab-dot"></div>設定</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Style C: Neon Cyber -->
+  <div>
+    <div class="label">C: ネオンサイバー</div>
+    <div class="label-desc">発光・グリッド・ハッカー感・エンジニアっぽい</div>
+    <div class="phone style-c">
+      <div class="header">
+        <h2>ダッシュボード</h2>
+        <p>今日もコードを書こう</p>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="num">4.5h</div><div class="lbl">今日</div></div>
+        <div class="stat-card"><div class="num">28h</div><div class="lbl">今週</div></div>
+        <div class="stat-card"><div class="num">12</div><div class="lbl">連続日</div></div>
+      </div>
+      <div class="chart-area">
+        <div class="bar" style="height:40%"></div><div class="bar" style="height:65%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:85%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:45%"></div><div class="bar" style="height:90%"></div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item active"><div class="tab-dot"></div>ホーム</div>
+        <div class="tab-item"><div class="tab-dot"></div>記録</div>
+        <div class="tab-item"><div class="tab-dot"></div>SNS</div>
+        <div class="tab-item"><div class="tab-dot"></div>設定</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Style D: 3D Immersive -->
+  <div>
+    <div class="label">D: 3Dイマーシブ</div>
+    <div class="label-desc">浮遊オーブ・グラデーション・映像的・ワクワク感</div>
+    <div class="phone style-d">
+      <div class="bg-orb orb1"></div>
+      <div class="bg-orb orb2"></div>
+      <div class="bg-orb orb3"></div>
+      <div class="header">
+        <h2>ダッシュボード</h2>
+        <p>今日もコードを書こう</p>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="num">4.5h</div><div class="lbl">今日</div></div>
+        <div class="stat-card"><div class="num">28h</div><div class="lbl">今週</div></div>
+        <div class="stat-card"><div class="num">12</div><div class="lbl">連続日</div></div>
+      </div>
+      <div class="chart-area">
+        <div class="bar" style="height:40%"></div><div class="bar" style="height:65%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:85%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:45%"></div><div class="bar" style="height:90%"></div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item active"><div class="tab-dot"></div>ホーム</div>
+        <div class="tab-item"><div class="tab-dot"></div>記録</div>
+        <div class="tab-item"><div class="tab-dot"></div>SNS</div>
+        <div class="tab-item"><div class="tab-dot"></div>設定</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

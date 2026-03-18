@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>つくろぐ v2.0 - カラー比較（AI感なし）</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0a; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; padding: 40px; }
+  h1 { text-align: center; font-size: 24px; margin-bottom: 6px; }
+  .subtitle { text-align: center; color: #888; margin-bottom: 40px; font-size: 13px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; max-width: 1200px; margin: 0 auto; }
+  .label { text-align: center; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .label-desc { text-align: center; font-size: 11px; color: #888; margin-bottom: 14px; line-height: 1.5; }
+
+  .phone { width: 320px; height: 620px; margin: 0 auto; border-radius: 36px; overflow: hidden; position: relative; border: 3px solid #333; }
+
+  /* Shared glassmorphism + animation base */
+  .phone .bg-orb { position: absolute; border-radius: 50%; filter: blur(45px); animation: float 6s ease-in-out infinite; }
+  @keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-18px) scale(1.05); } }
+  .phone .header { padding: 54px 18px 14px; position: relative; z-index: 1; }
+  .phone .header h2 { font-size: 24px; font-weight: 800; }
+  .phone .header p { font-size: 12px; margin-top: 3px; }
+  .phone .stats-row { display: flex; gap: 8px; padding: 0 18px; margin-top: 14px; position: relative; z-index: 1; }
+  .phone .stat-card { flex: 1; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 16px; padding: 12px; }
+  .phone .stat-card .num { font-size: 22px; font-weight: 800; }
+  .phone .stat-card .lbl { font-size: 10px; margin-top: 2px; }
+  .phone .chart-area { margin: 14px 18px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 16px; padding: 14px; height: 160px; display: flex; align-items: flex-end; gap: 6px; position: relative; z-index: 1; }
+  .phone .bar { flex: 1; border-radius: 6px; }
+  .phone .tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 74px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: space-around; padding-bottom: 14px; z-index: 2; }
+  .phone .tab-item { font-size: 9px; text-align: center; }
+  .phone .tab-dot { width: 22px; height: 22px; border-radius: 50%; margin: 0 auto 3px; }
+
+  /* ===== 1: ウォームアンバー ===== */
+  .warm { background: #0f0d0a; }
+  .warm .orb1 { width: 160px; height: 160px; background: radial-gradient(circle, rgba(255,160,50,0.4), transparent); top: 10px; right: -30px; }
+  .warm .orb2 { width: 130px; height: 130px; background: radial-gradient(circle, rgba(200,120,30,0.3), transparent); bottom: 130px; left: -20px; animation-delay: -3s; }
+  .warm .orb3 { width: 90px; height: 90px; background: radial-gradient(circle, rgba(255,200,100,0.25), transparent); top: 260px; right: 50px; animation-delay: -1.5s; }
+  .warm .header h2 { background: linear-gradient(135deg, #ffb347, #ff8c00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .warm .header p { color: rgba(255,180,80,0.4); }
+  .warm .stat-card { background: rgba(255,160,50,0.08); border: 1px solid rgba(255,160,50,0.12); }
+  .warm .stat-card .num { color: #ffb347; }
+  .warm .stat-card .lbl { color: rgba(255,180,80,0.4); }
+  .warm .chart-area { background: rgba(255,160,50,0.05); border: 1px solid rgba(255,160,50,0.08); }
+  .warm .bar { background: linear-gradient(180deg, #ffb347, #cc7000); box-shadow: 0 3px 10px rgba(255,160,50,0.25); }
+  .warm .tab-bar { background: rgba(15,13,10,0.85); border-top: 1px solid rgba(255,160,50,0.1); }
+  .warm .tab-item { color: rgba(255,180,80,0.3); }
+  .warm .tab-item.active { color: #ffb347; }
+  .warm .tab-dot { background: rgba(255,160,50,0.08); }
+  .warm .tab-item.active .tab-dot { background: linear-gradient(135deg, #ffb347, #ff8c00); box-shadow: 0 0 12px rgba(255,160,50,0.4); }
+
+  /* ===== 2: オーシャンティール ===== */
+  .ocean { background: #080f12; }
+  .ocean .orb1 { width: 160px; height: 160px; background: radial-gradient(circle, rgba(0,180,160,0.35), transparent); top: 10px; right: -30px; }
+  .ocean .orb2 { width: 130px; height: 130px; background: radial-gradient(circle, rgba(0,140,130,0.25), transparent); bottom: 130px; left: -20px; animation-delay: -3s; }
+  .ocean .orb3 { width: 90px; height: 90px; background: radial-gradient(circle, rgba(100,220,200,0.2), transparent); top: 260px; right: 50px; animation-delay: -1.5s; }
+  .ocean .header h2 { background: linear-gradient(135deg, #5ce0d2, #2aa89a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .ocean .header p { color: rgba(92,224,210,0.4); }
+  .ocean .stat-card { background: rgba(0,180,160,0.07); border: 1px solid rgba(0,180,160,0.12); }
+  .ocean .stat-card .num { color: #5ce0d2; }
+  .ocean .stat-card .lbl { color: rgba(92,224,210,0.4); }
+  .ocean .chart-area { background: rgba(0,180,160,0.04); border: 1px solid rgba(0,180,160,0.08); }
+  .ocean .bar { background: linear-gradient(180deg, #5ce0d2, #1a7a70); box-shadow: 0 3px 10px rgba(0,180,160,0.2); }
+  .ocean .tab-bar { background: rgba(8,15,18,0.85); border-top: 1px solid rgba(0,180,160,0.1); }
+  .ocean .tab-item { color: rgba(92,224,210,0.3); }
+  .ocean .tab-item.active { color: #5ce0d2; }
+  .ocean .tab-dot { background: rgba(0,180,160,0.08); }
+  .ocean .tab-item.active .tab-dot { background: linear-gradient(135deg, #5ce0d2, #2aa89a); box-shadow: 0 0 12px rgba(92,224,210,0.4); }
+
+  /* ===== 3: ミッドナイトローズ ===== */
+  .rose { background: #100a0d; }
+  .rose .orb1 { width: 160px; height: 160px; background: radial-gradient(circle, rgba(220,80,100,0.35), transparent); top: 10px; right: -30px; }
+  .rose .orb2 { width: 130px; height: 130px; background: radial-gradient(circle, rgba(180,60,90,0.25), transparent); bottom: 130px; left: -20px; animation-delay: -3s; }
+  .rose .orb3 { width: 90px; height: 90px; background: radial-gradient(circle, rgba(255,140,160,0.2), transparent); top: 260px; right: 50px; animation-delay: -1.5s; }
+  .rose .header h2 { background: linear-gradient(135deg, #ff8fa3, #d63864); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .rose .header p { color: rgba(255,143,163,0.4); }
+  .rose .stat-card { background: rgba(220,80,100,0.07); border: 1px solid rgba(220,80,100,0.12); }
+  .rose .stat-card .num { color: #ff8fa3; }
+  .rose .stat-card .lbl { color: rgba(255,143,163,0.4); }
+  .rose .chart-area { background: rgba(220,80,100,0.04); border: 1px solid rgba(220,80,100,0.08); }
+  .rose .bar { background: linear-gradient(180deg, #ff8fa3, #a82848); box-shadow: 0 3px 10px rgba(220,80,100,0.25); }
+  .rose .tab-bar { background: rgba(16,10,13,0.85); border-top: 1px solid rgba(220,80,100,0.1); }
+  .rose .tab-item { color: rgba(255,143,163,0.3); }
+  .rose .tab-item.active { color: #ff8fa3; }
+  .rose .tab-dot { background: rgba(220,80,100,0.08); }
+  .rose .tab-item.active .tab-dot { background: linear-gradient(135deg, #ff8fa3, #d63864); box-shadow: 0 0 12px rgba(255,143,163,0.4); }
+
+  /* ===== 4: アーバングレー ===== */
+  .urban { background: #0e0e10; }
+  .urban .orb1 { width: 160px; height: 160px; background: radial-gradient(circle, rgba(180,180,200,0.2), transparent); top: 10px; right: -30px; }
+  .urban .orb2 { width: 130px; height: 130px; background: radial-gradient(circle, rgba(140,140,170,0.15), transparent); bottom: 130px; left: -20px; animation-delay: -3s; }
+  .urban .orb3 { width: 90px; height: 90px; background: radial-gradient(circle, rgba(220,220,240,0.12), transparent); top: 260px; right: 50px; animation-delay: -1.5s; }
+  .urban .header h2 { background: linear-gradient(135deg, #e8e8f0, #a0a0b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .urban .header p { color: rgba(200,200,220,0.35); }
+  .urban .stat-card { background: rgba(200,200,220,0.06); border: 1px solid rgba(200,200,220,0.1); }
+  .urban .stat-card .num { color: #e0e0ec; }
+  .urban .stat-card .lbl { color: rgba(200,200,220,0.35); }
+  .urban .chart-area { background: rgba(200,200,220,0.04); border: 1px solid rgba(200,200,220,0.07); }
+  .urban .bar { background: linear-gradient(180deg, #d0d0e0, #6a6a80); box-shadow: 0 3px 10px rgba(180,180,200,0.15); }
+  .urban .tab-bar { background: rgba(14,14,16,0.85); border-top: 1px solid rgba(200,200,220,0.08); }
+  .urban .tab-item { color: rgba(200,200,220,0.25); }
+  .urban .tab-item.active { color: #d0d0e0; }
+  .urban .tab-dot { background: rgba(200,200,220,0.06); }
+  .urban .tab-item.active .tab-dot { background: linear-gradient(135deg, #d0d0e0, #8888a0); box-shadow: 0 0 10px rgba(200,200,220,0.25); }
+
+  /* ===== 5: フォレストグリーン ===== */
+  .forest { background: #0a0f0a; }
+  .forest .orb1 { width: 160px; height: 160px; background: radial-gradient(circle, rgba(80,180,80,0.3), transparent); top: 10px; right: -30px; }
+  .forest .orb2 { width: 130px; height: 130px; background: radial-gradient(circle, rgba(60,140,60,0.2), transparent); bottom: 130px; left: -20px; animation-delay: -3s; }
+  .forest .orb3 { width: 90px; height: 90px; background: radial-gradient(circle, rgba(140,220,100,0.18), transparent); top: 260px; right: 50px; animation-delay: -1.5s; }
+  .forest .header h2 { background: linear-gradient(135deg, #7dda58, #3a9e2c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .forest .header p { color: rgba(125,218,88,0.4); }
+  .forest .stat-card { background: rgba(80,180,80,0.06); border: 1px solid rgba(80,180,80,0.1); }
+  .forest .stat-card .num { color: #7dda58; }
+  .forest .stat-card .lbl { color: rgba(125,218,88,0.35); }
+  .forest .chart-area { background: rgba(80,180,80,0.04); border: 1px solid rgba(80,180,80,0.07); }
+  .forest .bar { background: linear-gradient(180deg, #7dda58, #2a7a1e); box-shadow: 0 3px 10px rgba(80,180,80,0.2); }
+  .forest .tab-bar { background: rgba(10,15,10,0.85); border-top: 1px solid rgba(80,180,80,0.08); }
+  .forest .tab-item { color: rgba(125,218,88,0.3); }
+  .forest .tab-item.active { color: #7dda58; }
+  .forest .tab-dot { background: rgba(80,180,80,0.06); }
+  .forest .tab-item.active .tab-dot { background: linear-gradient(135deg, #7dda58, #3a9e2c); box-shadow: 0 0 12px rgba(125,218,88,0.35); }
+
+  /* ===== 6: サンセットコーラル ===== */
+  .sunset { background: #100c0a; }
+  .sunset .orb1 { width: 160px; height: 160px; background: radial-gradient(circle, rgba(255,120,80,0.35), transparent); top: 10px; right: -30px; }
+  .sunset .orb2 { width: 130px; height: 130px; background: radial-gradient(circle, rgba(255,80,120,0.2), transparent); bottom: 130px; left: -20px; animation-delay: -3s; }
+  .sunset .orb3 { width: 90px; height: 90px; background: radial-gradient(circle, rgba(255,180,60,0.22), transparent); top: 260px; right: 50px; animation-delay: -1.5s; }
+  .sunset .header h2 { background: linear-gradient(135deg, #ff8a65, #ff5252); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .sunset .header p { color: rgba(255,138,101,0.4); }
+  .sunset .stat-card { background: rgba(255,120,80,0.07); border: 1px solid rgba(255,120,80,0.12); }
+  .sunset .stat-card .num { color: #ff8a65; }
+  .sunset .stat-card .lbl { color: rgba(255,138,101,0.35); }
+  .sunset .chart-area { background: rgba(255,120,80,0.04); border: 1px solid rgba(255,120,80,0.08); }
+  .sunset .bar { background: linear-gradient(180deg, #ff8a65, #c43e00); box-shadow: 0 3px 10px rgba(255,120,80,0.25); }
+  .sunset .tab-bar { background: rgba(16,12,10,0.85); border-top: 1px solid rgba(255,120,80,0.1); }
+  .sunset .tab-item { color: rgba(255,138,101,0.3); }
+  .sunset .tab-item.active { color: #ff8a65; }
+  .sunset .tab-dot { background: rgba(255,120,80,0.08); }
+  .sunset .tab-item.active .tab-dot { background: linear-gradient(135deg, #ff8a65, #ff5252); box-shadow: 0 0 12px rgba(255,138,101,0.4); }
+
+</style>
+</head>
+<body>
+
+<h1>カラーパレット比較 — AI感なし × グラス × アニメーション</h1>
+<p class="subtitle">全て同じグラスモーフィズム + 浮遊オーブの構成で、色だけ変えています</p>
+
+<div class="grid">
+
+  <!-- 1: Warm Amber -->
+  <div>
+    <div class="label">1: ウォームアンバー</div>
+    <div class="label-desc">温かみ・クラフト感・夜カフェ<br>落ち着いてて高級感がある</div>
+    <div class="phone warm">
+      <div class="bg-orb orb1"></div><div class="bg-orb orb2"></div><div class="bg-orb orb3"></div>
+      <div class="header"><h2>ダッシュボード</h2><p>今日もコードを書こう</p></div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="num">4.5h</div><div class="lbl">今日</div></div>
+        <div class="stat-card"><div class="num">28h</div><div class="lbl">今週</div></div>
+        <div class="stat-card"><div class="num">12</div><div class="lbl">連続日</div></div>
+      </div>
+      <div class="chart-area">
+        <div class="bar" style="height:40%"></div><div class="bar" style="height:65%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:85%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:45%"></div><div class="bar" style="height:90%"></div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item active"><div class="tab-dot"></div>ホーム</div>
+        <div class="tab-item"><div class="tab-dot"></div>記録</div>
+        <div class="tab-item"><div class="tab-dot"></div>SNS</div>
+        <div class="tab-item"><div class="tab-dot"></div>設定</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2: Ocean Teal -->
+  <div>
+    <div class="label">2: オーシャンティール</div>
+    <div class="label-desc">清潔感・集中・深海<br>エンジニアっぽいけどAIっぽくない</div>
+    <div class="phone ocean">
+      <div class="bg-orb orb1"></div><div class="bg-orb orb2"></div><div class="bg-orb orb3"></div>
+      <div class="header"><h2>ダッシュボード</h2><p>今日もコードを書こう</p></div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="num">4.5h</div><div class="lbl">今日</div></div>
+        <div class="stat-card"><div class="num">28h</div><div class="lbl">今週</div></div>
+        <div class="stat-card"><div class="num">12</div><div class="lbl">連続日</div></div>
+      </div>
+      <div class="chart-area">
+        <div class="bar" style="height:40%"></div><div class="bar" style="height:65%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:85%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:45%"></div><div class="bar" style="height:90%"></div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item active"><div class="tab-dot"></div>ホーム</div>
+        <div class="tab-item"><div class="tab-dot"></div>記録</div>
+        <div class="tab-item"><div class="tab-dot"></div>SNS</div>
+        <div class="tab-item"><div class="tab-dot"></div>設定</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3: Midnight Rose -->
+  <div>
+    <div class="label">3: ミッドナイトローズ</div>
+    <div class="label-desc">大胆・情熱的・個性的<br>他のアプリと差別化しやすい</div>
+    <div class="phone rose">
+      <div class="bg-orb orb1"></div><div class="bg-orb orb2"></div><div class="bg-orb orb3"></div>
+      <div class="header"><h2>ダッシュボード</h2><p>今日もコードを書こう</p></div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="num">4.5h</div><div class="lbl">今日</div></div>
+        <div class="stat-card"><div class="num">28h</div><div class="lbl">今週</div></div>
+        <div class="stat-card"><div class="num">12</div><div class="lbl">連続日</div></div>
+      </div>
+      <div class="chart-area">
+        <div class="bar" style="height:40%"></div><div class="bar" style="height:65%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:85%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:45%"></div><div class="bar" style="height:90%"></div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item active"><div class="tab-dot"></div>ホーム</div>
+        <div class="tab-item"><div class="tab-dot"></div>記録</div>
+        <div class="tab-item"><div class="tab-dot"></div>SNS</div>
+        <div class="tab-item"><div class="tab-dot"></div>設定</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4: Urban Grey -->
+  <div>
+    <div class="label">4: アーバングレー</div>
+    <div class="label-desc">モノトーン・洗練・Apple的<br>色に頼らず質感で魅せる</div>
+    <div class="phone urban">
+      <div class="bg-orb orb1"></div><div class="bg-orb orb2"></div><div class="bg-orb orb3"></div>
+      <div class="header"><h2>ダッシュボード</h2><p>今日もコードを書こう</p></div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="num">4.5h</div><div class="lbl">今日</div></div>
+        <div class="stat-card"><div class="num">28h</div><div class="lbl">今週</div></div>
+        <div class="stat-card"><div class="num">12</div><div class="lbl">連続日</div></div>
+      </div>
+      <div class="chart-area">
+        <div class="bar" style="height:40%"></div><div class="bar" style="height:65%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:85%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:45%"></div><div class="bar" style="height:90%"></div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item active"><div class="tab-dot"></div>ホーム</div>
+        <div class="tab-item"><div class="tab-dot"></div>記録</div>
+        <div class="tab-item"><div class="tab-dot"></div>SNS</div>
+        <div class="tab-item"><div class="tab-dot"></div>設定</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5: Forest Green -->
+  <div>
+    <div class="label">5: フォレストグリーン</div>
+    <div class="label-desc">自然・成長・GitHubっぽさ<br>コントリビューション感</div>
+    <div class="phone forest">
+      <div class="bg-orb orb1"></div><div class="bg-orb orb2"></div><div class="bg-orb orb3"></div>
+      <div class="header"><h2>ダッシュボード</h2><p>今日もコードを書こう</p></div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="num">4.5h</div><div class="lbl">今日</div></div>
+        <div class="stat-card"><div class="num">28h</div><div class="lbl">今週</div></div>
+        <div class="stat-card"><div class="num">12</div><div class="lbl">連続日</div></div>
+      </div>
+      <div class="chart-area">
+        <div class="bar" style="height:40%"></div><div class="bar" style="height:65%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:85%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:45%"></div><div class="bar" style="height:90%"></div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item active"><div class="tab-dot"></div>ホーム</div>
+        <div class="tab-item"><div class="tab-dot"></div>記録</div>
+        <div class="tab-item"><div class="tab-dot"></div>SNS</div>
+        <div class="tab-item"><div class="tab-dot"></div>設定</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6: Sunset Coral -->
+  <div>
+    <div class="label">6: サンセットコーラル</div>
+    <div class="label-desc">エネルギッシュ・夕焼け・活力<br>ゲーミフィケーションに合う</div>
+    <div class="phone sunset">
+      <div class="bg-orb orb1"></div><div class="bg-orb orb2"></div><div class="bg-orb orb3"></div>
+      <div class="header"><h2>ダッシュボード</h2><p>今日もコードを書こう</p></div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="num">4.5h</div><div class="lbl">今日</div></div>
+        <div class="stat-card"><div class="num">28h</div><div class="lbl">今週</div></div>
+        <div class="stat-card"><div class="num">12</div><div class="lbl">連続日</div></div>
+      </div>
+      <div class="chart-area">
+        <div class="bar" style="height:40%"></div><div class="bar" style="height:65%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:85%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:45%"></div><div class="bar" style="height:90%"></div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item active"><div class="tab-dot"></div>ホーム</div>
+        <div class="tab-item"><div class="tab-dot"></div>記録</div>
+        <div class="tab-item"><div class="tab-dot"></div>SNS</div>
+        <div class="tab-item"><div class="tab-dot"></div>設定</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

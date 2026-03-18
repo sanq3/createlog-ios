@@ -1,0 +1,19 @@
+{
+  "enabledPlugins": {
+    "superpowers@superpowers-marketplace": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "WebSearch",
+      "WebFetch",
+      "Agent"
+    ],
+    "defaultMode": "bypassPermissions"
+  }
+}

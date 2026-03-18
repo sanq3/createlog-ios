@@ -5,85 +5,92 @@ struct HomeView: View {
     @State private var posts = MockData.posts
 
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            ScrollView {
-                VStack(spacing: 0) {
-                    // Segment
-                    CLSegmentedControl(
-                        items: ["フォロー中", "おすすめ"],
-                        selection: $segmentIndex
-                    )
-                    .padding(.horizontal, 20)
-                    .padding(.top, 12)
+        ScrollView {
+            VStack(spacing: 0) {
+                CLSegmentedControl(
+                    items: ["タイムライン", "フォロー中"],
+                    selection: $segmentIndex
+                )
+                .padding(.horizontal, 20)
+                .padding(.top, 8)
 
-                    // Active now bar
-                    HStack(spacing: 10) {
-                        Circle()
-                            .fill(Color.clSuccess)
-                            .frame(width: 8, height: 8)
-                            .shadow(color: Color.clSuccess.opacity(0.5), radius: 4)
-                            .modifier(PulseModifier())
-
-                        Text("3人")
-                            .font(.clCaption)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(Color.clTextPrimary)
-                        + Text("が今作業中")
-                            .font(.clCaption)
-                            .foregroundStyle(Color.clTextSecondary)
-
-                        Spacer()
-
-                        Image(systemName: "eye")
-                            .font(.clCaption)
-                            .foregroundStyle(Color.clTextTertiary)
-                    }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background(Color.clSurfaceLow, in: RoundedRectangle(cornerRadius: 14))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(Color.clBorder, lineWidth: 1)
-                    )
-                    .padding(.horizontal, 20)
-                    .padding(.top, 14)
-
-                    // Feed
-                    LazyVStack(spacing: 0) {
-                        ForEach(Array(posts.enumerated()), id: \.element.id) { index, post in
-                            PostCardView(post: post)
-
-                            if index < posts.count - 1 {
-                                Divider()
-                                    .overlay(Color.clBorder)
-                                    .padding(.leading, 72)
-                            }
-                        }
-                    }
-                    .padding(.top, 6)
-
-                    Spacer(minLength: 100)
-                }
-            }
-            .scrollIndicators(.hidden)
-
-            // FAB
-            FloatingActionButton { }
-                .padding(.trailing, 20)
-                .padding(.bottom, 20)
-        }
-        .background(Color.clBackground)
-        .navigationTitle("つくろぐ")
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     HapticManager.light()
                 } label: {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundStyle(Color.clTextSecondary)
+                    HStack(spacing: 12) {
+                        HStack(spacing: -8) {
+                            ForEach(0..<3, id: \.self) { i in
+                                Circle()
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [
+                                                Color(hue: Double(i) * 0.3, saturation: 0.25, brightness: 0.55),
+                                                Color(hue: Double(i) * 0.3, saturation: 0.2, brightness: 0.4)
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .frame(width: 28, height: 28)
+                                    .overlay(Circle().strokeBorder(Color.clBackground, lineWidth: 2))
+                            }
+                        }
+
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text("3人が今作業中")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(Color.clTextPrimary)
+                            Text("タップして確認")
+                                .font(.system(size: 11))
+                                .foregroundStyle(Color.clTextTertiary)
+                        }
+
+                        Spacer()
+
+                        HStack(spacing: 5) {
+                            Circle()
+                                .fill(Color.clSuccess)
+                                .frame(width: 6, height: 6)
+                                .modifier(PulseModifier())
+                            Text("LIVE")
+                                .font(.system(size: 10, weight: .heavy, design: .monospaced))
+                                .foregroundStyle(Color.clSuccess)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(
+                            Capsule()
+                                .fill(Color.clSuccess.opacity(0.12))
+                                .overlay(Capsule().strokeBorder(Color.clSuccess.opacity(0.25), lineWidth: 1))
+                        )
+                    }
+                    .padding(14)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.clSurfaceLow)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .strokeBorder(Color.clBorder, lineWidth: 1)
+                            )
+                    )
                 }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+
+                LazyVStack(spacing: 12) {
+                    ForEach(Array(posts.enumerated()), id: \.element.id) { _, post in
+                        PostCardView(post: post)
+                    }
+                }
+                .padding(.top, 12)
+
+                Spacer(minLength: 100)
             }
         }
+        .scrollIndicators(.hidden)
+        .background(Color.clBackground)
+        .navigationBarHidden(true)
     }
 }
 
@@ -92,10 +99,10 @@ struct PulseModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .opacity(isAnimating ? 0.6 : 1.0)
-            .scaleEffect(isAnimating ? 0.85 : 1.0)
+            .opacity(isAnimating ? 0.4 : 1.0)
+            .scaleEffect(isAnimating ? 0.7 : 1.0)
             .onAppear {
-                withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
                     isAnimating = true
                 }
             }

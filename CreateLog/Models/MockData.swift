@@ -49,6 +49,54 @@ enum MockData {
             likes: 31,
             reposts: 2,
             comments: 4
+        ),
+        PostData(
+            name: "Yuki Tanaka",
+            handle: "yuki_t",
+            initials: "Y",
+            status: .online,
+            workTime: "2h 10m",
+            content: "Rustの勉強を始めた。所有権の概念が面白い。TypeScriptとは全然違うけど、理解できると気持ちいい",
+            timeAgo: "10h",
+            likes: 56,
+            reposts: 3,
+            comments: 8
+        ),
+        PostData(
+            name: "Maria Santos",
+            handle: "maria_dev",
+            initials: "M",
+            status: .offline,
+            workTime: "4h 00m",
+            content: "Finally deployed my portfolio site. Next.js + Vercel is such a smooth combo. Link in bio if anyone wants to check it out",
+            timeAgo: "12h",
+            likes: 73,
+            reposts: 11,
+            comments: 5
+        ),
+        PostData(
+            name: "高橋リョウ",
+            handle: "ryo_codes",
+            initials: "高",
+            status: .coding,
+            workTime: "6h 15m",
+            content: "Docker Composeで開発環境を整えた。もう二度と「自分の環境では動く」とは言わない #Docker #インフラ",
+            timeAgo: "14h",
+            likes: 198,
+            reposts: 22,
+            comments: 14
+        ),
+        PostData(
+            name: "Jake Wilson",
+            handle: "jake_w",
+            initials: "J",
+            status: .offline,
+            workTime: "1h 45m",
+            content: "Code review is an art form. Learning to give constructive feedback without being harsh is a skill worth developing",
+            timeAgo: "16h",
+            likes: 245,
+            reposts: 31,
+            comments: 19
         )
     ]
 

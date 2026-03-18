@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>つくろぐ v2.0 - ホーム画面モックアップ</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #08080a; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'SF Pro Display', sans-serif; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 30px; gap: 40px; }
+
+  .label-col { padding-top: 60px; width: 200px; flex-shrink: 0; }
+  .label-col h1 { font-size: 20px; font-weight: 800; margin-bottom: 8px; background: linear-gradient(135deg, #e8e8f0, #8888a0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .label-col p { font-size: 12px; color: #555; line-height: 1.6; }
+  .label-col .note { margin-top: 20px; padding: 12px; background: rgba(200,200,220,0.04); border: 1px solid rgba(200,200,220,0.08); border-radius: 12px; }
+  .label-col .note h3 { font-size: 11px; color: #888; margin-bottom: 4px; }
+  .label-col .note p { font-size: 10px; color: #555; }
+
+  /* iPhone 16 Pro frame */
+  .iphone { width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; border: 3px solid #222; background: #0e0e10; flex-shrink: 0; }
+
+  /* Dynamic Island */
+  .dynamic-island { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 126px; height: 36px; background: #000; border-radius: 20px; z-index: 100; }
+
+  /* Status bar */
+  .status-bar { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 30px 6px; z-index: 50; font-size: 12px; font-weight: 600; color: #fff; }
+
+  /* Scrollable content */
+  .scroll-content { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .scroll-content::-webkit-scrollbar { display: none; }
+
+  /* Nav bar - Liquid Glass style */
+  .nav-glass { position: sticky; top: 0; z-index: 40; padding: 54px 20px 12px; background: rgba(14,14,16,0.7); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); border-bottom: 1px solid rgba(200,200,220,0.06); display: flex; justify-content: space-between; align-items: center; }
+  .nav-glass .logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #e8e8f0, #a0a0b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .nav-icons { display: flex; gap: 8px; }
+  .nav-icon { width: 34px; height: 34px; border-radius: 50%; background: rgba(200,200,220,0.06); border: 1px solid rgba(200,200,220,0.08); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; transition: all 0.2s; position: relative; }
+  .nav-icon:hover { background: rgba(200,200,220,0.12); }
+  .nav-badge { position: absolute; top: -1px; right: -1px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; border: 2px solid #0e0e10; }
+
+  /* Segment tabs */
+  .segment-wrap { padding: 12px 20px 0; }
+  .segment { display: flex; gap: 0; background: rgba(200,200,220,0.04); border-radius: 10px; padding: 3px; }
+  .seg-item { flex: 1; text-align: center; padding: 8px 0; font-size: 13px; font-weight: 600; color: rgba(200,200,220,0.35); border-radius: 8px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+  .seg-item.active { background: rgba(200,200,220,0.1); color: #e0e0ec; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+
+  /* Active now bar */
+  .active-bar { margin: 14px 20px 0; padding: 10px 14px; background: rgba(200,200,220,0.04); border: 1px solid rgba(200,200,220,0.06); border-radius: 14px; display: flex; align-items: center; gap: 10px; }
+  .active-pulse { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 8px rgba(74,222,128,0.5); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
+  .active-text { font-size: 12px; color: rgba(200,200,220,0.5); flex: 1; }
+  .active-text b { color: #d0d0e0; font-weight: 600; }
+  .active-time { font-size: 13px; font-weight: 700; color: #e0e0ec; font-variant-numeric: tabular-nums; }
+
+  /* Feed */
+  .feed { padding: 6px 0; }
+
+  .post { padding: 16px 20px; border-bottom: 1px solid rgba(200,200,220,0.04); transition: background 0.2s; }
+  .post:active { background: rgba(200,200,220,0.03); }
+
+  .post-header { display: flex; gap: 12px; align-items: flex-start; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; position: relative; overflow: hidden; }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, rgba(200,200,220,0.2), rgba(200,200,220,0.05)); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .avatar .status-dot { position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #0e0e10; }
+  .status-dot.online { background: #4ade80; }
+  .status-dot.coding { background: #60a5fa; }
+
+  .post-meta { flex: 1; }
+  .post-name-row { display: flex; align-items: center; gap: 6px; }
+  .post-name { font-size: 14px; font-weight: 700; color: #e0e0ec; }
+  .post-handle { font-size: 12px; color: rgba(200,200,220,0.3); }
+  .post-time { font-size: 12px; color: rgba(200,200,220,0.2); margin-left: auto; }
+  .post-work-badge { display: inline-flex; align-items: center; gap: 4px; margin-top: 3px; padding: 2px 8px; background: rgba(200,200,220,0.06); border-radius: 6px; font-size: 11px; color: rgba(200,200,220,0.45); }
+  .post-work-badge .work-time { color: #d0d0e0; font-weight: 600; }
+
+  .post-body { margin: 10px 0 0 52px; }
+  .post-text { font-size: 14px; line-height: 1.6; color: rgba(200,200,220,0.75); letter-spacing: 0.01em; }
+  .post-text .hashtag { color: rgba(200,200,220,0.5); font-weight: 500; }
+
+  /* Post image */
+  .post-image { margin-top: 12px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(200,200,220,0.06); aspect-ratio: 16/9; background: linear-gradient(135deg, rgba(200,200,220,0.06), rgba(200,200,220,0.02)); display: flex; align-items: center; justify-content: center; }
+  .post-image .placeholder-code { font-family: 'SF Mono', monospace; font-size: 10px; color: rgba(200,200,220,0.2); text-align: left; line-height: 1.8; padding: 16px; }
+
+  /* Actions */
+  .post-actions { margin: 12px 0 0 52px; display: flex; gap: 0; }
+  .action { display: flex; align-items: center; gap: 5px; padding: 6px 12px 6px 0; font-size: 12px; color: rgba(200,200,220,0.25); cursor: pointer; transition: all 0.2s; }
+  .action:hover { color: rgba(200,200,220,0.5); }
+  .action .icon { font-size: 14px; transition: transform 0.2s; }
+  .action:active .icon { transform: scale(1.3); }
+  .action.liked { color: #f87171; }
+  .action.reposted { color: #4ade80; }
+
+  /* Compose FAB */
+  .fab { position: absolute; bottom: 90px; right: 20px; width: 52px; height: 52px; border-radius: 50%; background: rgba(200,200,220,0.1); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(200,200,220,0.12); display: flex; align-items: center; justify-content: center; z-index: 30; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+  .fab:hover { transform: scale(1.08); background: rgba(200,200,220,0.15); }
+  .fab .plus { font-size: 24px; color: #e0e0ec; font-weight: 300; }
+
+  /* Tab bar - Liquid Glass */
+  .tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 84px; background: rgba(14,14,16,0.75); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); border-top: 1px solid rgba(200,200,220,0.06); display: flex; align-items: flex-start; justify-content: space-around; padding-top: 10px; z-index: 40; }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s; padding: 0 4px; }
+  .tab-icon { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 18px; border-radius: 50%; transition: all 0.3s; }
+  .tab.active .tab-icon { background: rgba(200,200,220,0.12); box-shadow: 0 0 12px rgba(200,200,220,0.1); }
+  .tab-label { font-size: 10px; color: rgba(200,200,220,0.25); font-weight: 500; transition: color 0.2s; }
+  .tab.active .tab-label { color: #d0d0e0; }
+  .tab .tab-badge-dot { position: absolute; top: 0; right: -2px; width: 6px; height: 6px; background: #ef4444; border-radius: 50%; }
+
+  /* Record tab (center) - special */
+  .tab.record .tab-icon { width: 36px; height: 36px; background: rgba(200,200,220,0.08); border: 1.5px solid rgba(200,200,220,0.15); font-size: 16px; }
+  .tab.record.active .tab-icon { background: rgba(200,200,220,0.15); border-color: rgba(200,200,220,0.25); }
+
+  /* Second phone: Report screen */
+  .report-content { padding: 100px 20px 100px; }
+
+  /* Report header card */
+  .report-hero { text-align: center; padding: 24px 0 20px; }
+  .report-hero .greeting { font-size: 13px; color: rgba(200,200,220,0.35); }
+  .report-hero .big-number { font-size: 64px; font-weight: 800; background: linear-gradient(135deg, #e8e8f0, #8888a0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; margin: 8px 0; font-variant-numeric: tabular-nums; }
+  .report-hero .big-label { font-size: 14px; color: rgba(200,200,220,0.4); font-weight: 500; }
+
+  .report-period { display: flex; justify-content: center; gap: 4px; margin: 16px 0; }
+  .period-btn { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; color: rgba(200,200,220,0.3); background: transparent; cursor: pointer; transition: all 0.3s; }
+  .period-btn.active { background: rgba(200,200,220,0.1); color: #e0e0ec; }
+
+  /* Stats grid */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+  .stat-cell { background: rgba(200,200,220,0.03); border: 1px solid rgba(200,200,220,0.06); border-radius: 16px; padding: 16px; position: relative; overflow: hidden; }
+  .stat-cell::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(200,200,220,0.1), transparent); }
+  .stat-cell .stat-num { font-size: 28px; font-weight: 800; color: #e0e0ec; font-variant-numeric: tabular-nums; }
+  .stat-cell .stat-label { font-size: 11px; color: rgba(200,200,220,0.3); margin-top: 2px; }
+  .stat-cell .stat-change { font-size: 11px; color: #4ade80; margin-top: 6px; font-weight: 600; }
+  .stat-cell .stat-change.down { color: #f87171; }
+
+  /* Chart */
+  .chart-card { background: rgba(200,200,220,0.03); border: 1px solid rgba(200,200,220,0.06); border-radius: 16px; padding: 16px; margin: 10px 0; }
+  .chart-title { font-size: 12px; color: rgba(200,200,220,0.4); font-weight: 600; margin-bottom: 12px; }
+  .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 120px; padding-top: 8px; }
+  .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+  .chart-bar { width: 100%; border-radius: 6px; background: linear-gradient(180deg, rgba(200,200,220,0.2), rgba(200,200,220,0.06)); transition: height 1s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+  .chart-bar.today { background: linear-gradient(180deg, rgba(200,200,220,0.35), rgba(200,200,220,0.1)); box-shadow: 0 0 12px rgba(200,200,220,0.1); }
+  .chart-bar-label { font-size: 9px; color: rgba(200,200,220,0.2); }
+  .chart-bar-label.today { color: rgba(200,200,220,0.5); font-weight: 600; }
+
+  /* Category breakdown */
+  .category-list { margin: 10px 0; }
+  .cat-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(200,200,220,0.04); }
+  .cat-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .cat-info { flex: 1; }
+  .cat-name { font-size: 13px; font-weight: 600; color: #d0d0e0; }
+  .cat-time { font-size: 11px; color: rgba(200,200,220,0.3); margin-top: 1px; }
+  .cat-bar-bg { flex: 0 0 100px; height: 6px; background: rgba(200,200,220,0.04); border-radius: 3px; overflow: hidden; }
+  .cat-bar-fill { height: 100%; border-radius: 3px; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+  .cat-pct { font-size: 12px; font-weight: 600; color: rgba(200,200,220,0.4); width: 36px; text-align: right; }
+
+  /* Share button */
+  .share-btn { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 20px 0; padding: 14px; background: rgba(200,200,220,0.06); border: 1px solid rgba(200,200,220,0.1); border-radius: 14px; font-size: 14px; font-weight: 600; color: #d0d0e0; cursor: pointer; transition: all 0.2s; }
+  .share-btn:hover { background: rgba(200,200,220,0.1); }
+
+  /* Streak */
+  .streak-card { background: rgba(200,200,220,0.03); border: 1px solid rgba(200,200,220,0.06); border-radius: 16px; padding: 16px; margin: 10px 0; display: flex; align-items: center; gap: 14px; }
+  .streak-fire { font-size: 32px; }
+  .streak-info .streak-num { font-size: 24px; font-weight: 800; color: #e0e0ec; }
+  .streak-info .streak-label { font-size: 11px; color: rgba(200,200,220,0.3); margin-top: 1px; }
+  .streak-dots { display: flex; gap: 3px; margin-top: 6px; }
+  .streak-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(200,200,220,0.08); }
+  .streak-dot.filled { background: rgba(200,200,220,0.25); }
+  .streak-dot.today { background: rgba(200,200,220,0.4); box-shadow: 0 0 6px rgba(200,200,220,0.2); }
+</style>
+</head>
+<body>
+
+<!-- LEFT: Home Feed -->
+<div class="label-col">
+  <h1>ホーム画面</h1>
+  <p>フォロー中のエンジニアの投稿と作業状況が流れるフィード。</p>
+  <div class="note">
+    <h3>Liquid Glass適用箇所</h3>
+    <p>ナビバー、タブバー、FABにblur + 半透明を適用。iOS 26では.glassEffect()に置き換え。</p>
+  </div>
+  <div class="note" style="margin-top:10px">
+    <h3>インタラクション</h3>
+    <p>ダブルタップ → いいね<br>長押し → プレビュー<br>スワイプ → セグメント切替<br>全アクションにハプティクス連動</p>
+  </div>
+</div>
+
+<div class="iphone">
+  <div class="dynamic-island"></div>
+  <div class="scroll-content">
+    <div class="nav-glass">
+      <div class="logo">つくろぐ</div>
+      <div class="nav-icons">
+        <div class="nav-icon">🔍</div>
+      </div>
+    </div>
+
+    <div class="segment-wrap">
+      <div class="segment">
+        <div class="seg-item active">フォロー中</div>
+        <div class="seg-item">おすすめ</div>
+      </div>
+    </div>
+
+    <div class="active-bar">
+      <div class="active-pulse"></div>
+      <div class="active-text"><b>3人</b>が今作業中</div>
+      <div class="active-time">👀</div>
+    </div>
+
+    <div class="feed">
+      <!-- Post 1 -->
+      <div class="post">
+        <div class="post-header">
+          <div class="avatar"><div class="avatar-placeholder">🧑‍💻</div><div class="status-dot coding"></div></div>
+          <div class="post-meta">
+            <div class="post-name-row">
+              <div class="post-name">田中ゆうき</div>
+              <div class="post-handle">@tanaka_dev</div>
+              <div class="post-time">2h</div>
+            </div>
+            <div class="post-work-badge">⏱ 今日 <span class="work-time">3h 20m</span> 作業</div>
+          </div>
+        </div>
+        <div class="post-body">
+          <div class="post-text">SwiftUIのアニメーション、やっと理解できてきた。matchedGeometryEffectが神すぎる 🔥<br><span class="hashtag">#SwiftUI</span> <span class="hashtag">#個人開発</span></div>
+          <div class="post-image">
+            <div class="placeholder-code">
+              struct ContentView: View {<br>
+              &nbsp;&nbsp;@Namespace var ns<br>
+              &nbsp;&nbsp;var body: some View {<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;// ✨ magic here<br>
+              &nbsp;&nbsp;}<br>
+              }
+            </div>
+          </div>
+          <div class="post-actions">
+            <div class="action"><span class="icon">💬</span> 3</div>
+            <div class="action reposted"><span class="icon">🔄</span> 5</div>
+            <div class="action liked"><span class="icon">❤️</span> 24</div>
+            <div class="action"><span class="icon">↗️</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Post 2 -->
+      <div class="post">
+        <div class="post-header">
+          <div class="avatar"><div class="avatar-placeholder">👩‍💻</div><div class="status-dot online"></div></div>
+          <div class="post-meta">
+            <div class="post-name-row">
+              <div class="post-name">Emily Chen</div>
+              <div class="post-handle">@emily_codes</div>
+              <div class="post-time">4h</div>
+            </div>
+            <div class="post-work-badge">⏱ 今日 <span class="work-time">5h 45m</span> 作業</div>
+          </div>
+        </div>
+        <div class="post-body">
+          <div class="post-text">Just shipped my first Flutter app! 🚀 The feeling of seeing your creation on the App Store is unreal. 6 months of late nights finally paid off.</div>
+          <div class="post-actions">
+            <div class="action"><span class="icon">💬</span> 12</div>
+            <div class="action"><span class="icon">🔄</span> 8</div>
+            <div class="action liked"><span class="icon">❤️</span> 89</div>
+            <div class="action"><span class="icon">↗️</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Post 3 -->
+      <div class="post">
+        <div class="post-header">
+          <div class="avatar"><div class="avatar-placeholder">🧑</div></div>
+          <div class="post-meta">
+            <div class="post-name-row">
+              <div class="post-name">佐藤 健太</div>
+              <div class="post-handle">@sato_k</div>
+              <div class="post-time">6h</div>
+            </div>
+            <div class="post-work-badge">⏱ 今日 <span class="work-time">1h 10m</span> 作業</div>
+          </div>
+        </div>
+        <div class="post-body">
+          <div class="post-text">初心者だけど、毎日30分でもコード書くようにしてる。今日で連続14日目！小さい積み重ねが大事だと信じてます 💪<br><span class="hashtag">#プログラミング初心者</span></div>
+          <div class="post-actions">
+            <div class="action"><span class="icon">💬</span> 7</div>
+            <div class="action"><span class="icon">🔄</span> 15</div>
+            <div class="action"><span class="icon">❤️</span> 142</div>
+            <div class="action"><span class="icon">↗️</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Post 4 -->
+      <div class="post" style="padding-bottom: 100px;">
+        <div class="post-header">
+          <div class="avatar"><div class="avatar-placeholder">👨‍🎨</div><div class="status-dot coding"></div></div>
+          <div class="post-meta">
+            <div class="post-name-row">
+              <div class="post-name">Alex Kim</div>
+              <div class="post-handle">@alexkim</div>
+              <div class="post-time">8h</div>
+            </div>
+            <div class="post-work-badge">⏱ 今日 <span class="work-time">7h 30m</span> 作業</div>
+          </div>
+        </div>
+        <div class="post-body">
+          <div class="post-text">Working on a new design system for my SaaS. Trying to nail the dark mode color palette 🎨</div>
+          <div class="post-actions">
+            <div class="action"><span class="icon">💬</span> 4</div>
+            <div class="action"><span class="icon">🔄</span> 2</div>
+            <div class="action"><span class="icon">❤️</span> 31</div>
+            <div class="action"><span class="icon">↗️</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAB -->
+  <div class="fab"><span class="plus">+</span></div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <div class="tab active">
+      <div class="tab-icon">🏠</div>
+      <div class="tab-label">ホーム</div>
+    </div>
+    <div class="tab">
+      <div class="tab-icon">🔍</div>
+      <div class="tab-label">発見</div>
+    </div>
+    <div class="tab record">
+      <div class="tab-icon">⏺</div>
+      <div class="tab-label">記録</div>
+    </div>
+    <div class="tab" style="position:relative">
+      <div class="tab-icon">🔔</div>
+      <div class="tab-badge-dot"></div>
+      <div class="tab-label">通知</div>
+    </div>
+    <div class="tab">
+      <div class="tab-icon">👤</div>
+      <div class="tab-label">マイ</div>
+    </div>
+  </div>
+</div>
+
+<!-- RIGHT: Report Screen -->
+<div class="iphone">
+  <div class="dynamic-island"></div>
+  <div class="scroll-content">
+    <div class="nav-glass">
+      <div class="logo">レポート</div>
+      <div class="nav-icons">
+        <div class="nav-icon">↗️</div>
+      </div>
+    </div>
+
+    <div class="report-content" style="padding-top:0">
+      <div class="report-hero">
+        <div class="greeting">今週のあなた</div>
+        <div class="big-number">28.5</div>
+        <div class="big-label">時間</div>
+      </div>
+
+      <div class="report-period">
+        <div class="period-btn">今日</div>
+        <div class="period-btn active">今週</div>
+        <div class="period-btn">今月</div>
+        <div class="period-btn">累計</div>
+      </div>
+
+      <div class="streak-card">
+        <div class="streak-fire">🔥</div>
+        <div class="streak-info">
+          <div class="streak-num">12日連続</div>
+          <div class="streak-label">パーソナルベスト更新中！</div>
+          <div class="streak-dots">
+            <div class="streak-dot filled"></div>
+            <div class="streak-dot filled"></div>
+            <div class="streak-dot filled"></div>
+            <div class="streak-dot filled"></div>
+            <div class="streak-dot filled"></div>
+            <div class="streak-dot filled"></div>
+            <div class="streak-dot today"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-cell">
+          <div class="stat-num">4.5h</div>
+          <div class="stat-label">今日</div>
+          <div class="stat-change">↑ 1.2h 昨日比</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num">28.5h</div>
+          <div class="stat-label">今週</div>
+          <div class="stat-change">↑ 3h 先週比</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num">1,240h</div>
+          <div class="stat-label">累計</div>
+          <div class="stat-change">上位 12%</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num">4.1h</div>
+          <div class="stat-label">日平均</div>
+          <div class="stat-change down">↓ 0.3h 先週比</div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-title">週間推移</div>
+        <div class="chart-bars">
+          <div class="chart-bar-wrap"><div class="chart-bar" style="height:45%"></div><div class="chart-bar-label">月</div></div>
+          <div class="chart-bar-wrap"><div class="chart-bar" style="height:65%"></div><div class="chart-bar-label">火</div></div>
+          <div class="chart-bar-wrap"><div class="chart-bar" style="height:50%"></div><div class="chart-bar-label">水</div></div>
+          <div class="chart-bar-wrap"><div class="chart-bar" style="height:85%"></div><div class="chart-bar-label">木</div></div>
+          <div class="chart-bar-wrap"><div class="chart-bar" style="height:70%"></div><div class="chart-bar-label">金</div></div>
+          <div class="chart-bar-wrap"><div class="chart-bar" style="height:40%"></div><div class="chart-bar-label">土</div></div>
+          <div class="chart-bar-wrap"><div class="chart-bar today" style="height:60%"></div><div class="chart-bar-label today">日</div></div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-title">カテゴリ別</div>
+        <div class="category-list">
+          <div class="cat-item">
+            <div class="cat-dot" style="background:#a0a0b8"></div>
+            <div class="cat-info"><div class="cat-name">iOS開発</div><div class="cat-time">12h 30m</div></div>
+            <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:65%;background:linear-gradient(90deg,#a0a0b8,#d0d0e0)"></div></div>
+            <div class="cat-pct">44%</div>
+          </div>
+          <div class="cat-item">
+            <div class="cat-dot" style="background:#7a7a90"></div>
+            <div class="cat-info"><div class="cat-name">Web開発</div><div class="cat-time">8h 15m</div></div>
+            <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:43%;background:linear-gradient(90deg,#7a7a90,#a0a0b8)"></div></div>
+            <div class="cat-pct">29%</div>
+          </div>
+          <div class="cat-item">
+            <div class="cat-dot" style="background:#5a5a70"></div>
+            <div class="cat-info"><div class="cat-name">学習</div><div class="cat-time">5h 00m</div></div>
+            <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:26%;background:linear-gradient(90deg,#5a5a70,#7a7a90)"></div></div>
+            <div class="cat-pct">18%</div>
+          </div>
+          <div class="cat-item">
+            <div class="cat-dot" style="background:#4a4a60"></div>
+            <div class="cat-info"><div class="cat-name">デザイン</div><div class="cat-time">2h 45m</div></div>
+            <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:14%;background:linear-gradient(90deg,#4a4a60,#5a5a70)"></div></div>
+            <div class="cat-pct">9%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="share-btn">
+        ↗️ レポートをシェア
+      </div>
+
+      <div style="height:40px"></div>
+    </div>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <div class="tab">
+      <div class="tab-icon">🏠</div>
+      <div class="tab-label">ホーム</div>
+    </div>
+    <div class="tab">
+      <div class="tab-icon">🔍</div>
+      <div class="tab-label">発見</div>
+    </div>
+    <div class="tab record active">
+      <div class="tab-icon">📊</div>
+      <div class="tab-label">記録</div>
+    </div>
+    <div class="tab">
+      <div class="tab-icon">🔔</div>
+      <div class="tab-label">通知</div>
+    </div>
+    <div class="tab">
+      <div class="tab-icon">👤</div>
+      <div class="tab-label">マイ</div>
+    </div>
+  </div>
+</div>
+
+<div class="label-col">
+  <h1>レポート画面</h1>
+  <p>記録タブ内のセグメント切替で表示。映える統計で、シェアしたくなるデザイン。</p>
+  <div class="note">
+    <h3>映え要素</h3>
+    <p>大きな数字 + グラデーション<br>ストリーク演出<br>前週比・ランキング<br>シェアボタンで画像生成</p>
+  </div>
+  <div class="note" style="margin-top:10px">
+    <h3>アニメーション</h3>
+    <p>数字カウントアップ<br>グラフが下から伸びる<br>カテゴリバーがスライドイン<br>全て0.3-0.5sの気持ちいい速度</p>
+  </div>
+  <div class="note" style="margin-top:10px">
+    <h3>AI感を出さない</h3>
+    <p>モノトーン基調<br>グラデーションは白〜グレー系のみ<br>紫・ネオンは一切使わない<br>質感と動きで魅せる</p>
+  </div>
+</div>
+
+</body>
+</html>
