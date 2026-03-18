@@ -8,30 +8,77 @@
 
 /* Begin PBXBuildFile section */
 		036F36B32785FD1DC98D5C1E /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001C5B3FE69B3F4533D7B0B0 /* Typography.swift */; };
+		23871A9D7F7F5670B21BC7E9 /* CategoryBreakdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A611D868C252A93C899EF0A /* CategoryBreakdown.swift */; };
 		4C064C52FC17BC6009306169 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E25B4D3292D49FE5A1DF464 /* HapticManager.swift */; };
 		6DDC31ACB144C8F3BABB3117 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC7597E3EB92E2404ECD3F7 /* Colors.swift */; };
 		80D6DC1541C550A8F2A78846 /* GlassModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9FC98E178D3909AF5CC19A3 /* GlassModifier.swift */; };
+		887DE720294519799B31F630 /* StatBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9EEE16326F4501A28D02D4 /* StatBadge.swift */; };
+		93E0CFFDA16E66B560EC1184 /* MockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B141BC174E5A4716B6A00B0 /* MockData.swift */; };
+		BA461C196CF813ABEE61FC48 /* FloatingActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 402CA35490B26B8F31A4C802 /* FloatingActionButton.swift */; };
+		C588F5467A90BC3F0AB00728 /* StreakCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE14513B498545E54F2F531B /* StreakCard.swift */; };
+		CCBC39E7901FAD4DE84DB481 /* SegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C090B8FC250EA076F966165 /* SegmentedControl.swift */; };
 		CDB40ECCE2B82EE74E689E48 /* CreateLogApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B71F6CCD23799D5E87AC4F9 /* CreateLogApp.swift */; };
+		D1B79E4BF71F619823642678 /* PostCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61E9548F5C764F2824639E5 /* PostCardView.swift */; };
+		D9F890E1832C7DAD5D8620A8 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D59D1827DADE6CD635B5E4 /* AvatarView.swift */; };
+		E0C9CEC6DC31A6E68734DA60 /* WeeklyChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648A12A9B6A483C751BDA663 /* WeeklyChart.swift */; };
+		E27B955607502E236BE0BE7C /* ActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82DF86062926ACBE5D38E992 /* ActionButton.swift */; };
+		E4E796F17F98341C0F40953C /* GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00A16462AAD3E29CA6CF04C1 /* GlassCard.swift */; };
 		EA9C30EDFA3C4954BB00703D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5C5D4B286351E93137A67B3A /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		001C5B3FE69B3F4533D7B0B0 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		00A16462AAD3E29CA6CF04C1 /* GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCard.swift; sourceTree = "<group>"; };
 		0E25B4D3292D49FE5A1DF464 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
+		2B141BC174E5A4716B6A00B0 /* MockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockData.swift; sourceTree = "<group>"; };
+		402CA35490B26B8F31A4C802 /* FloatingActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingActionButton.swift; sourceTree = "<group>"; };
 		5C5D4B286351E93137A67B3A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		648A12A9B6A483C751BDA663 /* WeeklyChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyChart.swift; sourceTree = "<group>"; };
+		7C090B8FC250EA076F966165 /* SegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedControl.swift; sourceTree = "<group>"; };
+		82DF86062926ACBE5D38E992 /* ActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionButton.swift; sourceTree = "<group>"; };
+		8A611D868C252A93C899EF0A /* CategoryBreakdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryBreakdown.swift; sourceTree = "<group>"; };
 		8B71F6CCD23799D5E87AC4F9 /* CreateLogApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateLogApp.swift; sourceTree = "<group>"; };
 		9AC7597E3EB92E2404ECD3F7 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		9B9EEE16326F4501A28D02D4 /* StatBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatBadge.swift; sourceTree = "<group>"; };
+		AE14513B498545E54F2F531B /* StreakCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakCard.swift; sourceTree = "<group>"; };
 		D0E5EE39DF2B661C1FAFF0F4 /* CreateLog.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CreateLog.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9FC98E178D3909AF5CC19A3 /* GlassModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassModifier.swift; sourceTree = "<group>"; };
+		E61E9548F5C764F2824639E5 /* PostCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCardView.swift; sourceTree = "<group>"; };
+		F9D59D1827DADE6CD635B5E4 /* AvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		0265BADBF53AC08C4DAE457F /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				2B141BC174E5A4716B6A00B0 /* MockData.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		045D02580D09687FAF89A3A3 = {
 			isa = PBXGroup;
 			children = (
 				ADB9452F66A5F1DC46673E2A /* CreateLog */,
 				C6E940724F188539AAFC6494 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		1CA1A5EA97C8B6FBB8460DEB /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				82DF86062926ACBE5D38E992 /* ActionButton.swift */,
+				F9D59D1827DADE6CD635B5E4 /* AvatarView.swift */,
+				8A611D868C252A93C899EF0A /* CategoryBreakdown.swift */,
+				402CA35490B26B8F31A4C802 /* FloatingActionButton.swift */,
+				00A16462AAD3E29CA6CF04C1 /* GlassCard.swift */,
+				E61E9548F5C764F2824639E5 /* PostCardView.swift */,
+				7C090B8FC250EA076F966165 /* SegmentedControl.swift */,
+				9B9EEE16326F4501A28D02D4 /* StatBadge.swift */,
+				AE14513B498545E54F2F531B /* StreakCard.swift */,
+				648A12A9B6A483C751BDA663 /* WeeklyChart.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 		3E41B5760FDF798585CFAF1B /* DesignSystem */ = {
@@ -41,6 +88,7 @@
 				D9FC98E178D3909AF5CC19A3 /* GlassModifier.swift */,
 				0E25B4D3292D49FE5A1DF464 /* HapticManager.swift */,
 				001C5B3FE69B3F4533D7B0B0 /* Typography.swift */,
+				1CA1A5EA97C8B6FBB8460DEB /* Components */,
 			);
 			path = DesignSystem;
 			sourceTree = "<group>";
@@ -59,6 +107,7 @@
 				8B71F6CCD23799D5E87AC4F9 /* CreateLogApp.swift */,
 				3E41B5760FDF798585CFAF1B /* DesignSystem */,
 				47F112AF9E986838EE239791 /* Features */,
+				0265BADBF53AC08C4DAE457F /* Models */,
 			);
 			path = CreateLog;
 			sourceTree = "<group>";
@@ -138,11 +187,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E27B955607502E236BE0BE7C /* ActionButton.swift in Sources */,
+				D9F890E1832C7DAD5D8620A8 /* AvatarView.swift in Sources */,
+				23871A9D7F7F5670B21BC7E9 /* CategoryBreakdown.swift in Sources */,
 				6DDC31ACB144C8F3BABB3117 /* Colors.swift in Sources */,
 				CDB40ECCE2B82EE74E689E48 /* CreateLogApp.swift in Sources */,
+				BA461C196CF813ABEE61FC48 /* FloatingActionButton.swift in Sources */,
+				E4E796F17F98341C0F40953C /* GlassCard.swift in Sources */,
 				80D6DC1541C550A8F2A78846 /* GlassModifier.swift in Sources */,
 				4C064C52FC17BC6009306169 /* HapticManager.swift in Sources */,
+				93E0CFFDA16E66B560EC1184 /* MockData.swift in Sources */,
+				D1B79E4BF71F619823642678 /* PostCardView.swift in Sources */,
+				CCBC39E7901FAD4DE84DB481 /* SegmentedControl.swift in Sources */,
+				887DE720294519799B31F630 /* StatBadge.swift in Sources */,
+				C588F5467A90BC3F0AB00728 /* StreakCard.swift in Sources */,
 				036F36B32785FD1DC98D5C1E /* Typography.swift in Sources */,
+				E0C9CEC6DC31A6E68734DA60 /* WeeklyChart.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
