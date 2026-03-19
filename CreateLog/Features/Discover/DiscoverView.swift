@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - Content Types
 
 enum DiscoverContentType {
-    case app
+    case project
     case article
     case video
     case codeSnippet
@@ -32,13 +32,13 @@ struct DiscoverItem: Identifiable {
 
 private let discoverItems: [DiscoverItem] = [
     DiscoverItem(
-        type: .app, size: .tall,
+        type: .project, size: .tall,
         title: "Tempo",
-        subtitle: "習慣トラッカー",
+        subtitle: "SwiftUIで作った習慣トラッカー",
         authorName: "田中ゆうき", authorInitials: "田",
         color: Color(red: 0.2, green: 0.25, blue: 0.45),
-        iconName: "app.fill",
-        metric: "4.8"
+        iconName: "hammer.fill",
+        metric: "182"
     ),
     DiscoverItem(
         type: .article, size: .small,
@@ -68,13 +68,13 @@ private let discoverItems: [DiscoverItem] = [
         metric: "89"
     ),
     DiscoverItem(
-        type: .app, size: .small,
+        type: .project, size: .small,
         title: "FocusFlow",
-        subtitle: "ポモドーロタイマー",
+        subtitle: "集中タイマーを個人開発中",
         authorName: "Alex Kim", authorInitials: "A",
         color: Color(red: 0.25, green: 0.15, blue: 0.35),
-        iconName: "app.fill",
-        metric: "4.5"
+        iconName: "hammer.fill",
+        metric: "67"
     ),
     DiscoverItem(
         type: .article, size: .tall,
@@ -104,13 +104,13 @@ private let discoverItems: [DiscoverItem] = [
         metric: "156"
     ),
     DiscoverItem(
-        type: .app, size: .small,
+        type: .project, size: .small,
         title: "CodeLog",
-        subtitle: "開発ジャーナル",
+        subtitle: "開発記録を残すアプリを作ってます",
         authorName: "Yuki Tanaka", authorInitials: "Y",
         color: Color(red: 0.2, green: 0.2, blue: 0.35),
-        iconName: "app.fill",
-        metric: "4.2"
+        iconName: "hammer.fill",
+        metric: "93"
     ),
     DiscoverItem(
         type: .article, size: .small,
@@ -131,13 +131,13 @@ private let discoverItems: [DiscoverItem] = [
         metric: "3.4K"
     ),
     DiscoverItem(
-        type: .app, size: .tall,
+        type: .project, size: .tall,
         title: "DevBoard",
-        subtitle: "エンジニア向けダッシュボード",
+        subtitle: "React + Supabaseでダッシュボード開発中",
         authorName: "Alex Kim", authorInitials: "A",
         color: Color(red: 0.15, green: 0.2, blue: 0.32),
-        iconName: "app.fill",
-        metric: "4.7"
+        iconName: "hammer.fill",
+        metric: "241"
     ),
 ]
 
@@ -148,6 +148,7 @@ struct DiscoverView: View {
     @Binding var tabBarOffset: CGFloat
 
     @State private var headerOffset: CGFloat = 0
+    @State private var currentScrollOffset: CGFloat = 0
     private let headerHeight: CGFloat = 56
 
     var body: some View {
@@ -162,20 +163,37 @@ struct DiscoverView: View {
             .onScrollGeometryChange(for: CGFloat.self) { geo in
                 geo.contentOffset.y
             } action: { oldValue, newValue in
-                DispatchQueue.main.async {
-                    let delta = newValue - oldValue
-                    guard newValue > 0 else {
-                        headerOffset = 0
-                        tabBarOffset = 0
-                        return
+                let delta = newValue - oldValue
+                currentScrollOffset = newValue
+                guard newValue > 0 else {
+                    headerOffset = 0
+                    tabBarOffset = 0
+                    return
+                }
+                headerOffset = min(0, max(-headerHeight, headerOffset - delta))
+                tabBarOffset = min(90, max(0, tabBarOffset + delta))
+            }
+            .onScrollPhaseChange { oldPhase, newPhase in
+                if newPhase == .idle && oldPhase != .idle {
+                    withAnimation(.easeOut(duration: 0.25)) {
+                        if currentScrollOffset <= 0 {
+                            headerOffset = 0
+                            tabBarOffset = 0
+                        } else {
+                            headerOffset = -headerHeight
+                            tabBarOffset = 90
+                        }
                     }
-                    headerOffset = min(0, max(-headerHeight, headerOffset - delta))
-                    tabBarOffset = min(90, max(0, tabBarOffset + delta))
                 }
             }
 
             searchHeader
                 .offset(y: headerOffset)
+
+            Color.clear
+                .frame(height: 0)
+                .background(Color.clBackground.ignoresSafeArea(edges: .top))
+                .allowsHitTesting(false)
         }
         .background(Color.clBackground)
         .navigationBarHidden(true)
@@ -187,7 +205,7 @@ struct DiscoverView: View {
                 .font(.system(size: 15, weight: .medium))
                 .foregroundStyle(Color.clTextTertiary)
 
-            Text("ユーザー、タグ、アプリを検索")
+            Text("ユーザー、タグ、プロジェクトを検索")
                 .font(.clBody)
                 .foregroundStyle(Color.clTextTertiary)
 
@@ -354,7 +372,7 @@ private struct DiscoverCard: View {
 
     private var typeInfo: (String, String) {
         switch item.type {
-        case .app: return ("app.fill", "App")
+        case .project: return ("hammer.fill", "プロジェクト")
         case .article: return ("doc.text.fill", "記事")
         case .video: return ("play.fill", "動画")
         case .codeSnippet: return ("chevron.left.forwardslash.chevron.right", "Code")
@@ -364,11 +382,11 @@ private struct DiscoverCard: View {
     @ViewBuilder
     private var metricLabel: some View {
         switch item.type {
-        case .app:
+        case .project:
             HStack(spacing: 2) {
-                Image(systemName: "star.fill")
+                Image(systemName: "heart.fill")
                     .font(.system(size: 8))
-                    .foregroundStyle(Color(red: 0.85, green: 0.65, blue: 0.13))
+                    .foregroundStyle(Color.clTextTertiary)
                 Text(item.metric)
                     .font(.system(size: 10, weight: .medium))
                     .foregroundStyle(Color.clTextTertiary)
