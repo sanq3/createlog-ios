@@ -11,6 +11,7 @@ struct CreateLogApp: App {
 
 struct MainTabView: View {
     @State private var selectedTab = 0
+    @State private var tabBarOffset: CGFloat = 0
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -19,8 +20,8 @@ struct MainTabView: View {
 
             Group {
                 switch selectedTab {
-                case 0: NavigationStack { HomeView() }
-                case 1: NavigationStack { DiscoverView() }
+                case 0: NavigationStack { HomeView(tabBarOffset: $tabBarOffset) }
+                case 1: NavigationStack { DiscoverView(tabBarOffset: $tabBarOffset) }
                 case 2: NavigationStack { RecordingTabView() }
                 case 3: NavigationStack { NotificationsView() }
                 case 4: NavigationStack { ProfileView() }
@@ -28,9 +29,9 @@ struct MainTabView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.bottom, 44)
 
             CustomTabBar(selectedTab: $selectedTab)
+                .offset(y: tabBarOffset)
         }
     }
 }
