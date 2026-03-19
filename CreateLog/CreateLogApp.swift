@@ -13,40 +13,24 @@ struct MainTabView: View {
     @State private var selectedTab = 0
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            Tab("ホーム", systemImage: "house.fill", value: 0) {
-                NavigationStack {
-                    HomeView()
-                }
-            }
+        ZStack(alignment: .bottom) {
+            Color.clBackground
+                .ignoresSafeArea()
 
-            Tab("発見", systemImage: "magnifyingglass", value: 1) {
-                NavigationStack {
-                    DiscoverView()
+            Group {
+                switch selectedTab {
+                case 0: NavigationStack { HomeView() }
+                case 1: NavigationStack { DiscoverView() }
+                case 2: NavigationStack { RecordingTabView() }
+                case 3: NavigationStack { NotificationsView() }
+                case 4: NavigationStack { ProfileView() }
+                default: EmptyView()
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.bottom, 44)
 
-            Tab("記録", systemImage: "circle.dotted.and.circle", value: 2) {
-                NavigationStack {
-                    RecordingTabView()
-                }
-            }
-
-            Tab("通知", systemImage: "bell.fill", value: 3) {
-                NavigationStack {
-                    NotificationsView()
-                }
-            }
-
-            Tab("マイ", systemImage: "person.fill", value: 4) {
-                NavigationStack {
-                    ProfileView()
-                }
-            }
-        }
-        .tint(Color.clAccent)
-        .onChange(of: selectedTab) { _, _ in
-            HapticManager.selection()
+            CustomTabBar(selectedTab: $selectedTab)
         }
     }
 }

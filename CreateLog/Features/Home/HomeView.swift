@@ -5,14 +5,14 @@ struct HomeView: View {
     @State private var posts = MockData.posts
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
+        VStack(spacing: 0) {
+            // Fixed header
+            VStack(spacing: 10) {
                 CLSegmentedControl(
                     items: ["タイムライン", "フォロー中"],
                     selection: $segmentIndex
                 )
                 .padding(.horizontal, 20)
-                .padding(.top, 8)
 
                 Button {
                     HapticManager.light()
@@ -64,31 +64,35 @@ struct HomeView: View {
                                 .overlay(Capsule().strokeBorder(Color.clSuccess.opacity(0.25), lineWidth: 1))
                         )
                     }
-                    .padding(14)
+                    .padding(12)
                     .background(
-                        RoundedRectangle(cornerRadius: 16)
+                        RoundedRectangle(cornerRadius: 14)
                             .fill(Color.clSurfaceLow)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 16)
+                                RoundedRectangle(cornerRadius: 14)
                                     .strokeBorder(Color.clBorder, lineWidth: 1)
                             )
                     )
                 }
                 .buttonStyle(.plain)
                 .padding(.horizontal, 16)
-                .padding(.top, 12)
+            }
+            .padding(.top, 8)
+            .padding(.bottom, 8)
+            .background(Color.clBackground)
 
+            // Scrollable feed
+            ScrollView {
                 LazyVStack(spacing: 12) {
                     ForEach(Array(posts.enumerated()), id: \.element.id) { _, post in
                         PostCardView(post: post)
                     }
                 }
                 .padding(.top, 12)
-
-                Spacer(minLength: 100)
+                .padding(.bottom, 60)
             }
+            .scrollIndicators(.hidden)
         }
-        .scrollIndicators(.hidden)
         .background(Color.clBackground)
         .navigationBarHidden(true)
     }
