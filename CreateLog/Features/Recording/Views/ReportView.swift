@@ -5,12 +5,6 @@ struct ReportView: View {
     @State private var animateNumbers = false
 
     private let totalCategories: Double = 28.5
-    private let categoryItems: [CategoryItem] = [
-        CategoryItem(name: "iOS開発", hours: 12.5, percentage: 44),
-        CategoryItem(name: "Web開発", hours: 8.25, percentage: 29),
-        CategoryItem(name: "学習", hours: 5.0, percentage: 18),
-        CategoryItem(name: "デザイン", hours: 2.75, percentage: 9)
-    ]
 
     var body: some View {
         ScrollView {
@@ -78,7 +72,7 @@ struct ReportView: View {
                     .padding(.horizontal, 20)
 
                 // Category breakdown
-                CategoryBreakdown(categories: categoryItems)
+                CategoryBreakdown(categories: MockData.categoryItems)
                     .padding(.horizontal, 20)
 
                 // Share button
