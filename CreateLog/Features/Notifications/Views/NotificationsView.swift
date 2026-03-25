@@ -19,12 +19,12 @@ struct NotificationsView: View {
                     ForEach(notifications) { notif in
                         HStack(spacing: 12) {
                             Circle()
-                                .fill(notif.iconColor.opacity(0.1))
+                                .fill(notif.type.color.opacity(0.1))
                                 .frame(width: 36, height: 36)
                                 .overlay(
-                                    Image(systemName: notif.icon)
+                                    Image(systemName: notif.type.icon)
                                         .font(.system(size: 14))
-                                        .foregroundStyle(notif.iconColor)
+                                        .foregroundStyle(notif.type.color)
                                 )
 
                             VStack(alignment: .leading, spacing: 2) {

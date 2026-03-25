@@ -13,7 +13,7 @@ struct DiscoverCard: View {
                 // Visual area
                 ZStack(alignment: .topTrailing) {
                     // Background
-                    item.color
+                    item.placeholderColor.color
                         .overlay(
                             VStack(spacing: 8) {
                                 Image(systemName: item.iconName)

@@ -1,4 +1,4 @@
-import SwiftUI
+import Foundation
 
 enum MockData {
     static let posts: [Post] = [
@@ -118,7 +118,7 @@ enum MockData {
             title: "Tempo",
             subtitle: "SwiftUIで作った習慣トラッカー",
             authorName: "田中ゆうき", authorInitials: "田",
-            color: Color(red: 0.2, green: 0.25, blue: 0.45),
+            placeholderColor: ColorRGB(red: 0.2, green: 0.25, blue: 0.45),
             iconName: "hammer.fill",
             metric: "182"
         ),
@@ -127,7 +127,7 @@ enum MockData {
             title: "SwiftUIで作るカスタムチャート",
             subtitle: "Charts不要の実装法",
             authorName: "佐藤健太", authorInitials: "佐",
-            color: Color(red: 0.15, green: 0.2, blue: 0.3),
+            placeholderColor: ColorRGB(red: 0.15, green: 0.2, blue: 0.3),
             iconName: "doc.text.fill",
             metric: "324"
         ),
@@ -136,7 +136,7 @@ enum MockData {
             title: "Flutter vs SwiftUI 2026",
             subtitle: "12:34",
             authorName: "Emily Chen", authorInitials: "E",
-            color: Color(red: 0.3, green: 0.18, blue: 0.25),
+            placeholderColor: ColorRGB(red: 0.3, green: 0.18, blue: 0.25),
             iconName: "play.fill",
             metric: "1.2K"
         ),
@@ -145,7 +145,7 @@ enum MockData {
             title: "async/await エラーハンドリング",
             subtitle: "Swift Concurrency",
             authorName: "高橋リョウ", authorInitials: "高",
-            color: Color(red: 0.12, green: 0.18, blue: 0.22),
+            placeholderColor: ColorRGB(red: 0.12, green: 0.18, blue: 0.22),
             iconName: "chevron.left.forwardslash.chevron.right",
             metric: "89"
         ),
@@ -154,7 +154,7 @@ enum MockData {
             title: "FocusFlow",
             subtitle: "集中タイマーを個人開発中",
             authorName: "Alex Kim", authorInitials: "A",
-            color: Color(red: 0.25, green: 0.15, blue: 0.35),
+            placeholderColor: ColorRGB(red: 0.25, green: 0.15, blue: 0.35),
             iconName: "hammer.fill",
             metric: "67"
         ),
@@ -163,7 +163,7 @@ enum MockData {
             title: "個人開発で月10万円稼ぐまでの全記録",
             subtitle: "収益化の実体験",
             authorName: "Maria Santos", authorInitials: "M",
-            color: Color(red: 0.18, green: 0.22, blue: 0.18),
+            placeholderColor: ColorRGB(red: 0.18, green: 0.22, blue: 0.18),
             iconName: "doc.text.fill",
             metric: "2.1K"
         ),
@@ -172,7 +172,7 @@ enum MockData {
             title: "0からiOSアプリをリリースするまで",
             subtitle: "45:12",
             authorName: "Jake Wilson", authorInitials: "J",
-            color: Color(red: 0.28, green: 0.15, blue: 0.15),
+            placeholderColor: ColorRGB(red: 0.28, green: 0.15, blue: 0.15),
             iconName: "play.fill",
             metric: "5.6K"
         ),
@@ -181,7 +181,7 @@ enum MockData {
             title: "matchedGeometryEffect 実践パターン",
             subtitle: "SwiftUI Animation",
             authorName: "鈴木一郎", authorInitials: "鈴",
-            color: Color(red: 0.1, green: 0.15, blue: 0.2),
+            placeholderColor: ColorRGB(red: 0.1, green: 0.15, blue: 0.2),
             iconName: "chevron.left.forwardslash.chevron.right",
             metric: "156"
         ),
@@ -190,7 +190,7 @@ enum MockData {
             title: "CodeLog",
             subtitle: "開発記録を残すアプリを作ってます",
             authorName: "Yuki Tanaka", authorInitials: "Y",
-            color: Color(red: 0.2, green: 0.2, blue: 0.35),
+            placeholderColor: ColorRGB(red: 0.2, green: 0.2, blue: 0.35),
             iconName: "hammer.fill",
             metric: "93"
         ),
@@ -199,7 +199,7 @@ enum MockData {
             title: "Supabase認証完全ガイド",
             subtitle: "SwiftUI + Auth",
             authorName: "田中ゆうき", authorInitials: "田",
-            color: Color(red: 0.15, green: 0.25, blue: 0.2),
+            placeholderColor: ColorRGB(red: 0.15, green: 0.25, blue: 0.2),
             iconName: "doc.text.fill",
             metric: "890"
         ),
@@ -208,7 +208,7 @@ enum MockData {
             title: "Rust入門 ライブコーディング",
             subtitle: "1:23:45",
             authorName: "高橋リョウ", authorInitials: "高",
-            color: Color(red: 0.22, green: 0.12, blue: 0.18),
+            placeholderColor: ColorRGB(red: 0.22, green: 0.12, blue: 0.18),
             iconName: "play.fill",
             metric: "3.4K"
         ),
@@ -217,17 +217,17 @@ enum MockData {
             title: "DevBoard",
             subtitle: "React + Supabaseでダッシュボード開発中",
             authorName: "Alex Kim", authorInitials: "A",
-            color: Color(red: 0.15, green: 0.2, blue: 0.32),
+            placeholderColor: ColorRGB(red: 0.15, green: 0.2, blue: 0.32),
             iconName: "hammer.fill",
             metric: "241"
         ),
     ]
 
     static let notifications: [NotificationItem] = [
-        NotificationItem(icon: "heart.fill", iconColor: .clError, actor: "田中", message: "があなたの投稿にいいねしました", time: "3分前"),
-        NotificationItem(icon: "person.fill.badge.plus", iconColor: .clRecording, actor: "Emily", message: "があなたをフォローしました", time: "1時間前"),
-        NotificationItem(icon: "arrow.2.squarepath", iconColor: .clSuccess, actor: "佐藤", message: "があなたの投稿をリポストしました", time: "3時間前"),
-        NotificationItem(icon: "heart.fill", iconColor: .clError, actor: "yuki", message: "が記録に反応しました", time: "5時間前"),
-        NotificationItem(icon: "person.fill.badge.plus", iconColor: .clRecording, actor: "鈴木", message: "があなたをフォローしました", time: "昨日"),
+        NotificationItem(type: .like, actor: "田中", message: "があなたの投稿にいいねしました", time: "3分前"),
+        NotificationItem(type: .follow, actor: "Emily", message: "があなたをフォローしました", time: "1時間前"),
+        NotificationItem(type: .repost, actor: "佐藤", message: "があなたの投稿をリポストしました", time: "3時間前"),
+        NotificationItem(type: .reaction, actor: "yuki", message: "が記録に反応しました", time: "5時間前"),
+        NotificationItem(type: .follow, actor: "鈴木", message: "があなたをフォローしました", time: "昨日"),
     ]
 }

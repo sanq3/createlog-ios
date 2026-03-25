@@ -1,4 +1,4 @@
-import SwiftUI
+import Foundation
 
 enum DiscoverContentType {
     case project
@@ -21,6 +21,12 @@ enum DiscoverCardSize {
     }
 }
 
+struct ColorRGB {
+    let red: Double
+    let green: Double
+    let blue: Double
+}
+
 struct DiscoverItem: Identifiable {
     let id = UUID()
     let type: DiscoverContentType
@@ -29,7 +35,7 @@ struct DiscoverItem: Identifiable {
     let subtitle: String
     let authorName: String
     let authorInitials: String
-    let color: Color
+    let placeholderColor: ColorRGB
     let iconName: String
     let metric: String
 }
