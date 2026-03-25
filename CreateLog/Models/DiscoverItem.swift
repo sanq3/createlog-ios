@@ -11,6 +11,14 @@ enum DiscoverCardSize {
     case small
     case tall
     case wide
+
+    var height: CGFloat {
+        switch self {
+        case .small: return 180
+        case .tall: return 280
+        case .wide: return 180
+        }
+    }
 }
 
 struct DiscoverItem: Identifiable {

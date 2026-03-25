@@ -5,14 +5,6 @@ import SwiftUI
 struct DiscoverCard: View {
     let item: DiscoverItem
 
-    private var cardHeight: CGFloat {
-        switch item.size {
-        case .small: return 180
-        case .tall: return 280
-        case .wide: return 180
-        }
-    }
-
     var body: some View {
         Button {
             HapticManager.light()
@@ -34,7 +26,7 @@ struct DiscoverCard: View {
                     typeBadge
                         .padding(8)
                 }
-                .frame(height: cardHeight - 64)
+                .frame(height: item.size.height - 64)
                 .clipped()
 
                 // Info area

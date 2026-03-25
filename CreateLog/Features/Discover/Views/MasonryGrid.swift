@@ -32,7 +32,7 @@ struct MasonryGrid: View {
         var rightHeight: CGFloat = 0
 
         for item in items {
-            let h = cardHeight(item)
+            let h = item.size.height
             if leftHeight <= rightHeight {
                 left.append(item)
                 leftHeight += h + 10
@@ -42,13 +42,5 @@ struct MasonryGrid: View {
             }
         }
         return (left, right)
-    }
-
-    private func cardHeight(_ item: DiscoverItem) -> CGFloat {
-        switch item.size {
-        case .small: return 180
-        case .tall: return 280
-        case .wide: return 180
-        }
     }
 }
