@@ -7,7 +7,6 @@ struct DiscoverView: View {
     @Binding var tabBarOffset: CGFloat
 
     @State private var headerOffset: CGFloat = 0
-    @State private var currentScrollOffset: CGFloat = 0
     private let headerHeight: CGFloat = 56
 
     var body: some View {
@@ -19,32 +18,7 @@ struct DiscoverView: View {
                     .padding(.bottom, 100)
             }
             .scrollIndicators(.hidden)
-            .onScrollGeometryChange(for: CGFloat.self) { geo in
-                geo.contentOffset.y
-            } action: { oldValue, newValue in
-                let delta = newValue - oldValue
-                currentScrollOffset = newValue
-                guard newValue > 0 else {
-                    headerOffset = 0
-                    tabBarOffset = 0
-                    return
-                }
-                headerOffset = min(0, max(-headerHeight, headerOffset - delta))
-                tabBarOffset = min(90, max(0, tabBarOffset + delta))
-            }
-            .onScrollPhaseChange { oldPhase, newPhase in
-                if newPhase == .idle && oldPhase != .idle {
-                    withAnimation(.easeOut(duration: 0.25)) {
-                        if currentScrollOffset <= 0 {
-                            headerOffset = 0
-                            tabBarOffset = 0
-                        } else {
-                            headerOffset = -headerHeight
-                            tabBarOffset = 90
-                        }
-                    }
-                }
-            }
+            .scrollHide(headerHeight: headerHeight, headerOffset: $headerOffset, tabBarOffset: $tabBarOffset)
 
             searchHeader
                 .offset(y: headerOffset)

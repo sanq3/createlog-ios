@@ -6,7 +6,6 @@ struct HomeView: View {
     @Binding var tabBarOffset: CGFloat
 
     @State private var headerOffset: CGFloat = 0
-    @State private var currentScrollOffset: CGFloat = 0
     private let headerHeight: CGFloat = 120
 
     var body: some View {
@@ -22,34 +21,7 @@ struct HomeView: View {
                 .padding(.bottom, 60)
             }
             .scrollIndicators(.hidden)
-            .onScrollGeometryChange(for: CGFloat.self) { geo in
-                geo.contentOffset.y
-            } action: { oldValue, newValue in
-                let delta = newValue - oldValue
-                currentScrollOffset = newValue
-                guard newValue > 0 else {
-                    headerOffset = 0
-                    tabBarOffset = 0
-                    return
-                }
-                headerOffset = min(0, max(-headerHeight, headerOffset - delta))
-                tabBarOffset = min(90, max(0, tabBarOffset + delta))
-            }
-            .onScrollPhaseChange { oldPhase, newPhase in
-                if newPhase == .idle && oldPhase != .idle {
-                    withAnimation(.easeOut(duration: 0.25)) {
-                        if currentScrollOffset <= 0 {
-                            // 一番上 → ヘッダー/タブバー表示
-                            headerOffset = 0
-                            tabBarOffset = 0
-                        } else {
-                            // それ以外 → 全画面（隠す）
-                            headerOffset = -headerHeight
-                            tabBarOffset = 90
-                        }
-                    }
-                }
-            }
+            .scrollHide(headerHeight: headerHeight, headerOffset: $headerOffset, tabBarOffset: $tabBarOffset)
 
             // Layer 2: Header（上にスライドしてステータスバーマスクの裏に隠れる）
             headerView
