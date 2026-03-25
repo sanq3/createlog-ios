@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PostCardView: View {
-    @State var post: PostData
+    @State var post: Post
     @State private var heartScale: CGFloat = 1.0
 
     var body: some View {

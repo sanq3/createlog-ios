@@ -1,8 +1,8 @@
 import SwiftUI
 
 enum MockData {
-    static let posts: [PostData] = [
-        PostData(
+    static let posts: [Post] = [
+        Post(
             name: "田中ゆうき",
             handle: "tanaka_dev",
             initials: "田",
@@ -14,7 +14,7 @@ enum MockData {
             reposts: 5,
             comments: 3
         ),
-        PostData(
+        Post(
             name: "Emily Chen",
             handle: "emily_codes",
             initials: "E",
@@ -26,7 +26,7 @@ enum MockData {
             reposts: 8,
             comments: 12
         ),
-        PostData(
+        Post(
             name: "佐藤健太",
             handle: "sato_k",
             initials: "佐",
@@ -38,7 +38,7 @@ enum MockData {
             reposts: 15,
             comments: 7
         ),
-        PostData(
+        Post(
             name: "Alex Kim",
             handle: "alexkim",
             initials: "A",
@@ -50,7 +50,7 @@ enum MockData {
             reposts: 2,
             comments: 4
         ),
-        PostData(
+        Post(
             name: "Yuki Tanaka",
             handle: "yuki_t",
             initials: "Y",
@@ -62,7 +62,7 @@ enum MockData {
             reposts: 3,
             comments: 8
         ),
-        PostData(
+        Post(
             name: "Maria Santos",
             handle: "maria_dev",
             initials: "M",
@@ -74,7 +74,7 @@ enum MockData {
             reposts: 11,
             comments: 5
         ),
-        PostData(
+        Post(
             name: "高橋リョウ",
             handle: "ryo_codes",
             initials: "高",
@@ -86,7 +86,7 @@ enum MockData {
             reposts: 22,
             comments: 14
         ),
-        PostData(
+        Post(
             name: "Jake Wilson",
             handle: "jake_w",
             initials: "J",

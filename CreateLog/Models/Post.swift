@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct PostData: Identifiable {
+struct Post: Identifiable {
     let id = UUID()
     let name: String
     let handle: String
