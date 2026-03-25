@@ -1,14 +1,5 @@
 import SwiftUI
 
-@main
-struct CreateLogApp: App {
-    var body: some Scene {
-        WindowGroup {
-            MainTabView()
-        }
-    }
-}
-
 struct MainTabView: View {
     @State private var selectedTab = 0
     @State private var tabBarOffset: CGFloat = 0
