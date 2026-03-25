@@ -1,12 +1,5 @@
 import SwiftUI
 
-struct CategoryItem: Identifiable {
-    let id = UUID()
-    let name: String
-    let hours: Double
-    let percentage: Double
-}
-
 struct CategoryBreakdown: View {
     let categories: [CategoryItem]
 

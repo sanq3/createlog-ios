@@ -1,24 +1,9 @@
 import SwiftUI
 
-struct NotificationItem: Identifiable {
-    let id = UUID()
-    let icon: String
-    let iconColor: Color
-    let actor: String
-    let message: String
-    let time: String
-}
-
 struct NotificationsView: View {
     @State private var filterIndex = 0
 
-    private let notifications: [NotificationItem] = [
-        NotificationItem(icon: "heart.fill", iconColor: .clError, actor: "田中", message: "があなたの投稿にいいねしました", time: "3分前"),
-        NotificationItem(icon: "person.fill.badge.plus", iconColor: .clRecording, actor: "Emily", message: "があなたをフォローしました", time: "1時間前"),
-        NotificationItem(icon: "arrow.2.squarepath", iconColor: .clSuccess, actor: "佐藤", message: "があなたの投稿をリポストしました", time: "3時間前"),
-        NotificationItem(icon: "heart.fill", iconColor: .clError, actor: "yuki", message: "が記録に反応しました", time: "5時間前"),
-        NotificationItem(icon: "person.fill.badge.plus", iconColor: .clRecording, actor: "鈴木", message: "があなたをフォローしました", time: "昨日"),
-    ]
+    private let notifications = MockData.notifications
 
     var body: some View {
         ScrollView {
