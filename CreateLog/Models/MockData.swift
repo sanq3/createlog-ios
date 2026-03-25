@@ -105,11 +105,11 @@ enum MockData {
         ("木", 6.2), ("金", 5.1), ("土", 2.8), ("日", 4.5)
     ]
 
-    static let categories: [(name: String, hours: Double, color: String)] = [
-        ("iOS開発", 12.5, "clAccent"),
-        ("Web開発", 8.25, "clTextSecondary"),
-        ("学習", 5.0, "clTextTertiary"),
-        ("デザイン", 2.75, "clBorder")
+    static let categoryItems: [CategoryItem] = [
+        CategoryItem(name: "iOS開発", hours: 12.5, percentage: 44),
+        CategoryItem(name: "Web開発", hours: 8.25, percentage: 29),
+        CategoryItem(name: "学習", hours: 5.0, percentage: 18),
+        CategoryItem(name: "デザイン", hours: 2.75, percentage: 9)
     ]
 
     static let discoverItems: [DiscoverItem] = [
