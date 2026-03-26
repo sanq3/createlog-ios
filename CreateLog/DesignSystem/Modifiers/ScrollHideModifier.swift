@@ -2,9 +2,15 @@ import SwiftUI
 
 struct ScrollHideModifier: ViewModifier {
     let headerHeight: CGFloat
+    let tabBarHeight: CGFloat = 90
     @Binding var headerOffset: CGFloat
     @Binding var tabBarOffset: CGFloat
+
     @State private var currentScrollOffset: CGFloat = 0
+    @State private var lastDelta: CGFloat = 0
+
+    // Noise filter: ignore deltas smaller than this
+    private let noiseThreshold: CGFloat = 0.5
 
     func body(content: Content) -> some View {
         content
@@ -13,24 +19,46 @@ struct ScrollHideModifier: ViewModifier {
             } action: { oldValue, newValue in
                 let delta = newValue - oldValue
                 currentScrollOffset = newValue
+
+                // Top of content: always show
                 guard newValue > 0 else {
                     headerOffset = 0
                     tabBarOffset = 0
                     return
                 }
+
+                guard abs(delta) > noiseThreshold else { return }
+                lastDelta = delta
+
+                // Always 1:1 tracking in both directions
                 headerOffset = min(0, max(-headerHeight, headerOffset - delta))
-                tabBarOffset = min(90, max(0, tabBarOffset + delta))
+                tabBarOffset = min(tabBarHeight, max(0, tabBarOffset + delta))
             }
             .onScrollPhaseChange { oldPhase, newPhase in
-                if newPhase == .idle && oldPhase != .idle {
-                    withAnimation(.easeOut(duration: 0.25)) {
-                        if currentScrollOffset <= 0 {
-                            headerOffset = 0
-                            tabBarOffset = 0
-                        } else {
-                            headerOffset = -headerHeight
-                            tabBarOffset = 90
-                        }
+                guard newPhase == .idle, oldPhase != .idle else { return }
+
+                // At top: always show
+                if currentScrollOffset <= 0 {
+                    withAnimation(.spring(duration: 0.2, bounce: 0)) {
+                        headerOffset = 0
+                        tabBarOffset = 0
+                    }
+                    return
+                }
+
+                // 50% threshold snap:
+                // - Tab bar more than half visible → show
+                // - Tab bar more than half hidden → hide
+                let tabBarHiddenRatio = tabBarOffset / tabBarHeight
+                let shouldHide = tabBarHiddenRatio > 0.1
+
+                withAnimation(.spring(duration: 0.2, bounce: 0)) {
+                    if shouldHide {
+                        headerOffset = -headerHeight
+                        tabBarOffset = tabBarHeight
+                    } else {
+                        headerOffset = 0
+                        tabBarOffset = 0
                     }
                 }
             }
