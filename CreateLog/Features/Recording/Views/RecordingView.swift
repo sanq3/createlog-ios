@@ -5,42 +5,62 @@ struct RecordingView: View {
 
     @State private var isTimerRunning = false
     @State private var activeProject: String?
+    @State private var activeCategory: String?
     @State private var elapsedSeconds: Int = 0
     @State private var timerTask: Task<Void, Never>?
     @State private var inputText = ""
-    @State private var showManualInput = false
-    @State private var showParsedPreview = false
+    @State private var expandedCategory: String?
     @FocusState private var isInputFocused: Bool
 
-    private let recentProjects = [
-        ("iOS開発", "chevron.left.forwardslash.chevron.right"),
-        ("学習", "book.fill"),
-        ("バグ修正", "ladybug.fill"),
+    // 標準カテゴリ → プロジェクト (2層構造)
+    private let categoryProjects: [(category: String, projects: [String])] = [
+        ("開発", ["CreateLog", "FocusFlow", "Tempo"]),
+        ("デザイン", ["CreateLog UI", "ポートフォリオ"]),
+        ("学習", ["Swift Concurrency", "React入門"]),
+        ("ミーティング", ["社内定例", "1on1"]),
+        ("ライティング", ["技術ブログ", "ドキュメント"]),
+        ("マーケティング", ["SNS運用", "ASO"]),
+        ("事務", ["経理", "確定申告"]),
     ]
-
-    // Mock data — バックエンド接続時に置き換え
-    private let mockTodayHours: Double = 4.25
-    private let mockTotalHours: Double = 342.5
-    private let mockWeekDiff: Double = 2.3 // 今週 - 先週
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
-                // KPI summary
-                kpiRow
+            VStack(spacing: 0) {
+                // Running timer bar
+                if isTimerRunning {
+                    runningTimerBar
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
+                        .padding(.bottom, 12)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+
+                // Quick add
+                quickAddInput
+                    .padding(.horizontal, 16)
+                    .padding(.top, isTimerRunning ? 0 : 12)
+                    .padding(.bottom, 16)
+
+                // Category → Project picker
+                if !isTimerRunning {
+                    categorySection
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 16)
+                }
+
+                // Divider
+                Rectangle()
+                    .fill(Color.clBorder)
+                    .frame(height: 1)
                     .padding(.horizontal, 16)
 
-                // Timer / Quick Start
-                timerSection
-                    .padding(.horizontal, 16)
-
-                // Manual input
-                manualInputSection
+                // History
+                historySection
+                    .padding(.top, 14)
                     .padding(.horizontal, 16)
 
                 Spacer(minLength: 100)
             }
-            .padding(.top, 28)
         }
         .scrollIndicators(.hidden)
         .onDisappear {
@@ -48,173 +68,235 @@ struct RecordingView: View {
         }
     }
 
-    // MARK: - KPI Row
+    // MARK: - Running Timer Bar
 
-    private var kpiRow: some View {
-        HStack(spacing: 0) {
-            kpiItem(
-                value: String(format: "%.1f", mockTodayHours),
-                unit: "h",
-                label: "今日"
-            )
+    private var runningTimerBar: some View {
+        HStack(spacing: 10) {
+            Circle()
+                .fill(Color.clError)
+                .frame(width: 8, height: 8)
+                .scaleEffect(isTimerRunning ? 1.2 : 0.8)
+                .animation(.easeInOut(duration: 0.8).repeatForever(), value: isTimerRunning)
 
-            kpiItem(
-                value: String(format: "%.0f", mockTotalHours),
-                unit: "h",
-                label: "累計"
-            )
-
-            kpiItem(
-                value: (mockWeekDiff >= 0 ? "+" : "") + String(format: "%.1f", mockWeekDiff),
-                unit: "h",
-                label: "前週比",
-                valueColor: mockWeekDiff >= 0 ? Color.clSuccess : Color.clError
-            )
-        }
-    }
-
-    private func kpiItem(
-        value: String,
-        unit: String,
-        label: String,
-        valueColor: Color = Color.clTextPrimary
-    ) -> some View {
-        VStack(spacing: 3) {
-            HStack(alignment: .firstTextBaseline, spacing: 1) {
-                Text(value)
-                    .font(.system(size: 28, weight: .heavy, design: .rounded))
-                    .foregroundStyle(valueColor)
-                Text(unit)
-                    .font(.system(size: 12, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color.clTextTertiary)
+            if let cat = activeCategory {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(LogEntry.color(for: cat))
+                    .frame(width: 3, height: 18)
             }
-            Text(label)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(Color.clTextTertiary)
-        }
-        .frame(maxWidth: .infinity)
-    }
 
-    // MARK: - Timer Section
-
-    private var timerSection: some View {
-        VStack(spacing: 12) {
-            if isTimerRunning {
-                runningTimer
-            } else {
-                quickStartGrid
-            }
-        }
-    }
-
-    private var runningTimer: some View {
-        GlassCard {
-            VStack(spacing: 12) {
-                Text(formattedTime)
-                    .font(.system(size: 48, weight: .heavy, design: .monospaced))
-                    .foregroundStyle(Color.clAccent)
-                    .contentTransition(.numericText())
-
-                if let project = activeProject {
-                    let entry = LogEntry(title: "", categoryName: project, startHour: 0, endHour: 0)
-                    HStack(spacing: 6) {
-                        Image(systemName: entry.categoryIcon)
-                            .font(.system(size: 12))
-                        Text(project)
-                            .font(.system(size: 14, weight: .semibold))
-                    }
-                    .foregroundStyle(entry.categoryColor)
+            VStack(alignment: .leading, spacing: 1) {
+                if let proj = activeProject {
+                    Text(proj)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Color.clTextPrimary)
                 }
-
-                Button {
-                    stopTimer()
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "stop.fill")
-                            .font(.system(size: 12))
-                        Text("記録を停止")
-                            .font(.system(size: 14, weight: .semibold))
-                    }
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(Color.clError, in: RoundedRectangle(cornerRadius: 12))
+                if let cat = activeCategory {
+                    Text(cat)
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(Color.clTextTertiary)
                 }
-                .buttonStyle(.plain)
-            }
-        }
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(Color.clAccent.opacity(0.2), lineWidth: 1)
-        )
-    }
-
-    private var quickStartGrid: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Text("記録を開始")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color.clTextTertiary)
-                Spacer()
             }
 
-            ForEach(recentProjects, id: \.0) { name, icon in
-                let entry = LogEntry(title: "", categoryName: name, startHour: 0, endHour: 0)
-                Button {
-                    startTimer(project: name)
-                } label: {
-                    HStack(spacing: 10) {
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(entry.categoryColor)
-                            .frame(width: 4, height: 28)
+            Spacer()
 
-                        Image(systemName: icon)
-                            .font(.system(size: 14))
-                            .foregroundStyle(entry.categoryColor)
-                            .frame(width: 20)
-
-                        Text(name)
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(Color.clTextPrimary)
-
-                        Spacer()
-
-                        Image(systemName: "play.fill")
-                            .font(.system(size: 11))
-                            .foregroundStyle(entry.categoryColor.opacity(0.5))
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(entry.categoryColor.opacity(0.04))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .strokeBorder(entry.categoryColor.opacity(0.08), lineWidth: 1)
-                            )
-                    )
-                }
-                .buttonStyle(.plain)
-            }
+            Text(formattedTime)
+                .font(.system(size: 15, weight: .heavy, design: .monospaced))
+                .foregroundStyle(Color.clTextPrimary)
+                .contentTransition(.numericText())
 
             Button {
-                HapticManager.light()
+                stopTimer()
             } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 12, weight: .medium))
-                    Text("新しいプロジェクト")
-                        .font(.system(size: 13, weight: .medium))
-                }
-                .foregroundStyle(Color.clTextTertiary)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .strokeBorder(Color.clBorder, style: StrokeStyle(lineWidth: 1, dash: [6, 4]))
-                )
+                Image(systemName: "stop.fill")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.white)
+                    .padding(8)
+                    .background(Color.clError, in: Circle())
             }
             .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .glassBackground(cornerRadius: 14)
+    }
+
+    // MARK: - Quick Add Input
+
+    private var quickAddInput: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "plus.circle.fill")
+                .font(.system(size: 20))
+                .foregroundStyle(Color.clAccent)
+
+            TextField("開発 CreateLog 3時間", text: $inputText)
+                .font(.system(size: 15))
+                .foregroundStyle(Color.clTextPrimary)
+                .focused($isInputFocused)
+                .onSubmit { addManualRecord() }
+
+            if !inputText.isEmpty {
+                Button {
+                    addManualRecord()
+                } label: {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.system(size: 22))
+                        .foregroundStyle(Color.clAccent)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color.clSurfaceLow)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(
+                            isInputFocused ? Color.clAccent.opacity(0.4) : Color.clBorder,
+                            lineWidth: 1
+                        )
+                )
+        )
+        .animation(.easeOut(duration: 0.2), value: isInputFocused)
+    }
+
+    // MARK: - Category → Project Picker
+
+    private var categorySection: some View {
+        VStack(spacing: 6) {
+            ForEach(categoryProjects, id: \.category) { item in
+                let isExpanded = expandedCategory == item.category
+                let color = LogEntry.color(for: item.category)
+
+                VStack(spacing: 0) {
+                    // Category row
+                    Button {
+                        withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                            expandedCategory = isExpanded ? nil : item.category
+                        }
+                        HapticManager.light()
+                    } label: {
+                        HStack(spacing: 10) {
+                            RoundedRectangle(cornerRadius: 2)
+                                .fill(color)
+                                .frame(width: 4, height: 22)
+
+                            Text(item.category)
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(Color.clTextPrimary)
+
+                            Spacer()
+
+                            Text("\(item.projects.count)")
+                                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                .foregroundStyle(Color.clTextTertiary)
+
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(Color.clTextTertiary)
+                                .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                    }
+                    .buttonStyle(.plain)
+
+                    // Projects (expanded)
+                    if isExpanded {
+                        VStack(spacing: 0) {
+                            ForEach(item.projects, id: \.self) { project in
+                                Button {
+                                    startTimer(category: item.category, project: project)
+                                } label: {
+                                    HStack(spacing: 10) {
+                                        Circle()
+                                            .fill(color.opacity(0.3))
+                                            .frame(width: 6, height: 6)
+
+                                        Text(project)
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundStyle(Color.clTextPrimary)
+
+                                        Spacer()
+
+                                        Image(systemName: "play.fill")
+                                            .font(.system(size: 9))
+                                            .foregroundStyle(color.opacity(0.5))
+                                    }
+                                    .padding(.horizontal, 24)
+                                    .padding(.vertical, 8)
+                                }
+                                .buttonStyle(.plain)
+                            }
+
+                            // Add new project
+                            Button {
+                                HapticManager.light()
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "plus")
+                                        .font(.system(size: 10, weight: .medium))
+                                    Text("追加")
+                                        .font(.system(size: 12, weight: .medium))
+                                }
+                                .foregroundStyle(Color.clTextTertiary)
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 6)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                    }
+                }
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(isExpanded ? color.opacity(0.04) : .clear)
+                )
+            }
+        }
+    }
+
+    // MARK: - History
+
+    private var historySection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("最近の記録")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Color.clTextTertiary)
+
+            ForEach(MockData.todayLogs) { log in
+                HStack(spacing: 10) {
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(log.categoryColor)
+                        .frame(width: 3, height: 36)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(log.title)
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(Color.clTextPrimary)
+                        Text(log.categoryName)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(log.categoryColor)
+                    }
+
+                    Spacer()
+
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text(log.durationString)
+                            .font(.system(size: 13, weight: .bold, design: .monospaced))
+                            .foregroundStyle(Color.clTextPrimary)
+                        Text(log.timeRangeString)
+                            .font(.system(size: 10, weight: .medium, design: .monospaced))
+                            .foregroundStyle(Color.clTextTertiary)
+                    }
+                }
+                .padding(.vertical, 8)
+
+                if log.id != MockData.todayLogs.last?.id {
+                    Divider()
+                }
+            }
         }
     }
 
@@ -230,10 +312,14 @@ struct RecordingView: View {
         return String(format: "%02d:%02d", m, s)
     }
 
-    private func startTimer(project: String) {
+    private func startTimer(category: String, project: String) {
+        activeCategory = category
         activeProject = project
         elapsedSeconds = 0
-        isTimerRunning = true
+        withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+            isTimerRunning = true
+            expandedCategory = nil
+        }
         HapticManager.medium()
 
         timerTask = Task {
@@ -253,151 +339,15 @@ struct RecordingView: View {
         withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
             isTimerRunning = false
         }
+        activeProject = nil
+        activeCategory = nil
         HapticManager.success()
     }
 
-    // MARK: - Manual Input
-
-    private var manualInputSection: some View {
-        VStack(spacing: 8) {
-            if showManualInput {
-                HStack(spacing: 10) {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 14))
-                        .foregroundStyle(Color.clAccent.opacity(0.7))
-
-                    TextField("例: iOS開発 3時間", text: $inputText)
-                        .font(.clBody)
-                        .foregroundStyle(Color.clTextPrimary)
-                        .focused($isInputFocused)
-                        .onSubmit {
-                            guard !inputText.isEmpty else { return }
-                            withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                                showParsedPreview = true
-                            }
-                            HapticManager.light()
-                        }
-
-                    if !inputText.isEmpty {
-                        Button {
-                            withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                                showParsedPreview = true
-                            }
-                            isInputFocused = false
-                            HapticManager.light()
-                        } label: {
-                            Image(systemName: "arrow.up.circle.fill")
-                                .font(.system(size: 22))
-                                .foregroundStyle(Color.clAccent)
-                        }
-                        .buttonStyle(.plain)
-                    }
-
-                    Button {
-                        withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
-                            showManualInput = false
-                            inputText = ""
-                            showParsedPreview = false
-                        }
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundStyle(Color.clTextTertiary)
-                            .padding(6)
-                    }
-                    .buttonStyle(.plain)
-                }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 14)
-                        .fill(Color.clSurfaceLow)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14)
-                                .strokeBorder(
-                                    isInputFocused ? Color.clAccent.opacity(0.4) : Color.clBorder,
-                                    lineWidth: 1
-                                )
-                        )
-                )
-                .animation(.easeOut(duration: 0.2), value: isInputFocused)
-
-                if showParsedPreview {
-                    parsedPreview
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                }
-            } else {
-                Button {
-                    withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
-                        showManualInput = true
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        isInputFocused = true
-                    }
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: "keyboard")
-                            .font(.system(size: 12))
-                        Text("手動で記録を追加")
-                            .font(.system(size: 13, weight: .medium))
-                    }
-                    .foregroundStyle(Color.clTextTertiary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .strokeBorder(Color.clBorder, style: StrokeStyle(lineWidth: 1, dash: [6, 4]))
-                    )
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
-    private var parsedPreview: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Image(systemName: "sparkles")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Color.clAccent)
-                Text("解析結果")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(Color.clAccent)
-                Spacer()
-            }
-
-            let mock = LogEntry(title: "", categoryName: "iOS開発", startHour: 0, endHour: 0)
-            HStack(spacing: 8) {
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(mock.categoryColor)
-                    .frame(width: 3, height: 24)
-                Text("iOS開発")
-                    .font(.clBody)
-                    .foregroundStyle(Color.clTextPrimary)
-                Spacer()
-                Text("3h")
-                    .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(Color.clTextSecondary)
-            }
-
-            Button {
-                withAnimation(.spring(duration: 0.35, bounce: 0.2)) {
-                    showParsedPreview = false
-                    showManualInput = false
-                    inputText = ""
-                }
-                HapticManager.success()
-            } label: {
-                Text("記録する")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .background(Color.clAccent, in: RoundedRectangle(cornerRadius: 10))
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(14)
-        .glassBackground(cornerRadius: 16)
+    private func addManualRecord() {
+        guard !inputText.isEmpty else { return }
+        inputText = ""
+        isInputFocused = false
+        HapticManager.success()
     }
 }
