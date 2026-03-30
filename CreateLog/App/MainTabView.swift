@@ -6,10 +6,11 @@ struct MainTabView: View {
     @State private var showSideMenu = false
     @State private var sideMenuDragOffset: CGFloat = 0
     @State private var showSettings = false
+    private let menuWidthRatio: CGFloat = 0.82
 
     var body: some View {
         GeometryReader { geometry in
-            let menuWidth = geometry.size.width * 0.82
+            let menuWidth = geometry.size.width * menuWidthRatio
             let prog = menuProgress(menuWidth: menuWidth)
 
             ZStack(alignment: .leading) {
@@ -32,9 +33,10 @@ struct MainTabView: View {
                         radius: 12, x: -4, y: 0
                     )
                     .overlay {
-                        if showSideMenu {
+                        if prog > 0.001 {
                             Color.black
                                 .opacity(Double(prog) * 0.35)
+                                .allowsHitTesting(showSideMenu)
                                 .onTapGesture { closeSideMenu() }
                                 .gesture(closeDrag(menuWidth: menuWidth))
                         }
@@ -93,7 +95,7 @@ struct MainTabView: View {
             .onEnded { value in
                 guard showSideMenu else { return }
                 let remaining = menuWidth + sideMenuDragOffset
-                if remaining < menuWidth * 0.6 || value.velocity.width < -500 {
+                if remaining < menuWidth * 0.5 || value.velocity.width < -500 {
                     closeSideMenu()
                 } else {
                     withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
