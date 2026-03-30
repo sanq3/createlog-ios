@@ -32,6 +32,10 @@ struct DiscoverView: View {
         .navigationBarHidden(true)
     }
 
+    private var headerContentOpacity: Double {
+        headerHeight > 0 ? 1.0 + Double(headerOffset / headerHeight) : 1.0
+    }
+
     private var searchHeader: some View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass")
@@ -54,6 +58,7 @@ struct DiscoverView: View {
                         .strokeBorder(Color.clBorder, lineWidth: 1)
                 )
         )
+        .opacity(headerContentOpacity)
         .padding(.horizontal, 16)
         .padding(.top, 8)
         .padding(.bottom, 8)

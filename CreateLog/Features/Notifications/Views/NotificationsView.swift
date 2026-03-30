@@ -3,49 +3,47 @@ import SwiftUI
 struct NotificationsView: View {
     @State private var filterIndex = 0
 
-    private let notifications = MockData.notifications
+    private let allNotifications = MockData.notifications
+    private let filterLabels = ["すべて", "いいね", "フォロー", "メンション", "システム"]
+
+    private var filteredNotifications: [NotificationItem] {
+        guard filterIndex > 0 else { return allNotifications }
+        let targetTypes: [NotificationType] = {
+            switch filterIndex {
+            case 1: return [.like]
+            case 2: return [.follow]
+            case 3: return [.mention]
+            case 4: return [.system]
+            default: return NotificationType.allCases
+            }
+        }()
+        return allNotifications.filter { targetTypes.contains($0.type) }
+    }
+
+    private var groupedBySection: [(section: NotificationTimeSection, items: [NotificationItem])] {
+        let sectionOrder: [NotificationTimeSection] = [.new, .today, .thisWeek, .earlier]
+        let grouped = Dictionary(grouping: filteredNotifications) { $0.timeSection }
+        return sectionOrder.compactMap { section in
+            guard let items = grouped[section], !items.isEmpty else { return nil }
+            return (section, items)
+        }
+    }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
                 CLSegmentedControl(
-                    items: ["すべて", "いいね", "フォロー", "メンション"],
+                    items: filterLabels,
                     selection: $filterIndex
                 )
                 .padding(.horizontal, 20)
                 .padding(.top, 8)
 
-                LazyVStack(spacing: 0) {
-                    ForEach(notifications) { notif in
-                        HStack(spacing: 12) {
-                            Circle()
-                                .fill(notif.type.color.opacity(0.1))
-                                .frame(width: 36, height: 36)
-                                .overlay(
-                                    Image(systemName: notif.type.icon)
-                                        .font(.system(size: 14))
-                                        .foregroundStyle(notif.type.color)
-                                )
-
-                            VStack(alignment: .leading, spacing: 2) {
-                                (Text(notif.actor).fontWeight(.semibold).foregroundColor(Color.clTextPrimary)
-                                 + Text(notif.message).foregroundColor(Color.clTextSecondary))
-                                    .font(.clBody)
-
-                                Text(notif.time)
-                                    .font(.clCaption)
-                                    .foregroundStyle(Color.clTextTertiary)
-                            }
-
-                            Spacer()
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
-
-                        Divider().overlay(Color.clBorder).padding(.leading, 68)
-                    }
+                if filteredNotifications.isEmpty {
+                    emptyState
+                } else {
+                    notificationList
                 }
-                .padding(.top, 12)
 
                 Spacer(minLength: 100)
             }
@@ -53,5 +51,153 @@ struct NotificationsView: View {
         .scrollIndicators(.hidden)
         .background(Color.clBackground)
         .navigationTitle("通知")
+    }
+
+    // MARK: - Notification List
+
+    private var notificationList: some View {
+        LazyVStack(spacing: 0) {
+            ForEach(groupedBySection, id: \.section) { section, items in
+                Section {
+                    ForEach(items) { notif in
+                        notificationRow(notif)
+                    }
+                } header: {
+                    sectionHeader(section)
+                }
+            }
+        }
+        .padding(.top, 8)
+    }
+
+    // MARK: - Section Header
+
+    private func sectionHeader(_ section: NotificationTimeSection) -> some View {
+        HStack {
+            Text(section.rawValue)
+                .font(.clHeadline)
+                .foregroundStyle(Color.clTextSecondary)
+            Spacer()
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 8)
+        .background(Color.clBackground)
+    }
+
+    // MARK: - Notification Row
+
+    private func notificationRow(_ notif: NotificationItem) -> some View {
+        VStack(spacing: 0) {
+            HStack(alignment: .top, spacing: 12) {
+                notificationIcon(notif)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    actorAndMessage(notif)
+
+                    if let preview = notif.contentPreview {
+                        Text(preview)
+                            .font(.clCaption)
+                            .foregroundStyle(Color.clTextTertiary)
+                            .lineLimit(1)
+                    }
+
+                    Text(notif.relativeTimeText)
+                        .font(.clCaption)
+                        .foregroundStyle(Color.clTextTertiary)
+                }
+
+                Spacer(minLength: 0)
+
+                if !notif.isRead {
+                    Circle()
+                        .fill(Color.clAccent)
+                        .frame(width: 8, height: 8)
+                        .padding(.top, 6)
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .background(notif.isRead ? Color.clear : Color.clAccent.opacity(0.05))
+
+            Divider()
+                .overlay(Color.clBorder)
+                .padding(.leading, 76)
+        }
+    }
+
+    // MARK: - Avatar + Badge
+
+    private func notificationIcon(_ notif: NotificationItem) -> some View {
+        ZStack(alignment: .bottomTrailing) {
+            if notif.isSystemNotification {
+                // 運営通知: アプリアイコン風
+                Circle()
+                    .fill(Color.clSurfaceHigh)
+                    .frame(width: 44, height: 44)
+                    .overlay(
+                        Image(systemName: "square.stack.3d.up.fill")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundStyle(Color.clTextSecondary)
+                    )
+            } else {
+                // ユーザー通知: イニシャルアバター
+                Circle()
+                    .fill(notif.avatarBackgroundColor)
+                    .frame(width: 44, height: 44)
+                    .overlay(
+                        Text(notif.avatarInitial)
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(.white)
+                    )
+            }
+
+            // タイプバッジ（右下）
+            if !notif.isSystemNotification {
+                Circle()
+                    .fill(notif.type.color)
+                    .frame(width: 20, height: 20)
+                    .overlay(
+                        Image(systemName: notif.type.badgeIcon)
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(.white)
+                    )
+                    .offset(x: 2, y: 2)
+            }
+        }
+    }
+
+    // MARK: - Actor + Message
+
+    @ViewBuilder
+    private func actorAndMessage(_ notif: NotificationItem) -> some View {
+        let actorText = Text(notif.actorDisplayText)
+            .fontWeight(.semibold)
+            .foregroundColor(Color.clTextPrimary)
+        let messageText = Text(notif.message)
+            .foregroundColor(Color.clTextSecondary)
+
+        (actorText + messageText)
+            .font(.clBody)
+            .lineLimit(2)
+    }
+
+    // MARK: - Empty State
+
+    private var emptyState: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "bell.slash")
+                .font(.system(size: 40, weight: .light))
+                .foregroundStyle(Color.clTextTertiary)
+
+            Text("通知はありません")
+                .font(.clHeadline)
+                .foregroundStyle(Color.clTextSecondary)
+
+            Text("いいね、フォロー、コメントなどの\n通知がここに表示されます")
+                .font(.clCaption)
+                .foregroundStyle(Color.clTextTertiary)
+                .multilineTextAlignment(.center)
+        }
+        .padding(.top, 120)
     }
 }

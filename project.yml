@@ -11,6 +11,15 @@ targets:
     platform: iOS
     sources:
       - CreateLog
+    info:
+      path: CreateLog/Info.plist
+      properties:
+        LSApplicationQueriesSchemes:
+          - line
+          - instagram
+          - twitter
+          - fb-messenger
+          - discord
     settings:
       base:
         DEVELOPMENT_TEAM: YP9R79UAU5
@@ -20,7 +29,22 @@ targets:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_NSCameraUsageDescription: "QRコードをスキャンしてユーザーを追加するためにカメラを使用します"
         SWIFT_EMIT_LOC_STRINGS: YES
         GENERATE_INFOPLIST_FILE: YES
         CURRENT_PROJECT_VERSION: 1
         MARKETING_VERSION: "2.0.0"
+  CreateLogTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - CreateLogTests
+    dependencies:
+      - target: CreateLog
+    settings:
+      base:
+        BUNDLE_LOADER: $(TEST_HOST)
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/CreateLog.app/CreateLog
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: YP9R79UAU5
+        GENERATE_INFOPLIST_FILE: YES

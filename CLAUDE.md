@@ -1,29 +1,51 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+エンジニア向け作業記録・共有プラットフォーム。SwiftUI / iOS 26.0 / XcodeGen。v2.0フルリビルド中。
 
-## 概要
+## プロダクト情報
 
-エンジニア向け作業記録・共有アプリ。純SwiftUI、外部依存なし。v2.0フルリビルド中。
+- See docs/feature-roadmap.md (全機能一覧、MVP/将来の分類、設計決定ログ) ← 機能判断の正
+- See docs/product-context.md (ビジョン、収益モデル、App Store規約)
+- See docs/supabase-schema.md (DBスキーマ)
 
 ## ビルド
 
 ```bash
 xcodegen generate
-xcodebuild -project CreateLog.xcodeproj -scheme CreateLog -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build
+xcodebuild -project CreateLog.xcodeproj -scheme CreateLog -destination 'generic/platform=iOS Simulator' build
 ```
 
-テストターゲットなし。
+テスト:
+```bash
+xcodebuild -project CreateLog.xcodeproj -scheme CreateLogTests -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test
+```
 
 ## 構成
 
-- エントリ: `CreateLogApp.swift` → `MainTabView`(5タブ）
-- 機能別: `Features/` 配下にHome, Discover, Recording, Notifications, Profile
-- デザインシステム: `DesignSystem/` に `cl` プレフィックスの色・フォント・共通コンポーネント
-- バックエンド(予定): Supabase。スキーマは `docs/supabase-schema.md`
+```
+CreateLog/
+├── App/                          # エントリ + MainTabView (5タブ)
+├── Models/                       # ドメインモデル (Foundation-only)
+│   └── MockData.swift            # 開発用モックデータ
+├── Features/{Feature}/Views/     # 画面別View。将来ViewModels/を追加
+├── DesignSystem/
+│   ├── Tokens/                   # cl色・フォント定義
+│   ├── Components/               # 再利用UIコンポーネント
+│   ├── Modifiers/                # ViewModifier
+│   ├── Utilities/                # HapticManager等
+│   └── Extensions/               # モデル→UI変換 (Color mapping等)
+└── Assets.xcassets/
+CreateLogTests/              # Swift Testing (XCTest互換)
+├── Models/                  # ドメインモデルのテスト
+└── ...
+```
 
-## 規約
+## 行動原則
 
-- iOS 26.0 / XcodeGen (`project.yml`) / iPhone縦固定
-- 色・フォントは `cl` プレフィックスのトークンを使う（ハードコード禁止）
-- アニメーションはspring(duration 0.35, bounce 0.15-0.3)
+- 既存の実装を正しいと仮定するな。常に疑い、問題があれば指摘して直す
+- 技術的負債を「あとで直す」にするな。気づいた時点で根本から直す
+- ワークアラウンドや場当たり的な修正を入れるな。原因を特定して根本解決する
+- トレードオフが発生したら明示して相談する
+- UIや機能に関する質問・作業の前に docs/feature-roadmap.md を必ず読め。読まずに回答するな
+- プロダクトに関する決定が下されたら docs/feature-roadmap.md の設計決定ログに即追記しろ
+- コード・設計・機能に変更があったら、関連するドキュメント全てを即更新しろ。対象: このCLAUDE.md、docs/配下の全ファイル、.claude/rules/配下。古い情報を残すな

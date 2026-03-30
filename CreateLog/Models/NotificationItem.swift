@@ -1,16 +1,99 @@
 import Foundation
 
-enum NotificationType {
+enum NotificationType: CaseIterable {
     case like
     case follow
     case repost
-    case reaction
+    case comment
+    case mention
+    case system
+}
+
+enum NotificationTimeSection: String {
+    case new = "新着"
+    case today = "今日"
+    case thisWeek = "今週"
+    case earlier = "それ以前"
 }
 
 struct NotificationItem: Identifiable {
     let id = UUID()
     let type: NotificationType
-    let actor: String
+    let primaryActor: String
+    let groupedActors: [String]
     let message: String
-    let time: String
+    let timestamp: Date
+    let isRead: Bool
+    let contentPreview: String?
+    let avatarColor: Int
+
+    init(
+        type: NotificationType,
+        primaryActor: String,
+        groupedActors: [String] = [],
+        message: String,
+        timestamp: Date,
+        isRead: Bool = false,
+        contentPreview: String? = nil
+    ) {
+        self.type = type
+        self.primaryActor = primaryActor
+        self.groupedActors = groupedActors
+        self.message = message
+        self.timestamp = timestamp
+        self.isRead = isRead
+        self.contentPreview = contentPreview
+        // 名前から決定的にカラーインデックスを生成
+        self.avatarColor = abs(primaryActor.hashValue) % 6
+    }
+
+    var isSystemNotification: Bool {
+        type == .system
+    }
+
+    var totalActorCount: Int {
+        1 + groupedActors.count
+    }
+
+    var actorDisplayText: String {
+        if groupedActors.isEmpty {
+            return primaryActor
+        }
+        let othersCount = groupedActors.count
+        return "\(primaryActor)と他\(othersCount)人"
+    }
+
+    var timeSection: NotificationTimeSection {
+        let calendar = Calendar.current
+        let now = Date()
+
+        if !isRead {
+            return .new
+        }
+        if calendar.isDateInToday(timestamp) {
+            return .today
+        }
+        let weekAgo = calendar.date(byAdding: .day, value: -7, to: now) ?? now
+        if timestamp > weekAgo {
+            return .thisWeek
+        }
+        return .earlier
+    }
+
+    var relativeTimeText: String {
+        let now = Date()
+        let interval = now.timeIntervalSince(timestamp)
+        let minutes = Int(interval / 60)
+        let hours = Int(interval / 3600)
+        let days = Int(interval / 86400)
+
+        if minutes < 1 { return "たった今" }
+        if minutes < 60 { return "\(minutes)分前" }
+        if hours < 24 { return "\(hours)時間前" }
+        if days < 7 { return "\(days)日前" }
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M/d"
+        return formatter.string(from: timestamp)
+    }
 }

@@ -1,0 +1,24 @@
+# Xcode (XcodeGenで再生成するため)
+*.xcodeproj/
+xcuserdata/
+*.xcworkspace/
+
+# macOS
+.DS_Store
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# CocoaPods
+Pods/
+
+# Build artifacts
+build/
+DerivedData/
+
+# Claude Code
+.claude/settings.local.json
+.claude/session-state.md
+.claude/session-state.md.bak
+HANDOFF.md
