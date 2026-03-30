@@ -17,6 +17,13 @@ Pods/
 build/
 DerivedData/
 
+# Supabase local temp (contains connection info)
+supabase/.temp/
+
+# Environment / Secrets
+*.xcconfig
+.env*
+
 # Claude Code
 .claude/settings.local.json
 .claude/session-state.md

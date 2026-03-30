@@ -14,6 +14,7 @@ targets:
     info:
       path: CreateLog/Info.plist
       properties:
+        ITSAppUsesNonExemptEncryption: false
         LSApplicationQueriesSchemes:
           - line
           - instagram
@@ -22,6 +23,7 @@ targets:
           - discord
     settings:
       base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.sanq3.createlog
         DEVELOPMENT_TEAM: YP9R79UAU5
         CODE_SIGN_STYLE: Automatic
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES

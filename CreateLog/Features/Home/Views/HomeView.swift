@@ -7,12 +7,14 @@ struct HomeView: View {
     @Binding var showSideMenu: Bool
     @Binding var sideMenuDragOffset: CGFloat
 
-    @State private var headerOffset: CGFloat = 0
+    @State private var subHeaderVisible = true
+    @State private var scrollInitialized = false
+    @State private var lastScrollOffset: CGFloat = 0
     @State private var scrollProgress: CGFloat = 0
     @State private var viewWidth: CGFloat = 1
     @State private var showCompose = false
-    private let topRowHeight: CGFloat = 50
-    private let tabBarSectionHeight: CGFloat = 46
+    private let titleRowHeight: CGFloat = 44
+    private let tabBarSectionHeight: CGFloat = 38
 
     private var timelinePosts: [Post] { Array(posts.prefix(5)) }
     private var followingPosts: [Post] { Array(posts.suffix(from: min(5, posts.count))) }
@@ -39,23 +41,48 @@ struct HomeView: View {
             ))
             .onScrollGeometryChange(for: CGFloat.self) { geo in
                 geo.contentOffset.x
-            } action: { _, newOffset in
+            } action: { oldOffset, newOffset in
                 scrollProgress = newOffset / max(1, viewWidth)
+                // Horizontal swipe → show sub header
+                if abs(newOffset - oldOffset) > 5 {
+                    subHeaderVisible = true
+                }
             }
 
-            // Top row header (hides on scroll)
-            topHeaderRow
-                .offset(y: headerOffset)
+            // Fixed header
+            VStack(spacing: 0) {
+                // CreateLog title - always visible
+                Text("CreateLog")
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundStyle(Color.clTextPrimary)
+                    .frame(height: titleRowHeight)
 
-            // Sticky tab bar (pins to top with blur)
-            stickyTabBar
-                .offset(y: max(0, topRowHeight + headerOffset))
+                // Tab bar - hide on scroll down
+                tabBar
+                    .opacity(subHeaderVisible ? 1 : 0)
+                    .frame(height: subHeaderVisible ? tabBarSectionHeight : 0)
+            }
+            .animation(.spring(duration: 0.3, bounce: 0.1), value: subHeaderVisible)
 
-            // Status bar mask
-            Color.clear
-                .frame(height: 0)
-                .background(Color.clBackground.ignoresSafeArea(edges: .top))
-                .allowsHitTesting(false)
+            // Bell icon overlaid top-right, hides with sub header
+            HStack {
+                Spacer()
+                NavigationLink {
+                    NotificationsView()
+                } label: {
+                    Image(systemName: "bell")
+                        .font(.system(size: 18, weight: .regular))
+                        .foregroundStyle(Color.clTextPrimary)
+                        .frame(width: 44, height: 44)
+                        .glassEffect(.regular, in: .circle)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 16)
+            .frame(height: titleRowHeight)
+            .opacity(subHeaderVisible ? 1 : 0)
+            .animation(.spring(duration: 0.3, bounce: 0.1), value: subHeaderVisible)
+
         }
         .background(Color.clBackground)
         .overlay(alignment: .bottomTrailing) {
@@ -119,103 +146,39 @@ struct HomeView: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.top, topRowHeight + tabBarSectionHeight + 12)
+            .padding(.top, titleRowHeight + tabBarSectionHeight + 12)
             .padding(.bottom, 60)
         }
         .scrollIndicators(.hidden)
-        .scrollHide(headerHeight: topRowHeight, headerOffset: $headerOffset, tabBarOffset: $tabBarOffset)
-    }
-
-    private var topRowOpacity: Double {
-        topRowHeight > 0 ? 1.0 + Double(headerOffset / topRowHeight) : 1.0
-    }
-
-    // MARK: - Top Row (hides on scroll)
-
-    private var topHeaderRow: some View {
-        HStack {
-            Spacer()
-
-            Button {
-                HapticManager.light()
-            } label: {
-                HStack(spacing: 6) {
-                    HStack(spacing: -5) {
-                        ForEach(0..<3, id: \.self) { i in
-                            Circle()
-                                .fill(
-                                    Color(hue: Double(i) * 0.3, saturation: 0.2, brightness: 0.5)
-                                )
-                                .frame(width: 18, height: 18)
-                                .overlay(Circle().strokeBorder(Color.clBackground, lineWidth: 1.5))
-                        }
-                    }
-
-                    Text("3人が作業中")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(Color.clTextSecondary)
-
-                    Circle()
-                        .fill(Color.clSuccess)
-                        .frame(width: 5, height: 5)
-                        .modifier(PulseModifier())
-                }
+        .onScrollGeometryChange(for: CGFloat.self) { geo in
+            geo.contentOffset.y
+        } action: { oldOffset, newOffset in
+            // Skip initial scroll events to prevent hiding on launch
+            guard scrollInitialized else {
+                lastScrollOffset = newOffset
+                scrollInitialized = true
+                return
             }
-            .buttonStyle(.plain)
-
-            Spacer()
-
-            NavigationLink {
-                NotificationsView()
-            } label: {
-                Image(systemName: "bell")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(Color.clTextPrimary)
-                    .frame(width: 40, height: 40)
-                    .background(Color.clTextSecondary.opacity(0.2))
-                    .clipShape(Circle())
+            let delta = newOffset - lastScrollOffset
+            let threshold: CGFloat = 15
+            if delta > threshold {
+                subHeaderVisible = false
+            } else if delta < -threshold {
+                subHeaderVisible = true
             }
-            .buttonStyle(.plain)
+            lastScrollOffset = newOffset
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 8)
-        .padding(.bottom, 6)
-        .background(Color.clBackground)
-        .opacity(topRowOpacity)
     }
 
-    // MARK: - Sticky Tab Bar (always visible)
-
-    private var stickyTabBar: some View {
-        tabBar
-            .padding(.bottom, 4)
-    }
-
-    // MARK: - Tab Bar with Sliding Indicator
+    // MARK: - Tab Bar (hides on scroll down, shows on scroll up / horizontal swipe)
 
     private var tabBar: some View {
-        VStack(spacing: 0) {
-            // Tab labels
-            HStack(spacing: 0) {
-                tabLabel(title: "タイムライン", index: 0)
-                tabLabel(title: "フォロー中", index: 1)
-            }
-
-            // Sliding indicator (follows scroll position in real-time)
-            GeometryReader { geo in
-                let tabWidth = geo.size.width / 2
-                let clampedProgress = max(0, min(1, scrollProgress))
-
-                Capsule()
-                    .fill(Color.clAccent)
-                    .frame(width: 28, height: 3)
-                    .position(
-                        x: tabWidth / 2 + clampedProgress * tabWidth,
-                        y: 1.5
-                    )
-            }
-            .frame(height: 3)
+        HStack(spacing: 24) {
+            tabLabel(title: "タイムライン", index: 0)
+            tabLabel(title: "フォロー中", index: 1)
         }
+        .padding(.vertical, 8)
+        .frame(height: tabBarSectionHeight)
     }
 
     private func tabLabel(title: String, index: Int) -> some View {
@@ -228,8 +191,6 @@ struct HomeView: View {
             Text(title)
                 .font(.system(size: 15, weight: segmentIndex == index ? .bold : .regular))
                 .foregroundStyle(segmentIndex == index ? Color.clTextPrimary : Color.clTextSecondary)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
         }
         .buttonStyle(.plain)
     }

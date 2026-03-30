@@ -76,8 +76,10 @@ View → ViewModel(@Observable) → Repository/Service → Supabase
 
 ## Supabase / Postgres
 
-- SQL・スキーマ・RLS・インデックスを書く前に `.claude/skills/supabase-postgres-best-practices/references/` を参照しろ
-- 特にCRITICALカテゴリ（query-*, conn-*, security-*）は必読
+- SwiftからSupabaseクエリを書くときも `.claude/rules/supabase-postgres.md` のルールに従え
+- Repository層でクエリを書く前に、該当するreferencesファイルを読め
+- 全テーブルにRLS必須。Swift側でフィルタしてるからRLS不要、は禁止
+- `.from("table").select()` を書くときはインデックスの存在を確認しろ
 
 ## パフォーマンス
 
