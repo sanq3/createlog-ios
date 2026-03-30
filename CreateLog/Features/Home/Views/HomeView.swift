@@ -11,7 +11,8 @@ struct HomeView: View {
     @State private var scrollProgress: CGFloat = 0
     @State private var viewWidth: CGFloat = 1
     @State private var showCompose = false
-    private let headerHeight: CGFloat = 80
+    private let topRowHeight: CGFloat = 50
+    private let tabBarSectionHeight: CGFloat = 46
 
     private var timelinePosts: [Post] { Array(posts.prefix(5)) }
     private var followingPosts: [Post] { Array(posts.suffix(from: min(5, posts.count))) }
@@ -42,9 +43,13 @@ struct HomeView: View {
                 scrollProgress = newOffset / max(1, viewWidth)
             }
 
-            // Header (fixed)
-            headerView
+            // Top row header (hides on scroll)
+            topHeaderRow
                 .offset(y: headerOffset)
+
+            // Sticky tab bar (pins to top with blur)
+            stickyTabBar
+                .offset(y: max(0, topRowHeight + headerOffset))
 
             // Status bar mask
             Color.clear
@@ -114,83 +119,76 @@ struct HomeView: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.top, headerHeight + 12)
+            .padding(.top, topRowHeight + tabBarSectionHeight + 12)
             .padding(.bottom, 60)
         }
         .scrollIndicators(.hidden)
-        .scrollHide(headerHeight: headerHeight, headerOffset: $headerOffset, tabBarOffset: $tabBarOffset)
+        .scrollHide(headerHeight: topRowHeight, headerOffset: $headerOffset, tabBarOffset: $tabBarOffset)
     }
 
-    private var headerContentOpacity: Double {
-        headerHeight > 0 ? 1.0 + Double(headerOffset / headerHeight) : 1.0
+    private var topRowOpacity: Double {
+        topRowHeight > 0 ? 1.0 + Double(headerOffset / topRowHeight) : 1.0
     }
 
-    // MARK: - Header
+    // MARK: - Top Row (hides on scroll)
 
-    private var headerView: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Button {
-                    HapticManager.light()
-                    withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                        showSideMenu = true
-                    }
-                } label: {
-                    AvatarView(initials: MockData.currentUser.initials, size: 28, status: MockData.currentUser.status)
-                }
-                .buttonStyle(.plain)
+    private var topHeaderRow: some View {
+        HStack {
+            Spacer()
 
-                Spacer()
-
-                Button {
-                    HapticManager.light()
-                } label: {
-                    HStack(spacing: 6) {
-                        HStack(spacing: -5) {
-                            ForEach(0..<3, id: \.self) { i in
-                                Circle()
-                                    .fill(
-                                        Color(hue: Double(i) * 0.3, saturation: 0.2, brightness: 0.5)
-                                    )
-                                    .frame(width: 18, height: 18)
-                                    .overlay(Circle().strokeBorder(Color.clBackground, lineWidth: 1.5))
-                            }
+            Button {
+                HapticManager.light()
+            } label: {
+                HStack(spacing: 6) {
+                    HStack(spacing: -5) {
+                        ForEach(0..<3, id: \.self) { i in
+                            Circle()
+                                .fill(
+                                    Color(hue: Double(i) * 0.3, saturation: 0.2, brightness: 0.5)
+                                )
+                                .frame(width: 18, height: 18)
+                                .overlay(Circle().strokeBorder(Color.clBackground, lineWidth: 1.5))
                         }
-
-                        Text("3人が作業中")
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(Color.clTextSecondary)
-
-                        Circle()
-                            .fill(Color.clSuccess)
-                            .frame(width: 5, height: 5)
-                            .modifier(PulseModifier())
                     }
-                }
-                .buttonStyle(.plain)
 
-                Spacer()
-
-                NavigationLink {
-                    NotificationsView()
-                } label: {
-                    Image(systemName: "bell")
-                        .font(.system(size: 18, weight: .light))
+                    Text("3人が作業中")
+                        .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(Color.clTextSecondary)
-                        .frame(width: 36, height: 36)
-                }
-                .buttonStyle(.plain)
-            }
-            .padding(.horizontal, 20)
 
-            // X-style tab bar with sliding indicator
-            tabBar
-                .padding(.top, 6)
+                    Circle()
+                        .fill(Color.clSuccess)
+                        .frame(width: 5, height: 5)
+                        .modifier(PulseModifier())
+                }
+            }
+            .buttonStyle(.plain)
+
+            Spacer()
+
+            NavigationLink {
+                NotificationsView()
+            } label: {
+                Image(systemName: "bell")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(Color.clTextPrimary)
+                    .frame(width: 40, height: 40)
+                    .background(Color.clTextSecondary.opacity(0.2))
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.plain)
         }
-        .opacity(headerContentOpacity)
+        .padding(.horizontal, 20)
         .padding(.top, 8)
-        .padding(.bottom, 4)
+        .padding(.bottom, 6)
         .background(Color.clBackground)
+        .opacity(topRowOpacity)
+    }
+
+    // MARK: - Sticky Tab Bar (always visible)
+
+    private var stickyTabBar: some View {
+        tabBar
+            .padding(.bottom, 4)
     }
 
     // MARK: - Tab Bar with Sliding Indicator

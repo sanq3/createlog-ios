@@ -7,6 +7,7 @@
 - See docs/feature-roadmap.md (全機能一覧、MVP/将来の分類、設計決定ログ) ← 機能判断の正
 - See docs/product-context.md (ビジョン、収益モデル、App Store規約)
 - See docs/supabase-schema.md (DBスキーマ)
+- See .claude/skills/supabase-postgres-best-practices/ (Postgresベストプラクティス: クエリ最適化、RLS、インデックス設計)
 
 ## ビルド
 

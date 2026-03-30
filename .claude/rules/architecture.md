@@ -74,6 +74,11 @@ View → ViewModel(@Observable) → Repository/Service → Supabase
 - iOS最低サポートバージョンで使えない新APIを使う場合は`@available`で明示的にガードする
 - 実装前に「この設計は2年後も成立するか」を考えろ。スケールや要件変更で破綻が見える設計は採用するな
 
+## Supabase / Postgres
+
+- SQL・スキーマ・RLS・インデックスを書く前に `.claude/skills/supabase-postgres-best-practices/references/` を参照しろ
+- 特にCRITICALカテゴリ（query-*, conn-*, security-*）は必読
+
 ## パフォーマンス
 
 - リスト系APIは必ずページネーション対応(cursor or offset+limit)
