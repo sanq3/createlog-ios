@@ -7,6 +7,7 @@ struct ScrollHideModifier: ViewModifier {
     @Binding var tabBarOffset: CGFloat
 
     @State private var currentScrollOffset: CGFloat = 0
+    @State private var lastDelta: CGFloat = 0
 
     // Noise filter: ignore deltas smaller than this
     private let noiseThreshold: CGFloat = 0.5
@@ -27,6 +28,7 @@ struct ScrollHideModifier: ViewModifier {
                 }
 
                 guard abs(delta) > noiseThreshold else { return }
+                lastDelta = delta
 
                 // Always 1:1 tracking in both directions
                 headerOffset = min(0, max(-headerHeight, headerOffset - delta))
@@ -44,10 +46,11 @@ struct ScrollHideModifier: ViewModifier {
                     return
                 }
 
-                // 50% threshold snap
-                let headerHiddenRatio = headerHeight > 0 ? abs(headerOffset) / headerHeight : 0
-                let tabBarHiddenRatio = tabBarHeight > 0 ? tabBarOffset / tabBarHeight : 0
-                let shouldHide = max(headerHiddenRatio, tabBarHiddenRatio) > 0.5
+                // 50% threshold snap:
+                // - Tab bar more than half visible → show
+                // - Tab bar more than half hidden → hide
+                let tabBarHiddenRatio = tabBarOffset / tabBarHeight
+                let shouldHide = tabBarHiddenRatio > 0.1
 
                 withAnimation(.spring(duration: 0.2, bounce: 0)) {
                     if shouldHide {
