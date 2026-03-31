@@ -81,6 +81,8 @@ struct PostDetailView: View {
                     imageGrid(images)
                 case .video(let video):
                     videoThumbnail(video)
+                case .code(let code):
+                    codeBlock(code)
                 }
             }
             .padding(.horizontal, 16)
@@ -199,6 +201,36 @@ struct PostDetailView: View {
                     .background(Capsule().fill(.black.opacity(0.6)))
                     .padding(10)
             }
+    }
+
+    private func codeBlock(_ code: PostCode) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Text(code.language)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(Color.clAccent)
+
+                Spacer()
+
+                Image(systemName: "doc.on.doc")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color.clTextTertiary)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color.clSurfaceHigh)
+
+            Text(code.code)
+                .font(.system(size: 13, design: .monospaced))
+                .foregroundStyle(Color.clTextSecondary)
+                .padding(12)
+        }
+        .background(Color.clSurfaceLow)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(Color.clBorder, lineWidth: 1)
+        )
     }
 
     // MARK: - Timestamp
@@ -447,14 +479,6 @@ struct PostDetailView: View {
     // MARK: - Helpers
 
     private func relativeTime(from date: Date) -> String {
-        let interval = Date().timeIntervalSince(date)
-        let minutes = Int(interval / 60)
-        let hours = Int(interval / 3600)
-        let days = Int(interval / 86400)
-
-        if minutes < 1 { return "たった今" }
-        if minutes < 60 { return "\(minutes)分前" }
-        if hours < 24 { return "\(hours)時間前" }
-        return "\(days)日前"
+        RelativeTimeFormatter.format(from: date)
     }
 }

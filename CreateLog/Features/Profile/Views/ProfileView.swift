@@ -4,8 +4,15 @@ import CoreImage.CIFilterBuiltins
 struct ProfileView: View {
     @State private var showShareSheet = false
     @State private var showEditProfile = false
+    @State private var selectedPostTab: PostTab = .posts
 
     private let user = MockData.currentUser
+
+    private enum PostTab: String, CaseIterable {
+        case posts = "投稿"
+        case likes = "いいね"
+        case bookmarks = "ブックマーク"
+    }
     private var handle: String { "@\(user.handle)" }
     private var profileURL: String { "https://createlog.app/\(user.handle)" }
 
@@ -42,20 +49,46 @@ struct ProfileView: View {
                 .padding(.top, 14)
                 .padding(.bottom, 4)
 
-                // Name + Bio
+                // Name + Occupation + Bio
                 VStack(alignment: .leading, spacing: 2) {
                     Text(user.name)
                         .font(.clHeadline)
                         .foregroundStyle(Color.clTextPrimary)
 
-                    Text(user.bio)
-                        .font(.clBody)
-                        .foregroundStyle(Color.clTextSecondary)
+                    // 職業 + 経験年数
+                    if !user.occupation.isEmpty {
+                        Text("\(user.occupation) / \(user.experienceLevel.label)")
+                            .font(.clCaption)
+                            .foregroundStyle(Color.clTextTertiary)
+                    }
+
+                    if !user.bio.isEmpty {
+                        Text(user.bio)
+                            .font(.clBody)
+                            .foregroundStyle(Color.clTextSecondary)
+                            .padding(.top, 2)
+                    }
 
                     Text("累計 \(Int(user.totalHours))h / 連続 \(user.streak)日")
                         .font(.clCaption)
                         .foregroundStyle(Color.clTextTertiary)
                         .padding(.top, 2)
+
+                    // 外部リンク
+                    if !user.links.isEmpty {
+                        HStack(spacing: 12) {
+                            ForEach(user.links) { link in
+                                HStack(spacing: 4) {
+                                    Image(systemName: link.type.iconName)
+                                        .font(.system(size: 12))
+                                    Text(link.label)
+                                        .font(.system(size: 13))
+                                }
+                                .foregroundStyle(Color.clAccent)
+                            }
+                        }
+                        .padding(.top, 4)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 16)
@@ -85,15 +118,59 @@ struct ProfileView: View {
                 WeeklyChart(data: MockData.weeklyHours)
                     .padding(.horizontal, 16)
 
-                // My services
+                // マイサービス
                 VStack(alignment: .leading, spacing: 12) {
                     Text("マイサービス")
                         .font(.clHeadline)
                         .foregroundStyle(Color.clTextSecondary)
                         .padding(.horizontal, 16)
 
-                    serviceCard(name: "つくろぐ", desc: "エンジニアの記録プラットフォーム")
-                    serviceCard(name: "FocusFlow", desc: "ポモドーロタイマー")
+                    ForEach(MockData.projects) { project in
+                        serviceCard(project: project)
+                    }
+                }
+                .padding(.top, 20)
+
+                // 投稿タブ
+                VStack(spacing: 0) {
+                    // タブバー
+                    HStack(spacing: 0) {
+                        ForEach(PostTab.allCases, id: \.self) { tab in
+                            Button {
+                                withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                                    selectedPostTab = tab
+                                }
+                            } label: {
+                                VStack(spacing: 8) {
+                                    Text(tab.rawValue)
+                                        .font(.system(size: 14, weight: selectedPostTab == tab ? .semibold : .regular))
+                                        .foregroundStyle(
+                                            selectedPostTab == tab ? Color.clTextPrimary : Color.clTextTertiary
+                                        )
+
+                                    Rectangle()
+                                        .fill(selectedPostTab == tab ? Color.clAccent : Color.clear)
+                                        .frame(height: 2)
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .frame(maxWidth: .infinity)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+
+                    Divider()
+                        .foregroundStyle(Color.clBorder)
+
+                    // スワイプ可能な投稿リスト
+                    TabView(selection: $selectedPostTab) {
+                        ForEach(PostTab.allCases, id: \.self) { tab in
+                            postList(for: tab)
+                                .tag(tab)
+                        }
+                    }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
+                    .frame(height: postListHeight)
                 }
                 .padding(.top, 20)
 
@@ -129,6 +206,33 @@ struct ProfileView: View {
         }
     }
 
+    // タブごとの投稿データ
+    private func postsFor(_ tab: PostTab) -> [Post] {
+        switch tab {
+        case .posts:
+            Array(MockData.posts.prefix(3))
+        case .likes:
+            Array(MockData.posts.dropFirst(3).prefix(3))
+        case .bookmarks:
+            Array(MockData.posts.dropFirst(6).prefix(3))
+        }
+    }
+
+    // 各投稿カードの推定高さ x 件数 + spacing
+    private var postListHeight: CGFloat {
+        let count = CGFloat(postsFor(selectedPostTab).count)
+        return count * 200 + (count - 1) * 12 + 24
+    }
+
+    private func postList(for tab: PostTab) -> some View {
+        LazyVStack(spacing: 12) {
+            ForEach(postsFor(tab)) { post in
+                PostCardView(post: post)
+            }
+        }
+        .padding(.top, 12)
+    }
+
     private func profileStat(value: String, label: String) -> some View {
         VStack(spacing: 2) {
             Text(value)
@@ -141,28 +245,57 @@ struct ProfileView: View {
         }
     }
 
-    private func serviceCard(name: String, desc: String) -> some View {
-        HStack(spacing: 12) {
+    private func serviceCard(project: Project) -> some View {
+        let iconColor = Color(
+            red: project.iconColor.red,
+            green: project.iconColor.green,
+            blue: project.iconColor.blue
+        )
+
+        return HStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 10)
                 .fill(
                     LinearGradient(
-                        colors: [Color.clSurfaceHigh, Color.clSurfaceLow],
+                        colors: [iconColor, iconColor.opacity(0.7)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
                 .frame(width: 44, height: 44)
+                .overlay(
+                    Text(project.iconInitials)
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.9))
+                )
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(name)
-                    .font(.clHeadline)
-                    .foregroundStyle(Color.clTextPrimary)
-                Text(desc)
+                HStack {
+                    Text(project.name)
+                        .font(.clHeadline)
+                        .foregroundStyle(Color.clTextPrimary)
+
+                    Spacer()
+
+                    if project.reviewCount > 0 {
+                        HStack(spacing: 3) {
+                            Image(systemName: "star.fill")
+                                .font(.system(size: 11))
+                                .foregroundStyle(Color.clAccent)
+                            Text(String(format: "%.1f", project.averageRating))
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(Color.clTextPrimary)
+                            Text("(\(project.reviewCount))")
+                                .font(.system(size: 12))
+                                .foregroundStyle(Color.clTextTertiary)
+                        }
+                    }
+                }
+
+                Text(project.description)
                     .font(.clCaption)
                     .foregroundStyle(Color.clTextTertiary)
+                    .lineLimit(1)
             }
-
-            Spacer()
         }
         .padding(12)
         .background(Color.clSurfaceLow, in: RoundedRectangle(cornerRadius: 16))
@@ -171,23 +304,6 @@ struct ProfileView: View {
                 .strokeBorder(Color.clBorder, lineWidth: 1)
         )
         .padding(.horizontal, 16)
-    }
-}
-
-// MARK: - Action Button Style
-
-private extension Text {
-    func profileActionButton() -> some View {
-        self
-            .font(.system(size: 13, weight: .semibold))
-            .foregroundStyle(Color.clTextPrimary)
-            .frame(maxWidth: .infinity)
-            .frame(height: 32)
-            .background(Color.clSurfaceLow, in: RoundedRectangle(cornerRadius: 8))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .strokeBorder(Color.clBorder, lineWidth: 1)
-            )
     }
 }
 
@@ -278,7 +394,6 @@ struct ProfileShareSheet: View {
 
                 // Card with avatar overlapping top edge
                 ZStack(alignment: .top) {
-                    // White card
                     VStack(spacing: 0) {
                         Spacer().frame(height: avatarSize / 2 + 12)
 
@@ -292,7 +407,6 @@ struct ProfileShareSheet: View {
                             .foregroundStyle(cardHandleColor)
                             .padding(.bottom, 24)
 
-                        // QR Code
                         if let qrImage = generateQRCode(from: profileURL) {
                             ZStack {
                                 Image(uiImage: qrImage)
@@ -301,7 +415,6 @@ struct ProfileShareSheet: View {
                                     .scaledToFit()
                                     .frame(width: 220, height: 220)
 
-                                // App logo in center
                                 Text("CL")
                                     .font(.system(size: 14, weight: .heavy, design: .rounded))
                                     .foregroundStyle(.white)
@@ -321,7 +434,6 @@ struct ProfileShareSheet: View {
                     .padding(.horizontal, 28)
                     .padding(.top, avatarSize / 2)
 
-                    // Avatar (no status indicator)
                     AvatarView(initials: initials, size: avatarSize, status: .offline)
                         .overlay(
                             Circle()
@@ -340,7 +452,6 @@ struct ProfileShareSheet: View {
 
                 Spacer()
 
-                // Toast (between card and share icons)
                 if copied {
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark.circle.fill")
@@ -357,7 +468,6 @@ struct ProfileShareSheet: View {
 
                 Spacer().frame(height: 16)
 
-                // Share apps row
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
                         ForEach(shareDestinations.filter(\.isAvailable)) { dest in
@@ -386,7 +496,6 @@ struct ProfileShareSheet: View {
                             }
                         }
 
-                        // "その他" always shown
                         ShareLink(
                             item: URL(string: profileURL)!,
                             message: Text("CreateLogで繋がろう!")
@@ -421,7 +530,6 @@ struct ProfileShareSheet: View {
             withAnimation(.spring(duration: 0.4, bounce: 0.15).delay(0.25)) {
                 iconsAppeared = true
             }
-            // Show copied toast since handle was copied on button tap
             withAnimation(.spring(duration: 0.35, bounce: 0.2).delay(0.4)) {
                 copied = true
             }
@@ -495,5 +603,22 @@ struct ProfileShareSheet: View {
             return nil
         }
         return UIImage(cgImage: cgImage)
+    }
+}
+
+// MARK: - Action Button Style
+
+private extension Text {
+    func profileActionButton() -> some View {
+        self
+            .font(.system(size: 13, weight: .semibold))
+            .foregroundStyle(Color.clTextPrimary)
+            .frame(maxWidth: .infinity)
+            .frame(height: 32)
+            .background(Color.clSurfaceLow, in: RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .strokeBorder(Color.clBorder, lineWidth: 1)
+            )
     }
 }

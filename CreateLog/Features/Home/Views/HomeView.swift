@@ -6,15 +6,23 @@ struct HomeView: View {
     @Binding var tabBarOffset: CGFloat
     @Binding var showSideMenu: Bool
     @Binding var sideMenuDragOffset: CGFloat
+    let reselectCount: Int
 
-    @State private var subHeaderVisible = true
-    @State private var scrollInitialized = false
-    @State private var lastScrollOffset: CGFloat = 0
+    @State private var feedScrollPosition: ScrollPosition = .init(edge: .top)
+    @State private var isRefreshing = false
+    @State private var isAtTop = true
+    @State private var isScrollingToTop = false
+    @State private var headerVisible = true
+    @State private var lastScrollY: CGFloat = 0
+    @State private var accumulatedDistance: CGFloat = 0
+    @State private var scrollingDown = false
     @State private var scrollProgress: CGFloat = 0
     @State private var viewWidth: CGFloat = 1
     @State private var showCompose = false
     private let titleRowHeight: CGFloat = 44
     private let tabBarSectionHeight: CGFloat = 38
+    private let hideThreshold: CGFloat = 15
+    private let showThreshold: CGFloat = 100
 
     private var timelinePosts: [Post] { Array(posts.prefix(5)) }
     private var followingPosts: [Post] { Array(posts.suffix(from: min(5, posts.count))) }
@@ -43,48 +51,45 @@ struct HomeView: View {
                 geo.contentOffset.x
             } action: { oldOffset, newOffset in
                 scrollProgress = newOffset / max(1, viewWidth)
-                // Horizontal swipe → show sub header
-                if abs(newOffset - oldOffset) > 5 {
-                    subHeaderVisible = true
+                // Horizontal swipe → show header
+                if abs(newOffset - oldOffset) > 5, !headerVisible {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        headerVisible = true
+                        tabBarOffset = 0
+                    }
+                    accumulatedDistance = 0
                 }
             }
 
-            // Fixed header
+            // Header - all fades on scroll
             VStack(spacing: 0) {
-                // CreateLog title - always visible
-                Text("CreateLog")
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundStyle(Color.clTextPrimary)
-                    .frame(height: titleRowHeight)
-
-                // Tab bar - hide on scroll down
-                tabBar
-                    .opacity(subHeaderVisible ? 1 : 0)
-                    .frame(height: subHeaderVisible ? tabBarSectionHeight : 0)
-            }
-            .animation(.spring(duration: 0.3, bounce: 0.1), value: subHeaderVisible)
-
-            // Bell icon overlaid top-right, hides with sub header
-            HStack {
-                Spacer()
-                NavigationLink {
-                    NotificationsView()
-                } label: {
-                    Image(systemName: "bell")
-                        .font(.system(size: 18, weight: .regular))
+                ZStack {
+                    Text("CreateLog")
+                        .font(.system(size: 22, weight: .bold))
                         .foregroundStyle(Color.clTextPrimary)
-                        .frame(width: 44, height: 44)
-                        .glassEffect(.regular, in: .circle)
+
+                    HStack {
+                        Spacer()
+                        NavigationLink {
+                            NotificationsView()
+                        } label: {
+                            Image(systemName: "bell")
+                                .font(.system(size: 20, weight: .regular))
+                                .foregroundStyle(Color.clTextPrimary)
+                                .frame(width: 52, height: 40)
+                                .glassEffect(.regular.interactive(), in: .capsule)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
-                .buttonStyle(.plain)
+                .padding(.horizontal, 16)
+                .frame(height: titleRowHeight)
+
+                tabBar
             }
-            .padding(.horizontal, 16)
-            .frame(height: titleRowHeight)
-            .opacity(subHeaderVisible ? 1 : 0)
-            .animation(.spring(duration: 0.3, bounce: 0.1), value: subHeaderVisible)
+            .opacity(headerVisible ? 1 : 0)
 
         }
-        .background(Color.clBackground)
         .overlay(alignment: .bottomTrailing) {
             Button {
                 HapticManager.light()
@@ -99,13 +104,37 @@ struct HomeView: View {
             }
             .buttonStyle(.plain)
             .padding(.trailing, 20)
-            .padding(.bottom, 100)
+            .padding(.bottom, 80)
             .offset(y: tabBarOffset)
         }
         .fullScreenCover(isPresented: $showCompose) {
             ComposeView()
         }
         .navigationBarHidden(true)
+        .onChange(of: reselectCount) {
+            if isAtTop {
+                // Already at top → refresh
+                isRefreshing = true
+                HapticManager.light()
+                // Simulate refresh (replace with real API call later)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    isRefreshing = false
+                }
+            } else {
+                // Scroll to top — disable scroll triggers during animation
+                isScrollingToTop = true
+                withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                    feedScrollPosition.scrollTo(edge: .top)
+                    headerVisible = true
+                    tabBarOffset = 0
+                }
+                HapticManager.light()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    isScrollingToTop = false
+                    accumulatedDistance = 0
+                }
+            }
+        }
         .onGeometryChange(for: CGFloat.self) { proxy in
             proxy.size.width
         } action: { newWidth in
@@ -137,6 +166,11 @@ struct HomeView: View {
     private func feedPage(for pagePosts: [Post]) -> some View {
         ScrollView {
             LazyVStack(spacing: 12) {
+                if isRefreshing {
+                    ProgressView()
+                        .padding(.top, 8)
+                }
+
                 ForEach(Array(pagePosts.enumerated()), id: \.element.id) { _, post in
                     NavigationLink {
                         PostDetailView(post: post)
@@ -146,27 +180,54 @@ struct HomeView: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.top, titleRowHeight + tabBarSectionHeight + 12)
+            .padding(.top, titleRowHeight + tabBarSectionHeight)
             .padding(.bottom, 60)
         }
+        .scrollPosition($feedScrollPosition)
         .scrollIndicators(.hidden)
         .onScrollGeometryChange(for: CGFloat.self) { geo in
             geo.contentOffset.y
-        } action: { oldOffset, newOffset in
-            // Skip initial scroll events to prevent hiding on launch
-            guard scrollInitialized else {
-                lastScrollOffset = newOffset
-                scrollInitialized = true
+        } action: { _, newValue in
+            let delta = newValue - lastScrollY
+            lastScrollY = newValue
+            isAtTop = newValue <= 5
+
+            // Skip during programmatic scroll-to-top
+            guard !isScrollingToTop else { return }
+
+            // At top: always show
+            guard newValue > 0 else {
+                if !headerVisible {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        headerVisible = true
+                        tabBarOffset = 0
+                    }
+                }
+                accumulatedDistance = 0
                 return
             }
-            let delta = newOffset - lastScrollOffset
-            let threshold: CGFloat = 15
-            if delta > threshold {
-                subHeaderVisible = false
-            } else if delta < -threshold {
-                subHeaderVisible = true
+
+            guard abs(delta) > 0.5 else { return }
+
+            let nowDown = delta > 0
+            if nowDown != scrollingDown {
+                // Direction changed → reset accumulator
+                scrollingDown = nowDown
+                accumulatedDistance = 0
             }
-            lastScrollOffset = newOffset
+            accumulatedDistance += abs(delta)
+
+            if scrollingDown, accumulatedDistance > hideThreshold, headerVisible {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    headerVisible = false
+                    tabBarOffset = 100
+                }
+            } else if !scrollingDown, accumulatedDistance > showThreshold, !headerVisible {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    headerVisible = true
+                    tabBarOffset = 0
+                }
+            }
         }
     }
 

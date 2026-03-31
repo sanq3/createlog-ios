@@ -5,18 +5,27 @@ import SwiftUI
 struct DiscoverView: View {
     @State private var searchText = ""
     @Binding var tabBarOffset: CGFloat
+    let reselectCount: Int
 
+    @State private var scrollPosition: ScrollPosition = .init(edge: .top)
+    @State private var isRefreshing = false
     @State private var headerOffset: CGFloat = 0
     private let headerHeight: CGFloat = 56
 
     var body: some View {
         ZStack(alignment: .top) {
             ScrollView {
+                if isRefreshing {
+                    ProgressView()
+                        .padding(.top, headerHeight + 16)
+                }
+
                 MasonryGrid(items: MockData.discoverItems)
                     .padding(.horizontal, 12)
                     .padding(.top, headerHeight + 8)
                     .padding(.bottom, 100)
             }
+            .scrollPosition($scrollPosition)
             .scrollIndicators(.hidden)
             .scrollHide(headerHeight: headerHeight, headerOffset: $headerOffset, tabBarOffset: $tabBarOffset)
 
@@ -30,6 +39,20 @@ struct DiscoverView: View {
         }
         .background(Color.clBackground)
         .navigationBarHidden(true)
+        .onChange(of: reselectCount) {
+            if headerOffset == 0 {
+                isRefreshing = true
+                HapticManager.light()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    isRefreshing = false
+                }
+            } else {
+                withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                    scrollPosition.scrollTo(edge: .top)
+                }
+                HapticManager.light()
+            }
+        }
     }
 
     private var headerContentOpacity: Double {

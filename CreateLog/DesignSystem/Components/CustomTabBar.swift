@@ -9,6 +9,7 @@ struct TabItem: Identifiable {
 
 struct CustomTabBar: View {
     @Binding var selectedTab: Int
+    var onReselect: ((Int) -> Void)?
 
     private let tabs: [TabItem] = [
         TabItem(id: 0, icon: "house", iconFill: "house.fill", label: "ホーム"),
@@ -26,9 +27,12 @@ struct CustomTabBar: View {
             HStack(spacing: 0) {
                 ForEach(tabs) { tab in
                     Button {
-                        guard selectedTab != tab.id else { return }
-                        withAnimation(.spring(duration: 0.35, bounce: 0.2)) {
-                            selectedTab = tab.id
+                        if selectedTab == tab.id {
+                            onReselect?(tab.id)
+                        } else {
+                            withAnimation(.spring(duration: 0.35, bounce: 0.2)) {
+                                selectedTab = tab.id
+                            }
                         }
                         HapticManager.light()
                     } label: {
@@ -41,8 +45,8 @@ struct CustomTabBar: View {
                             )
                             .symbolEffect(.bounce, value: selectedTab == tab.id)
                             .frame(maxWidth: .infinity)
-                            .frame(height: 44)
-                            .padding(.vertical, 8)
+                            .frame(height: 36)
+                            .padding(.vertical, 4)
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)

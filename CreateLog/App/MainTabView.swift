@@ -6,6 +6,8 @@ struct MainTabView: View {
     @State private var showSideMenu = false
     @State private var sideMenuDragOffset: CGFloat = 0
     @State private var showSettings = false
+    @State private var homeReselectCount = 0
+    @State private var discoverReselectCount = 0
 
     var body: some View {
         GeometryReader { geometry in
@@ -55,8 +57,8 @@ struct MainTabView: View {
         ZStack(alignment: .bottom) {
             Group {
                 switch selectedTab {
-                case 0: NavigationStack { HomeView(tabBarOffset: $tabBarOffset, showSideMenu: $showSideMenu, sideMenuDragOffset: $sideMenuDragOffset) }
-                case 1: NavigationStack { DiscoverView(tabBarOffset: $tabBarOffset) }
+                case 0: NavigationStack { HomeView(tabBarOffset: $tabBarOffset, showSideMenu: $showSideMenu, sideMenuDragOffset: $sideMenuDragOffset, reselectCount: homeReselectCount) }
+                case 1: NavigationStack { DiscoverView(tabBarOffset: $tabBarOffset, reselectCount: discoverReselectCount) }
                 case 2: NavigationStack { RecordingTabView(tabBarOffset: $tabBarOffset) }
                 case 3: NavigationStack { ReportDashboardView() }
                 case 4: NavigationStack { ProfileView() }
@@ -65,8 +67,14 @@ struct MainTabView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            CustomTabBar(selectedTab: $selectedTab)
-                .offset(y: tabBarOffset)
+            CustomTabBar(selectedTab: $selectedTab) { tabId in
+                switch tabId {
+                case 0: homeReselectCount += 1
+                case 1: discoverReselectCount += 1
+                default: break
+                }
+            }
+            .offset(y: tabBarOffset)
         }
     }
 

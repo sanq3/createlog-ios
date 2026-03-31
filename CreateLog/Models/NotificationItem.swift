@@ -81,19 +81,6 @@ struct NotificationItem: Identifiable {
     }
 
     var relativeTimeText: String {
-        let now = Date()
-        let interval = now.timeIntervalSince(timestamp)
-        let minutes = Int(interval / 60)
-        let hours = Int(interval / 3600)
-        let days = Int(interval / 86400)
-
-        if minutes < 1 { return "たった今" }
-        if minutes < 60 { return "\(minutes)分前" }
-        if hours < 24 { return "\(hours)時間前" }
-        if days < 7 { return "\(days)日前" }
-
-        let formatter = DateFormatter()
-        formatter.dateFormat = "M/d"
-        return formatter.string(from: timestamp)
+        RelativeTimeFormatter.format(from: timestamp)
     }
 }

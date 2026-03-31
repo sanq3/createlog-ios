@@ -24,9 +24,14 @@ enum AppearanceMode: String, CaseIterable {
 
 struct SettingsView: View {
     @AppStorage("appearanceMode") private var appearanceMode: String = AppearanceMode.system.rawValue
+    @AppStorage("durationFormat") private var durationFormat: String = DurationFormat.system.rawValue
 
     private var selectedMode: AppearanceMode {
         AppearanceMode(rawValue: appearanceMode) ?? .system
+    }
+
+    private var selectedDurationFormat: DurationFormat {
+        DurationFormat(rawValue: durationFormat) ?? .system
     }
 
     var body: some View {
@@ -54,6 +59,31 @@ struct SettingsView: View {
                 }
             } header: {
                 Text("外観")
+            }
+
+            Section {
+                ForEach(DurationFormat.allCases, id: \.self) { format in
+                    Button {
+                        durationFormat = format.rawValue
+                        HapticManager.light()
+                    } label: {
+                        HStack {
+                            Text(format.label)
+                                .font(.clBody)
+                                .foregroundStyle(Color.clTextPrimary)
+
+                            Spacer()
+
+                            if selectedDurationFormat == format {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundStyle(Color.clAccent)
+                            }
+                        }
+                    }
+                }
+            } header: {
+                Text("時間の表示形式")
             }
         }
         .scrollContentBackground(.hidden)

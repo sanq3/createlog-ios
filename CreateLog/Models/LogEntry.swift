@@ -32,11 +32,7 @@ struct LogEntry: Identifiable {
     }
 
     var durationString: String {
-        let hours = durationMinutes / 60
-        let mins = durationMinutes % 60
-        if hours > 0 && mins > 0 { return "\(hours)h \(mins)m" }
-        if hours > 0 { return "\(hours)h" }
-        return "\(mins)m"
+        DurationFormatter.format(minutes: durationMinutes)
     }
 
     var startTimeString: String {

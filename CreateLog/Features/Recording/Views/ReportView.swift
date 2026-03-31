@@ -21,7 +21,7 @@ struct ReportView: View {
                         .tabularNumbers()
                         .contentTransition(.numericText())
 
-                    Text("時間")
+                    Text("h")
                         .font(.clBody)
                         .foregroundStyle(Color.clTextSecondary)
                 }

@@ -316,7 +316,11 @@ enum MockData {
             UserLink(type: .github, url: "https://github.com/yamada", label: "GitHub"),
             UserLink(type: .twitter, url: "https://x.com/yamada_dev", label: "X"),
             UserLink(type: .website, url: "https://yamada.dev", label: "yamada.dev"),
-        ]
+        ],
+        occupation: "iOSエンジニア",
+        experienceLevel: .threeToFive,
+        skills: ["Swift", "SwiftUI", "UIKit", "Combine", "Core Data", "Firebase", "Supabase", "Git"],
+        interests: ["iOS", "個人開発", "UI/UX", "Swift"]
     )
 
     static let users: [User] = [
@@ -333,7 +337,11 @@ enum MockData {
             streak: 42,
             projectCount: 5,
             reviewCount: 28,
-            trustScore: 4.9
+            trustScore: 4.9,
+            occupation: "iOSエンジニア",
+            experienceLevel: .threeToFive,
+            skills: ["Swift", "SwiftUI", "Combine", "Core Data", "CloudKit"],
+            interests: ["iOS", "個人開発", "OSS"]
         ),
         User(
             name: "Emily Chen",
@@ -348,7 +356,11 @@ enum MockData {
             streak: 7,
             projectCount: 4,
             reviewCount: 15,
-            trustScore: 4.7
+            trustScore: 4.7,
+            occupation: "モバイルエンジニア",
+            experienceLevel: .threeToFive,
+            skills: ["Flutter", "Dart", "Swift", "Firebase", "Figma"],
+            interests: ["モバイル", "UI/UX", "クロスプラットフォーム"]
         ),
         User(
             name: "佐藤健太",
@@ -363,7 +375,11 @@ enum MockData {
             streak: 14,
             projectCount: 1,
             reviewCount: 3,
-            trustScore: 5.0
+            trustScore: 5.0,
+            occupation: "学生",
+            experienceLevel: .lessThanOne,
+            skills: ["Python", "SwiftUI"],
+            interests: ["学習", "iOS", "AI"]
         ),
         User(
             name: "Alex Kim",
@@ -378,7 +394,11 @@ enum MockData {
             streak: 89,
             projectCount: 8,
             reviewCount: 45,
-            trustScore: 4.6
+            trustScore: 4.6,
+            occupation: "フルスタックエンジニア",
+            experienceLevel: .fiveToTen,
+            skills: ["React", "TypeScript", "Node.js", "Supabase", "PostgreSQL", "Docker", "AWS"],
+            interests: ["Web", "SaaS", "インフラ", "OSS"]
         ),
         User(
             name: "高橋リョウ",
@@ -393,7 +413,11 @@ enum MockData {
             streak: 21,
             projectCount: 3,
             reviewCount: 19,
-            trustScore: 4.8
+            trustScore: 4.8,
+            occupation: "インフラエンジニア",
+            experienceLevel: .fiveToTen,
+            skills: ["Docker", "Kubernetes", "Terraform", "AWS", "Go", "Linux"],
+            interests: ["インフラ", "DevOps", "SRE"]
         ),
         User(
             name: "Maria Santos",
@@ -408,7 +432,11 @@ enum MockData {
             streak: 5,
             projectCount: 6,
             reviewCount: 8,
-            trustScore: 4.5
+            trustScore: 4.5,
+            occupation: "フロントエンドエンジニア",
+            experienceLevel: .threeToFive,
+            skills: ["React", "Next.js", "TypeScript", "Figma", "Tailwind CSS"],
+            interests: ["Web", "デザイン", "個人開発"]
         ),
     ]
 

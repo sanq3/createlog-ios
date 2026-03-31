@@ -28,7 +28,7 @@ struct WeeklyChart: View {
                     AxisMarks(position: .leading) { value in
                         AxisValueLabel {
                             if let hours = value.as(Double.self) {
-                                Text("\(Int(hours))h")
+                                Text(DurationFormatter.formatAxisLabel(hours: hours))
                                     .font(.clCaption)
                                     .foregroundStyle(Color.clTextTertiary)
                             }

@@ -89,23 +89,34 @@ struct ReportDashboardView: View {
 
     private var kpiRow: some View {
         HStack(spacing: 0) {
-            kpiItem(value: String(format: "%.1f", animateIn ? todayHours : 0.0), label: "今日")
-            kpiItem(value: String(format: "%.1f", animateIn ? weekHours : 0.0), label: "今週")
-            kpiItem(value: String(format: "%.1f", animateIn ? monthHours : 0.0), label: "今月")
+            kpiItem(hours: animateIn ? todayHours : 0, label: "今日")
+            kpiItem(hours: animateIn ? weekHours : 0, label: "今週")
+            kpiItem(hours: animateIn ? monthHours : 0, label: "今月")
         }
     }
 
-    private func kpiItem(value: String, label: String) -> some View {
-        VStack(spacing: 3) {
+    private func kpiItem(hours: Double, label: String) -> some View {
+        let minutes = Int(hours * 60)
+        let h = minutes / 60
+        let m = minutes % 60
+        return VStack(spacing: 3) {
             HStack(alignment: .firstTextBaseline, spacing: 1) {
-                Text(value)
+                if h > 0 {
+                    Text("\(h)")
+                        .font(.system(size: 30, weight: .heavy, design: .rounded))
+                        .foregroundStyle(Color.clTextPrimary)
+                    Text("h")
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color.clTextTertiary)
+                }
+                Text("\(h > 0 ? String(format: "%02d", m) : "\(m)")")
                     .font(.system(size: 30, weight: .heavy, design: .rounded))
                     .foregroundStyle(Color.clTextPrimary)
-                    .contentTransition(.numericText())
-                Text("h")
+                Text("m")
                     .font(.system(size: 13, weight: .bold, design: .rounded))
                     .foregroundStyle(Color.clTextTertiary)
             }
+            .contentTransition(.numericText())
             Text(label)
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(Color.clTextTertiary)
@@ -173,7 +184,7 @@ struct ReportDashboardView: View {
                 Text("\(Int(totalCategoryHours))")
                     .font(.system(size: 22, weight: .heavy, design: .rounded))
                     .foregroundStyle(Color.clTextPrimary)
-                Text("時間")
+                Text("h")
                     .font(.system(size: 10, weight: .medium))
                     .foregroundStyle(Color.clTextTertiary)
             }
@@ -228,8 +239,9 @@ struct ReportDashboardView: View {
             HStack(spacing: 3) {
                 Text("\(percentage)%")
                     .font(.system(size: 10, weight: .bold, design: .monospaced))
-                Text(String(format: "%.1fh", cat.hours))
+                Text(DurationFormatter.formatHM(hours: cat.hours))
                     .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .lineLimit(1)
             }
             .foregroundStyle(Color.clTextTertiary)
         }
@@ -282,7 +294,7 @@ struct ReportDashboardView: View {
 
                 Spacer()
 
-                Text("avg 4.3h")
+                Text("avg 4h 18m")
                     .font(.system(size: 11, weight: .medium, design: .monospaced))
                     .foregroundStyle(Color.clTextTertiary)
             }

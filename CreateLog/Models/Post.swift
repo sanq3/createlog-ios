@@ -47,6 +47,13 @@ struct Post: Identifiable {
 enum PostMedia {
     case images([PostImage])
     case video(PostVideo)
+    case code(PostCode)
+}
+
+struct PostCode: Identifiable {
+    let id = UUID()
+    let code: String
+    let language: String
 }
 
 struct PostImage: Identifiable {

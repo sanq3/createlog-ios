@@ -86,7 +86,7 @@ struct ArticleDetailView: View {
                     Text("・")
                     Text(formattedDate)
                     Text("・")
-                    Text("\(article.readingTime)分で読める")
+                    Text(DurationFormatter.isJapanese ? "\(article.readingTime)分で読める" : "\(article.readingTime) min read")
                 }
                 .font(.caption)
                 .foregroundStyle(Color.clTextTertiary)

@@ -9,6 +9,9 @@ struct ProfileEditView: View {
     @State private var occupation: String
     @State private var experienceLevel: ExperienceLevel
     @State private var links: [EditableLink]
+    @State private var skills: [String]
+    @State private var newSkill: String = ""
+    @State private var interests: Set<String>
 
     private let originalName: String
     private let originalHandle: String
@@ -16,6 +19,14 @@ struct ProfileEditView: View {
     private let originalOccupation: String
     private let originalExperience: ExperienceLevel
     private let originalLinks: [EditableLink]
+    private let originalSkills: [String]
+    private let originalInterests: Set<String>
+
+    private static let interestOptions = [
+        "iOS", "Android", "Web", "バックエンド", "インフラ",
+        "AI/ML", "ゲーム", "デザイン", "個人開発", "OSS",
+        "セキュリティ", "データ", "モバイル", "クラウド", "DevOps",
+    ]
 
     private var hasChanges: Bool {
         displayName != originalName
@@ -24,6 +35,8 @@ struct ProfileEditView: View {
             || occupation != originalOccupation
             || experienceLevel != originalExperience
             || links != originalLinks
+            || skills != originalSkills
+            || interests != originalInterests
     }
 
     private var isHandleValid: Bool {
@@ -36,16 +49,20 @@ struct ProfileEditView: View {
         _displayName = State(initialValue: user.name)
         _handle = State(initialValue: user.handle)
         _bio = State(initialValue: user.bio)
-        _occupation = State(initialValue: "iOSエンジニア")
-        _experienceLevel = State(initialValue: .threeToFive)
+        _occupation = State(initialValue: user.occupation)
+        _experienceLevel = State(initialValue: user.experienceLevel)
         _links = State(initialValue: user.links.map { EditableLink(url: $0.url) })
+        _skills = State(initialValue: user.skills)
+        _interests = State(initialValue: Set(user.interests))
 
         originalName = user.name
         originalHandle = user.handle
         originalBio = user.bio
-        originalOccupation = "iOSエンジニア"
-        originalExperience = .threeToFive
+        originalOccupation = user.occupation
+        originalExperience = user.experienceLevel
         originalLinks = user.links.map { EditableLink(url: $0.url) }
+        originalSkills = user.skills
+        originalInterests = Set(user.interests)
     }
 
     var body: some View {
@@ -195,61 +212,156 @@ struct ProfileEditView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
 
+            // スキル
+            skillsEditSection
+
+            // 興味カテゴリ
+            interestsEditSection
+
             // 外部リンク
-            VStack(alignment: .leading, spacing: 12) {
-                Text("外部リンク")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(Color.clTextSecondary)
+            linksEditSection
+        }
+    }
 
-                ForEach(links) { link in
-                    HStack(spacing: 10) {
-                        Image(systemName: "link")
-                            .font(.system(size: 14))
-                            .foregroundStyle(Color.clTextTertiary)
+    // MARK: - Skills Edit
 
-                        TextField("https://...", text: linkBinding(for: link.id))
-                            .font(.system(size: 15))
+    private var skillsEditSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("スキル")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Color.clTextSecondary)
+
+            // 既存スキル
+            if !skills.isEmpty {
+                WrappingChips(items: skills) { skill in
+                    HStack(spacing: 4) {
+                        Text(skill)
+                            .font(.system(size: 13, weight: .medium))
                             .foregroundStyle(Color.clTextPrimary)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
-                            .keyboardType(.URL)
-                    }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 12)
-                    .background(Color.clSurfaceLow, in: RoundedRectangle(cornerRadius: 10))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .strokeBorder(Color.clBorder, lineWidth: 1)
-                    )
-                    .swipeActions(edge: .trailing) {
-                        Button(role: .destructive) {
+
+                        Button {
                             withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                                links.removeAll { $0.id == link.id }
+                                skills.removeAll { $0 == skill }
                             }
+                            HapticManager.light()
                         } label: {
-                            Label("削除", systemImage: "trash")
+                            Image(systemName: "xmark")
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundStyle(Color.clTextTertiary)
                         }
+                        .buttonStyle(.plain)
                     }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.clSurfaceLow, in: Capsule())
+                    .overlay(Capsule().strokeBorder(Color.clBorder, lineWidth: 1))
                 }
+            }
+
+            // 新規追加
+            HStack(spacing: 8) {
+                TextField("スキルを追加...", text: $newSkill)
+                    .font(.system(size: 15))
+                    .foregroundStyle(Color.clTextPrimary)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .onSubmit { addSkill() }
 
                 Button {
-                    withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                        links.append(EditableLink(url: ""))
-                    }
-                    HapticManager.light()
+                    addSkill()
                 } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 16))
-                        Text("リンクを追加")
-                            .font(.system(size: 14, weight: .medium))
-                    }
-                    .foregroundStyle(Color.clAccent)
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 20))
+                        .foregroundStyle(newSkill.isEmpty ? Color.clTextTertiary : Color.clAccent)
                 }
                 .buttonStyle(.plain)
+                .disabled(newSkill.isEmpty)
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(Color.clSurfaceLow, in: RoundedRectangle(cornerRadius: 10))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .strokeBorder(Color.clBorder, lineWidth: 1)
+            )
         }
+        .padding(.horizontal, 16)
+    }
+
+    // MARK: - Interests Edit
+
+    private var interestsEditSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("興味カテゴリ")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Color.clTextSecondary)
+
+            WrappingChips(items: Self.interestOptions) { interest in
+                interestChip(interest)
+            }
+        }
+        .padding(.horizontal, 16)
+    }
+
+    // MARK: - Links Edit
+
+    private var linksEditSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("外部リンク")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Color.clTextSecondary)
+
+            ForEach(links) { link in
+                HStack(spacing: 10) {
+                    Image(systemName: "link")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color.clTextTertiary)
+
+                    TextField("https://...", text: linkBinding(for: link.id))
+                        .font(.system(size: 15))
+                        .foregroundStyle(Color.clTextPrimary)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .keyboardType(.URL)
+
+                    Button {
+                        withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                            links.removeAll { $0.id == link.id }
+                        }
+                        HapticManager.light()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 18))
+                            .foregroundStyle(Color.clTextTertiary)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+                .background(Color.clSurfaceLow, in: RoundedRectangle(cornerRadius: 10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .strokeBorder(Color.clBorder, lineWidth: 1)
+                )
+            }
+
+            Button {
+                withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                    links.append(EditableLink(url: ""))
+                }
+                HapticManager.light()
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 16))
+                    Text("リンクを追加")
+                        .font(.system(size: 14, weight: .medium))
+                }
+                .foregroundStyle(Color.clAccent)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 16)
     }
 
     // MARK: - Helpers
@@ -283,11 +395,49 @@ struct ProfileEditView: View {
         )
     }
 
+    private func interestChip(_ interest: String) -> some View {
+        let isSelected = interests.contains(interest)
+        return Button {
+            withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                if isSelected {
+                    interests.remove(interest)
+                } else {
+                    interests.insert(interest)
+                }
+            }
+            HapticManager.light()
+        } label: {
+            Text(interest)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(isSelected ? .white : Color.clTextPrimary)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(
+                    isSelected ? Color.clAccent : Color.clSurfaceLow,
+                    in: Capsule()
+                )
+                .overlay(
+                    Capsule().strokeBorder(
+                        isSelected ? Color.clear : Color.clBorder,
+                        lineWidth: 1
+                    )
+                )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func addSkill() {
+        let trimmed = newSkill.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty, !skills.contains(trimmed) else { return }
+        withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+            skills.append(trimmed)
+        }
+        newSkill = ""
+        HapticManager.light()
+    }
+
     private func showPhotoOptions() {
         print("[ProfileEdit] Photo picker action sheet would appear here")
-        print("  - ライブラリから選択")
-        print("  - カメラで撮影")
-        print("  - キャンセル")
     }
 }
 
@@ -303,20 +453,64 @@ private struct EditableLink: Identifiable, Equatable {
     }
 }
 
-private enum ExperienceLevel: String, CaseIterable {
-    case lessThanOne
-    case oneToThree
-    case threeToFive
-    case fiveToTen
-    case moreThanTen
+// MARK: - Wrapping Chips (reusable flow layout for edit screens)
 
-    var label: String {
-        switch self {
-        case .lessThanOne: return "1年未満"
-        case .oneToThree: return "1-3年"
-        case .threeToFive: return "3-5年"
-        case .fiveToTen: return "5-10年"
-        case .moreThanTen: return "10年以上"
+struct WrappingChips<Item: Hashable, Content: View>: View {
+    let items: [Item]
+    let content: (Item) -> Content
+
+    @State private var totalHeight: CGFloat = .zero
+
+    var body: some View {
+        GeometryReader { geometry in
+            generateContent(in: geometry)
         }
+        .frame(height: totalHeight)
+    }
+
+    private func generateContent(in geometry: GeometryProxy) -> some View {
+        var width = CGFloat.zero
+        var height = CGFloat.zero
+
+        return ZStack(alignment: .topLeading) {
+            ForEach(items, id: \.self) { item in
+                content(item)
+                    .padding(.trailing, 6)
+                    .padding(.bottom, 6)
+                    .alignmentGuide(.leading) { dimension in
+                        if abs(width - dimension.width) > geometry.size.width {
+                            width = 0
+                            height -= dimension.height + 6
+                        }
+                        let result = width
+                        if item == items.last {
+                            width = 0
+                        } else {
+                            width -= dimension.width + 6
+                        }
+                        return result
+                    }
+                    .alignmentGuide(.top) { _ in
+                        let result = height
+                        if item == items.last {
+                            height = 0
+                        }
+                        return result
+                    }
+            }
+        }
+        .background(
+            GeometryReader { geo in
+                Color.clear.preference(key: EditHeightKey.self, value: geo.size.height)
+            }
+        )
+        .onPreferenceChange(EditHeightKey.self) { totalHeight = $0 }
+    }
+}
+
+private struct EditHeightKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
     }
 }

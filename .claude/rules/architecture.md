@@ -66,12 +66,35 @@ View → ViewModel(@Observable) → Repository/Service → Supabase
 - マジックナンバー禁止。定数はenumまたはstructで名前を付けて`AppConfig`等に集約する
 - 環境ごとに変わる値（API URL、Supabase key）はxcconfig経由で注入する
 
-### 非推奨・廃止予定の技術を使うな
+### iOS 26最低ターゲット — 古い書き方を使うな
 
-- Apple公式ドキュメントで「Deprecated」マークが付いているAPIは使用禁止。代替APIを調査して使う（例: NavigationView → NavigationStack、ObservableObject → @Observable）
-- 既に新しい標準がある旧式パターンを採用するな（例: UIKitラッパーでSwiftUI純正コンポーネントがあるもの）
-- サードパーティライブラリを導入する前に、メンテナンス状況（最終更新日、issue対応頻度）を確認する。1年以上更新なしのライブラリは原則使わない
-- iOS最低サポートバージョンで使えない新APIを使う場合は`@available`で明示的にガードする
+最低ターゲットはiOS 26.0。iOS 25以前のユーザーは切り捨てる。`@available`ガードは不要（全APIがiOS 26以上前提）。
+
+**使うべきもの（iOS 26 / Swift 6.2）:**
+- `@Observable` （ObservableObject / @Published は禁止）
+- `NavigationStack` （NavigationView は禁止）
+- Swift 6.2 concurrency（`@concurrent`、nonisolated(nonsending) デフォルト等）
+- Liquid Glass マテリアル（iOS 26のデザイン言語）
+- `@Previewable` マクロ（旧プレビュー構造体は禁止）
+- SwiftData（Core Data は禁止。新規で使うな）
+- Swift Charts（サードパーティチャートライブラリ禁止）
+- `ImageRenderer`（UIGraphicsBeginImageContext 禁止）
+- `AsyncImage` / Swift Concurrency ベースのネットワーキング
+- `withAnimation(.spring(duration:bounce:))` 形式（旧`.spring(response:dampingFraction:)` は非推奨）
+
+**禁止パターン:**
+- Apple公式で「Deprecated」マーク付きのAPI全般
+- UIKitラッパーでSwiftUI純正コンポーネントがあるもの
+- `@StateObject` / `@ObservedObject` / `@EnvironmentObject` → `@State` / `@Environment` + `@Observable` で統一
+- `onChange(of:perform:)` 旧シグネチャ → 新 `onChange(of:) { oldValue, newValue in }` を使う
+- `AnyView` によるtype erasure → `some View` / `@ViewBuilder` で解決しろ
+- iOS 26未満でしか動かないサードパーティライブラリ
+
+**サードパーティライブラリ導入基準:**
+- 導入前にメンテナンス状況を確認（最終更新日、issue対応頻度）。1年以上更新なしは原則禁止
+- Apple純正APIで代替できるなら純正を使え
+
+**設計判断:**
 - 実装前に「この設計は2年後も成立するか」を考えろ。スケールや要件変更で破綻が見える設計は採用するな
 
 ## Supabase / Postgres
@@ -80,6 +103,15 @@ View → ViewModel(@Observable) → Repository/Service → Supabase
 - Repository層でクエリを書く前に、該当するreferencesファイルを読め
 - 全テーブルにRLS必須。Swift側でフィルタしてるからRLS不要、は禁止
 - `.from("table").select()` を書くときはインデックスの存在を確認しろ
+
+## 多言語・テキスト長対応
+
+- 動的テキスト（時間、日付、数値フォーマット等）は言語によって長さが大きく変わる。日本語「2時間10分」vs 英語「2h 10m」等
+- 固定幅レイアウト内の動的テキストには必ず `.lineLimit(1)` と `.minimumScaleFactor(0.5)` を付けろ。改行やはみ出しを防ぐ
+- テキストフォーマッタを作成・変更したら、最も長い出力パターン（例: "100時間59分"）でレイアウトが崩れないか確認しろ
+- `DurationFormatter` を時間表示の唯一の手段として使え。各Viewでフォーマットロジックを書くな
+- UIDatePickerのlocaleは `DurationFormatter.pickerLocale` を使え
+- 設定画面の「時間の表示形式」でユーザーが切り替え可能。`UserDefaults("durationFormat")` に保存される
 
 ## パフォーマンス
 

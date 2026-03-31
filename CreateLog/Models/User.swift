@@ -16,6 +16,10 @@ struct User: Identifiable {
     let reviewCount: Int
     let trustScore: Double
     let links: [UserLink]
+    let occupation: String
+    let experienceLevel: ExperienceLevel
+    let skills: [String]
+    let interests: [String]
 
     init(
         name: String,
@@ -31,7 +35,11 @@ struct User: Identifiable {
         projectCount: Int = 0,
         reviewCount: Int = 0,
         trustScore: Double = 5.0,
-        links: [UserLink] = []
+        links: [UserLink] = [],
+        occupation: String = "",
+        experienceLevel: ExperienceLevel = .lessThanOne,
+        skills: [String] = [],
+        interests: [String] = []
     ) {
         self.name = name
         self.handle = handle
@@ -47,6 +55,28 @@ struct User: Identifiable {
         self.reviewCount = reviewCount
         self.trustScore = trustScore
         self.links = links
+        self.occupation = occupation
+        self.experienceLevel = experienceLevel
+        self.skills = skills
+        self.interests = interests
+    }
+}
+
+enum ExperienceLevel: String, CaseIterable, Sendable {
+    case lessThanOne
+    case oneToThree
+    case threeToFive
+    case fiveToTen
+    case moreThanTen
+
+    var label: String {
+        switch self {
+        case .lessThanOne: "1年未満"
+        case .oneToThree: "1-3年"
+        case .threeToFive: "3-5年"
+        case .fiveToTen: "5-10年"
+        case .moreThanTen: "10年以上"
+        }
     }
 }
 
@@ -63,5 +93,16 @@ struct UserLink: Identifiable {
         case zenn
         case qiita
         case other
+
+        var iconName: String {
+            switch self {
+            case .website: "globe"
+            case .github: "chevron.left.forwardslash.chevron.right"
+            case .twitter: "at"
+            case .zenn: "doc.text"
+            case .qiita: "doc.text"
+            case .other: "link"
+            }
+        }
     }
 }

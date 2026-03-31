@@ -28,7 +28,8 @@ CreateLog/
 ├── App/                          # エントリ + MainTabView (5タブ)
 ├── Models/                       # ドメインモデル (Foundation-only)
 │   └── MockData.swift            # 開発用モックデータ
-├── Features/{Feature}/Views/     # 画面別View。将来ViewModels/を追加
+├── Features/{Feature}/Views/     # 画面別View
+├── Features/{Feature}/ViewModels/ # @MainActor @Observable ViewModel
 ├── DesignSystem/
 │   ├── Tokens/                   # cl色・フォント定義
 │   ├── Components/               # 再利用UIコンポーネント

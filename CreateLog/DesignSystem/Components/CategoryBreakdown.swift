@@ -20,9 +20,10 @@ struct CategoryBreakdown: View {
                             Text(category.name)
                                 .font(.clHeadline)
                                 .foregroundStyle(Color.clTextPrimary)
-                            Text(String(format: "%.0fh %02dm", floor(category.hours), Int((category.hours.truncatingRemainder(dividingBy: 1)) * 60)))
+                            Text(DurationFormatter.formatHM(hours: category.hours))
                                 .font(.clCaption)
                                 .foregroundStyle(Color.clTextTertiary)
+                                .lineLimit(1)
                         }
 
                         Spacer()
