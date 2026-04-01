@@ -48,30 +48,26 @@ struct ComposeView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            composeHeader
-
+        NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(alignment: .top, spacing: 12) {
                         AvatarView(
                             initials: user.initials,
                             size: 40,
-                            status: user.status
+                            status: .offline
                         )
 
-                        ZStack(alignment: .topLeading) {
-                            if text.isEmpty {
-                                Text("いまなにしてる?")
-                                    .font(.system(size: 17))
-                                    .foregroundStyle(Color.clTextTertiary)
-                                    .padding(.top, 8)
-                                    .allowsHitTesting(false)
+                        AutoFocusTextView(text: $text)
+                            .frame(minHeight: 160)
+                            .overlay(alignment: .topLeading) {
+                                if text.isEmpty {
+                                    Text("いまなにしてる?")
+                                        .font(.system(size: 17))
+                                        .foregroundStyle(Color.clTextTertiary)
+                                        .allowsHitTesting(false)
+                                }
                             }
-
-                            AutoFocusTextView(text: $text)
-                                .frame(minHeight: 120)
-                        }
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
@@ -85,56 +81,90 @@ struct ComposeView: View {
                     }
                 }
             }
+            .background(Color.clBackground)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
+                        HapticManager.light()
+                        dismiss()
+                    } label: {
+                        Text("キャンセル")
+                            .font(.system(size: 16))
+                            .foregroundStyle(Color.clTextPrimary)
+                    }
+                }
 
-            Divider()
-                .overlay(Color.clBorder)
-
-            composeToolbar
-        }
-        .background(Color.clBackground)
-        .sheet(isPresented: $showCodeEditor) {
-            CodeAttachmentSheet(attachedCode: $attachedCode)
-        }
-        .onChange(of: selectedPhotos) { _, newItems in
-            handlePhotoSelection(newItems)
-        }
-    }
-
-    // MARK: - Header
-
-    private var composeHeader: some View {
-        HStack {
-            Button {
-                HapticManager.light()
-                dismiss()
-            } label: {
-                Text("キャンセル")
-                    .font(.system(size: 16))
-                    .foregroundStyle(Color.clTextPrimary)
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
+                        HapticManager.medium()
+                        dismiss()
+                    } label: {
+                        Text("投稿")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundStyle(canPost ? Color.clAccent : Color.clAccent.opacity(0.4))
+                    }
+                    .disabled(!canPost)
+                }
             }
-            .buttonStyle(.plain)
+            .toolbar(.visible, for: .bottomBar)
+            .toolbar {
+                ToolbarItemGroup(placement: .bottomBar) {
+                    PhotosPicker(
+                        selection: $selectedPhotos,
+                        maxSelectionCount: maxImages - attachedImages.count,
+                        matching: .any(of: [.images, .videos])
+                    ) {
+                        Image(systemName: "photo.on.rectangle.angled")
+                            .font(.system(size: 18))
+                            .foregroundStyle(
+                                attachedImages.count >= maxImages
+                                    ? Color.clTextTertiary
+                                    : Color.clAccent
+                            )
+                    }
+                    .disabled(attachedImages.count >= maxImages)
 
-            Spacer()
+                    Button {
+                        HapticManager.light()
+                        showCodeEditor = true
+                    } label: {
+                        Image(systemName: "chevron.left.forwardslash.chevron.right")
+                            .font(.system(size: 16))
+                            .foregroundStyle(
+                                attachedCode != nil
+                                    ? Color.clTextTertiary
+                                    : Color.clAccent
+                            )
+                    }
+                    .disabled(attachedCode != nil)
 
-            Button {
-                HapticManager.medium()
-                dismiss()
-            } label: {
-                Text("投稿する")
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 8)
+                    Spacer()
+
+                    HStack(spacing: 4) {
+                        Image(systemName: detectedType.icon)
+                            .font(.system(size: 11, weight: .medium))
+
+                        Text(detectedType.rawValue)
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .foregroundStyle(badgeColor)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
                     .background(
                         Capsule()
-                            .fill(canPost ? Color.clAccent : Color.clAccent.opacity(0.4))
+                            .fill(badgeColor.opacity(0.12))
                     )
+                    .animation(.spring(duration: 0.35, bounce: 0.15), value: detectedType)
+                }
             }
-            .buttonStyle(.plain)
-            .disabled(!canPost)
+            .sheet(isPresented: $showCodeEditor) {
+                CodeAttachmentSheet(attachedCode: $attachedCode)
+            }
+            .onChange(of: selectedPhotos) { _, newItems in
+                handlePhotoSelection(newItems)
+            }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
     }
 
     // MARK: - Photo Selection
@@ -249,65 +279,6 @@ struct ComposeView: View {
         )
         .padding(.horizontal, 68)
         .padding(.vertical, 12)
-    }
-
-    // MARK: - Compose Toolbar
-
-    private var composeToolbar: some View {
-        HStack(spacing: 0) {
-            PhotosPicker(
-                selection: $selectedPhotos,
-                maxSelectionCount: maxImages - attachedImages.count,
-                matching: .any(of: [.images, .videos])
-            ) {
-                Image(systemName: "photo.on.rectangle.angled")
-                    .font(.system(size: 18))
-                    .foregroundStyle(
-                        attachedImages.count >= maxImages
-                            ? Color.clTextTertiary
-                            : Color.clAccent
-                    )
-                    .frame(width: 44, height: 44)
-            }
-            .disabled(attachedImages.count >= maxImages)
-
-            Button {
-                HapticManager.light()
-                showCodeEditor = true
-            } label: {
-                Image(systemName: "chevron.left.forwardslash.chevron.right")
-                    .font(.system(size: 16))
-                    .foregroundStyle(
-                        attachedCode != nil
-                            ? Color.clTextTertiary
-                            : Color.clAccent
-                    )
-                    .frame(width: 44, height: 44)
-            }
-            .buttonStyle(.plain)
-            .disabled(attachedCode != nil)
-
-            Spacer()
-
-            HStack(spacing: 4) {
-                Image(systemName: detectedType.icon)
-                    .font(.system(size: 11, weight: .medium))
-
-                Text(detectedType.rawValue)
-                    .font(.system(size: 12, weight: .medium))
-            }
-            .foregroundStyle(badgeColor)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .background(
-                Capsule()
-                    .fill(badgeColor.opacity(0.12))
-            )
-            .animation(.spring(duration: 0.35, bounce: 0.15), value: detectedType)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 4)
-        .background(Color.clBackground)
     }
 
     private var badgeColor: Color {
