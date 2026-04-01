@@ -9,12 +9,16 @@ struct TimePickerSection: View {
         viewModel.pickerHours * 60 + viewModel.pickerMinutes
     }
 
-    private var hasSelection: Bool {
-        viewModel.selectedTag != nil
+    private var tagColor: Color {
+        if let tag = viewModel.selectedTag {
+            return RecordingViewModel.colorForTag(tag)
+        }
+        return Color.clAccent
     }
 
     var body: some View {
         VStack(spacing: 12) {
+            // Picker (always visible)
             DurationPicker(hours: $viewModel.pickerHours, minutes: $viewModel.pickerMinutes)
                 .frame(height: 100)
 
@@ -23,7 +27,7 @@ struct TimePickerSection: View {
                 if let tag = viewModel.selectedTag {
                     HStack(spacing: 6) {
                         RoundedRectangle(cornerRadius: 2)
-                            .fill(RecordingViewModel.colorForTag(tag))
+                            .fill(tagColor)
                             .frame(width: 3, height: 16)
                         Text(tag.name)
                             .font(.system(size: 13, weight: .semibold))
@@ -49,7 +53,7 @@ struct TimePickerSection: View {
                         .padding(.vertical, 10)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(pickerTotal > 0 ? Color.clAccent : Color.clBorder)
+                                .fill(pickerTotal > 0 ? tagColor : Color.clBorder)
                         )
                 }
                 .buttonStyle(.bounce)
@@ -64,18 +68,15 @@ struct TimePickerSection: View {
         .animation(.spring(duration: 0.3, bounce: 0.15), value: viewModel.selectedTag?.id)
     }
 
-    private var canSave: Bool {
-        pickerTotal > 0
-    }
-
     private func save() {
-        guard canSave else { return }
+        guard pickerTotal > 0 else { return }
         withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
             showConfirmation = true
         }
         viewModel.savePickerTime()
+        HapticManager.success()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             withAnimation(.spring(duration: 0.25, bounce: 0.15)) {
                 showConfirmation = false
             }
@@ -85,14 +86,14 @@ struct TimePickerSection: View {
     private var confirmationOverlay: some View {
         VStack(spacing: 4) {
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 28))
-                .foregroundStyle(Color.clSuccess)
+                .font(.system(size: 32))
+                .foregroundStyle(tagColor)
             Text("記録しました")
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(Color.clTextPrimary)
         }
-        .padding(16)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+        .padding(20)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
         .transition(.scale(scale: 0.8).combined(with: .opacity))
     }
 }

@@ -8,14 +8,18 @@ struct RecentHistoryView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("最近の記録")
-                .font(.clCaption)
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(Color.clTextTertiary)
+                .textCase(.uppercase)
+                .tracking(0.5)
 
             if entries.isEmpty {
                 emptyState
             } else {
-                ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
-                    entryRow(entry, index: index)
+                VStack(spacing: 6) {
+                    ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
+                        entryRow(entry, index: index)
+                    }
                 }
             }
         }
@@ -35,7 +39,7 @@ struct RecentHistoryView: View {
         return HStack(spacing: 10) {
             RoundedRectangle(cornerRadius: 2)
                 .fill(color)
-                .frame(width: 3, height: 36)
+                .frame(width: 4, height: 36)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(entry.projectName)
@@ -50,14 +54,19 @@ struct RecentHistoryView: View {
 
             VStack(alignment: .trailing, spacing: 2) {
                 Text(RecordingViewModel.formatDuration(entry.durationMinutes))
-                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
                     .foregroundStyle(Color.clTextPrimary)
                 Text(formatTime(entry.startDate))
                     .font(.system(size: 10, weight: .medium, design: .monospaced))
                     .foregroundStyle(Color.clTextTertiary)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.clSurfaceLow.opacity(0.3))
+        )
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 12)
         .animation(

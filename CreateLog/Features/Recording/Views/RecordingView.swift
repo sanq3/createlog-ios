@@ -16,6 +16,8 @@ struct RecordingView: View {
                 mainContent(viewModel)
             }
         }
+        .navigationTitle("記録")
+        .navigationBarTitleDisplayMode(.inline)
         .task {
             if viewModel == nil {
                 let vm = RecordingViewModel(modelContext: modelContext)
@@ -31,7 +33,7 @@ struct RecordingView: View {
     private func mainContent(_ vm: RecordingViewModel) -> some View {
         ScrollView {
             VStack(spacing: 0) {
-                // Stats
+                // Stats (glass card)
                 TodayHeroView(
                     todayMinutes: vm.todayTotalMinutes,
                     cumulativeMinutes: vm.cumulativeTotalMinutes,
@@ -39,7 +41,6 @@ struct RecordingView: View {
                     breakdown: vm.categoryBreakdown
                 )
                 .padding(.horizontal, 16)
-                .padding(.top, 8)
 
                 // Active timer
                 if vm.isTimerRunning {
@@ -53,12 +54,6 @@ struct RecordingView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
 
-                Rectangle()
-                    .fill(Color.clBorder)
-                    .frame(height: 1)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 16)
-
                 // Tags
                 TagChipsView(
                     tags: vm.tags,
@@ -67,7 +62,7 @@ struct RecordingView: View {
                     onTagLongPressed: { vm.startTimer(for: $0) },
                     onAddTapped: { vm.startCreateTag() }
                 )
-                .padding(.top, 14)
+                .padding(.top, 20)
 
                 if vm.tags.isEmpty {
                     emptyTagsHint
@@ -75,15 +70,9 @@ struct RecordingView: View {
                         .padding(.top, 8)
                 }
 
-                Rectangle()
-                    .fill(Color.clBorder)
-                    .frame(height: 1)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 14)
-
                 // History
                 RecentHistoryView(entries: vm.recentEntries)
-                    .padding(.top, 14)
+                    .padding(.top, 20)
                     .padding(.horizontal, 16)
 
                 Spacer(minLength: 100)
