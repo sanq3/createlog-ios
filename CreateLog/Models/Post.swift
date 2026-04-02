@@ -13,6 +13,7 @@ struct Post: Identifiable {
     var reposts: Int
     var comments: Int
     var isLiked: Bool = false
+    var isBookmarked: Bool = false
     let media: PostMedia?
 
     init(
@@ -27,6 +28,7 @@ struct Post: Identifiable {
         reposts: Int,
         comments: Int,
         isLiked: Bool = false,
+        isBookmarked: Bool = false,
         media: PostMedia? = nil
     ) {
         self.name = name
@@ -40,6 +42,7 @@ struct Post: Identifiable {
         self.reposts = reposts
         self.comments = comments
         self.isLiked = isLiked
+        self.isBookmarked = isBookmarked
         self.media = media
     }
 }

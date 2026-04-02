@@ -73,14 +73,7 @@ struct DiscoverView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.clSurfaceLow)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .strokeBorder(Color.clBorder, lineWidth: 1)
-                )
-        )
+        .glassEffect(.regular, in: .rect(cornerRadius: 12))
         .opacity(headerContentOpacity)
         .padding(.horizontal, 16)
         .padding(.top, 8)

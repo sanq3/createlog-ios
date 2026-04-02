@@ -97,15 +97,15 @@ struct HomeView: View {
             } label: {
                 Image(systemName: "plus")
                     .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.clTextPrimary)
                     .frame(width: 56, height: 56)
-                    .background(Color.clAccent, in: Circle())
-                    .shadow(color: Color.clAccent.opacity(0.3), radius: 12, y: 4)
+                    .contentShape(Circle())
             }
+            .glassEffect(.regular.interactive(), in: .circle)
+            .contentShape(Circle().inset(by: -8))
             .buttonStyle(.plain)
             .padding(.trailing, 20)
-            .padding(.bottom, 80)
-            .offset(y: tabBarOffset)
+            .padding(.bottom, max(6, 56 - tabBarOffset))
         }
         .fullScreenCover(isPresented: $showCompose) {
             ComposeView()

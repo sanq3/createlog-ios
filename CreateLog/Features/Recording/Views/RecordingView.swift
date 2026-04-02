@@ -6,84 +6,87 @@ struct RecordingView: View {
     @Environment(\.modelContext) private var modelContext
 
     @State private var viewModel: RecordingViewModel?
-    @State private var isReady = false
 
     var body: some View {
         ZStack {
             Color.clBackground.ignoresSafeArea()
-
-            if let viewModel, isReady {
-                mainContent(viewModel)
-            }
+            mainContent
         }
         .navigationTitle("記録")
         .navigationBarTitleDisplayMode(.inline)
         .task {
             if viewModel == nil {
                 let vm = RecordingViewModel(modelContext: modelContext)
-                vm.loadData()
                 viewModel = vm
-                isReady = true
+                vm.loadData()
             } else {
                 viewModel?.loadData()
             }
         }
     }
 
-    private func mainContent(_ vm: RecordingViewModel) -> some View {
+    private var mainContent: some View {
         ScrollView {
             VStack(spacing: 0) {
                 // Stats (glass card)
                 TodayHeroView(
-                    todayMinutes: vm.todayTotalMinutes,
-                    cumulativeMinutes: vm.cumulativeTotalMinutes,
-                    weekChange: vm.weekOverWeekChange,
-                    breakdown: vm.categoryBreakdown
+                    metrics: viewModel?.heroMetrics
                 )
                 .padding(.horizontal, 16)
 
-                // Active timer
-                if vm.isTimerRunning {
-                    timerBanner(vm)
+                if let vm = viewModel {
+                    // Active timer
+                    if vm.isTimerRunning {
+                        timerBanner(vm)
+                            .padding(.horizontal, 16)
+                            .padding(.top, 12)
+                    }
+
+                    // Picker + record button (always visible)
+                    TimePickerSection(viewModel: vm)
                         .padding(.horizontal, 16)
-                        .padding(.top, 12)
-                }
+                        .padding(.top, 16)
 
-                // Picker + record button (always visible)
-                TimePickerSection(viewModel: vm)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 16)
-
-                // Tags
-                TagChipsView(
-                    tags: vm.tags,
-                    selectedTag: vm.selectedTag,
-                    onTagTapped: { vm.selectTag($0) },
-                    onTagLongPressed: { vm.startTimer(for: $0) },
-                    onAddTapped: { vm.startCreateTag() }
-                )
-                .padding(.top, 20)
-
-                if vm.tags.isEmpty {
-                    emptyTagsHint
-                        .padding(.horizontal, 16)
-                        .padding(.top, 8)
-                }
-
-                // History
-                RecentHistoryView(entries: vm.recentEntries)
+                    // Tags
+                    TagChipsView(
+                        tags: vm.tags,
+                        selectedTag: vm.selectedTag,
+                        onTagTapped: { vm.selectTag($0) },
+                        onTagLongPressed: { vm.startTimer(for: $0) },
+                        onAddTapped: { vm.startCreateTag() }
+                    )
                     .padding(.top, 20)
-                    .padding(.horizontal, 16)
+
+                    if vm.tags.isEmpty {
+                        emptyTagsHint
+                            .padding(.horizontal, 16)
+                            .padding(.top, 8)
+                    }
+
+                    // History
+                    RecentHistoryView(entries: vm.recentEntries)
+                        .padding(.top, 20)
+                        .padding(.horizontal, 16)
+                }
 
                 Spacer(minLength: 100)
             }
         }
         .scrollIndicators(.hidden)
-        .sheet(isPresented: Bindable(vm).showCreateTag) {
-            TagCreationWizard(viewModel: vm)
-                .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
+        .sheet(isPresented: showCreateTagBinding) {
+            if let vm = viewModel {
+                TagCreationWizard(viewModel: vm)
+                    .presentationDetents([.medium])
+                    .presentationDragIndicator(.visible)
+            }
         }
+    }
+
+    private var showCreateTagBinding: Binding<Bool> {
+        Binding(
+            get: { viewModel?.showCreateTag ?? false },
+            set: { newValue in viewModel?.showCreateTag = newValue }
+        )
     }
 
     // MARK: - Timer Banner

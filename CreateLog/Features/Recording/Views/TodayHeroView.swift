@@ -2,35 +2,44 @@ import SwiftUI
 
 struct TodayHeroView: View {
     @State private var animateIn = false
+    @State private var displayedTodayMinutes = 0
+    @State private var displayedCumulativeMinutes = 0
+    @State private var displayedWeekChange = 0.0
+    @State private var lastAnimatedMetrics: RecordingHeroMetrics?
 
-    let todayMinutes: Int
-    let cumulativeMinutes: Int
-    let weekChange: Double?
-    let breakdown: [CategoryBreakdownItem]
+    let metrics: RecordingHeroMetrics?
 
     var body: some View {
         VStack(spacing: 16) {
             kpiRow
 
-            if breakdown.count >= 2 {
+            if currentBreakdown.count >= 2 {
                 categoryBar
             }
         }
         .padding(.top, 4)
         .padding(.bottom, 12)
         .onAppear {
-            withAnimation(.spring(duration: 1.0, bounce: 0.1).delay(0.1)) {
-                animateIn = true
+            resetDisplayedMetrics()
+            if let metrics {
+                animateMetrics(to: metrics)
             }
+        }
+        .onChange(of: metrics) { _, newMetrics in
+            guard let newMetrics else { return }
+            animateMetrics(to: newMetrics)
+        }
+        .onDisappear {
+            resetDisplayedMetrics()
         }
     }
 
-    // MARK: - KPI Row (same structure as ReportDashboardView)
+    // MARK: - KPI Row
 
     private var kpiRow: some View {
         HStack(spacing: 0) {
-            kpiItem(hours: animateIn ? Double(todayMinutes) / 60.0 : 0, label: "今日")
-            kpiItem(hours: animateIn ? Double(cumulativeMinutes) / 60.0 : 0, label: "累計")
+            kpiItem(hours: Double(displayedTodayMinutes) / 60.0, label: "今日")
+            kpiItem(hours: Double(displayedCumulativeMinutes) / 60.0, label: "累計")
             weekChangeItem
         }
     }
@@ -39,6 +48,7 @@ struct TodayHeroView: View {
         let minutes = Int(hours * 60)
         let h = minutes / 60
         let m = minutes % 60
+
         return VStack(spacing: 3) {
             HStack(alignment: .firstTextBaseline, spacing: 1) {
                 if h > 0 {
@@ -57,34 +67,36 @@ struct TodayHeroView: View {
                     .foregroundStyle(Color.clTextTertiary)
             }
             .contentTransition(.numericText())
+
             Text(label)
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(Color.clTextTertiary)
+                .offset(y: animateIn ? 0 : -14)
+                .opacity(animateIn ? 1 : 0)
         }
         .frame(maxWidth: .infinity)
     }
 
-    // MARK: - Week Change (same visual structure as kpiItem)
+    // MARK: - Week Change
 
     private var weekChangeItem: some View {
-        VStack(spacing: 3) {
-            if let change = weekChange, animateIn {
-                HStack(alignment: .firstTextBaseline, spacing: 2) {
-                    Image(systemName: change >= 0 ? "arrow.up.right" : "arrow.down.right")
-                        .font(.system(size: 13, weight: .bold))
-                    Text(formatPercent(change))
-                        .font(.system(size: 30, weight: .heavy, design: .rounded))
-                        .contentTransition(.numericText())
-                }
-                .foregroundStyle(change >= 0 ? Color.clSuccess : Color.clTextTertiary)
-            } else {
-                Text("--")
+        let isPositive = displayedWeekChange >= 0
+
+        return VStack(spacing: 3) {
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
+                Image(systemName: isPositive ? "arrow.up.right" : "arrow.down.right")
+                    .font(.system(size: 13, weight: .bold))
+                Text(formatPercent(displayedWeekChange))
                     .font(.system(size: 30, weight: .heavy, design: .rounded))
-                    .foregroundStyle(Color.clTextTertiary)
+                    .contentTransition(.numericText())
             }
+            .foregroundStyle(isPositive ? Color.clSuccess : Color.clTextTertiary)
+
             Text("先週比")
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(Color.clTextTertiary)
+                .offset(y: animateIn ? 0 : -14)
+                .opacity(animateIn ? 1 : 0)
         }
         .frame(maxWidth: .infinity)
     }
@@ -94,9 +106,9 @@ struct TodayHeroView: View {
     private var categoryBar: some View {
         GeometryReader { geo in
             HStack(spacing: 2) {
-                ForEach(breakdown) { item in
-                    let ratio = todayMinutes > 0
-                        ? CGFloat(item.minutes) / CGFloat(todayMinutes)
+                ForEach(currentBreakdown) { item in
+                    let ratio = displayedTodayMinutes > 0
+                        ? CGFloat(item.minutes) / CGFloat(displayedTodayMinutes)
                         : 0
 
                     RoundedRectangle(cornerRadius: 3)
@@ -113,8 +125,32 @@ struct TodayHeroView: View {
 
     // MARK: - Formatting
 
+    private var currentBreakdown: [CategoryBreakdownItem] {
+        metrics?.breakdown ?? []
+    }
+
     private func formatPercent(_ value: Double) -> String {
         let pct = Int(abs(value) * 100)
         return "\(pct)%"
+    }
+
+    private func resetDisplayedMetrics() {
+        animateIn = false
+        displayedTodayMinutes = 0
+        displayedCumulativeMinutes = 0
+        displayedWeekChange = 0
+        lastAnimatedMetrics = nil
+    }
+
+    private func animateMetrics(to metrics: RecordingHeroMetrics) {
+        guard lastAnimatedMetrics != metrics else { return }
+        lastAnimatedMetrics = metrics
+
+        withAnimation(.spring(duration: 1.0, bounce: 0.1).delay(0.1)) {
+            animateIn = true
+            displayedTodayMinutes = metrics.todayMinutes
+            displayedCumulativeMinutes = metrics.cumulativeMinutes
+            displayedWeekChange = metrics.weekChange ?? 0
+        }
     }
 }

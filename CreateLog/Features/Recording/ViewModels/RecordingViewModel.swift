@@ -1,6 +1,20 @@
 import SwiftUI
 import SwiftData
 
+struct RecordingHeroMetrics: Equatable {
+    let todayMinutes: Int
+    let cumulativeMinutes: Int
+    let weekChange: Double?
+    let breakdown: [CategoryBreakdownItem]
+
+    static let empty = RecordingHeroMetrics(
+        todayMinutes: 0,
+        cumulativeMinutes: 0,
+        weekChange: nil,
+        breakdown: []
+    )
+}
+
 @MainActor @Observable
 final class RecordingViewModel {
 
@@ -10,10 +24,7 @@ final class RecordingViewModel {
 
     // MARK: - State
 
-    var todayTotalMinutes: Int = 0
-    var cumulativeTotalMinutes: Int = 0
-    var weekOverWeekChange: Double? = nil // e.g. +0.15 = 15%増, -0.3 = 30%減
-    var categoryBreakdown: [CategoryBreakdownItem] = []
+    var heroMetrics: RecordingHeroMetrics = .empty
     var tags: [SDProject] = []
     var recentEntries: [SDTimeEntry] = []
 
@@ -75,11 +86,17 @@ final class RecordingViewModel {
         recentEntries = Array(allEntries.prefix(7))
 
         let todayEntries = allEntries.filter { Self.isToday($0.startDate) }
-        todayTotalMinutes = Self.computeTodayTotal(from: todayEntries)
-        categoryBreakdown = Self.computeCategoryBreakdown(from: todayEntries)
-        cumulativeTotalMinutes = allEntries.reduce(0) { $0 + $1.durationMinutes }
-        let computed = Self.computeWeekOverWeekChange(from: allEntries)
-        weekOverWeekChange = computed ?? 0.15 // Mock: +15% when no real data
+        let todayTotalMinutes = Self.computeTodayTotal(from: todayEntries)
+        let categoryBreakdown = Self.computeCategoryBreakdown(from: todayEntries)
+        let cumulativeTotalMinutes = allEntries.reduce(0) { $0 + $1.durationMinutes }
+        let weekOverWeekChange = Self.computeWeekOverWeekChange(from: allEntries) ?? 0.15
+
+        heroMetrics = RecordingHeroMetrics(
+            todayMinutes: todayTotalMinutes,
+            cumulativeMinutes: cumulativeTotalMinutes,
+            weekChange: weekOverWeekChange,
+            breakdown: categoryBreakdown
+        )
     }
 
     // MARK: - Actions

@@ -36,11 +36,7 @@ struct PostCardView: View {
                     .foregroundStyle(Color.clAccent)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
-                    .background(
-                        Capsule()
-                            .fill(Color.clAccent.opacity(0.1))
-                            .overlay(Capsule().strokeBorder(Color.clAccent.opacity(0.15), lineWidth: 1))
-                    )
+                    .glassEffect(.regular, in: .capsule)
                 }
             }
 
@@ -57,15 +53,7 @@ struct PostCardView: View {
                 .padding(.top, 14)
         }
         .padding(18)
-        .background(
-            RoundedRectangle(cornerRadius: 22)
-                .fill(Color.clSurfaceHigh)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 22)
-                        .strokeBorder(Color.clBorder, lineWidth: 1)
-                )
-                .shadow(color: .black.opacity(0.08), radius: 16, y: 6)
-        )
+        .glassEffect(.regular, in: .rect(cornerRadius: 22))
         .padding(.horizontal, 16)
     }
 
@@ -183,12 +171,11 @@ struct PostCardView: View {
             .clipShape(RoundedRectangle(cornerRadius: 14))
             .overlay(
                 ZStack {
-                    Circle()
-                        .fill(.ultraThinMaterial)
-                        .frame(width: 52, height: 52)
                     Image(systemName: "play.fill")
                         .font(.system(size: 20))
                         .foregroundStyle(.white)
+                        .frame(width: 52, height: 52)
+                        .glassEffect(.regular, in: .circle)
                 }
             )
             .overlay(alignment: .bottomTrailing) {
@@ -197,10 +184,7 @@ struct PostCardView: View {
                     .foregroundStyle(.white)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(
-                        Capsule()
-                            .fill(.black.opacity(0.6))
-                    )
+                    .glassEffect(.regular, in: .capsule)
                     .padding(10)
             }
     }
@@ -220,7 +204,6 @@ struct PostCardView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(Color.clSurfaceHigh)
 
             Text(code.code)
                 .font(.system(size: 13, design: .monospaced))
@@ -228,20 +211,17 @@ struct PostCardView: View {
                 .lineLimit(10)
                 .padding(12)
         }
-        .background(Color.clSurfaceLow)
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .strokeBorder(Color.clBorder, lineWidth: 1)
-        )
+        .glassEffect(.regular, in: .rect(cornerRadius: 12))
     }
 
     // MARK: - Actions
 
     private var actionBar: some View {
-        HStack(spacing: 2) {
+        HStack(spacing: 0) {
             actionItem(icon: "bubble.right", count: post.comments)
+            Spacer()
             actionItem(icon: "arrow.2.squarepath", count: post.reposts)
+            Spacer()
 
             Button {
                 withAnimation(.spring(duration: 0.4, bounce: 0.5)) {
@@ -275,10 +255,24 @@ struct PostCardView: View {
             Button {
                 HapticManager.light()
             } label: {
+                Image(systemName: post.isBookmarked ? "bookmark.fill" : "bookmark")
+                    .font(.system(size: 15))
+                    .foregroundStyle(post.isBookmarked ? Color.clAccent : Color.clTextTertiary)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 10)
+            }
+            .buttonStyle(.plain)
+
+            Spacer()
+
+            Button {
+                HapticManager.light()
+            } label: {
                 Image(systemName: "square.and.arrow.up")
                     .font(.system(size: 14))
                     .foregroundStyle(Color.clTextTertiary)
-                    .padding(8)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 10)
             }
             .buttonStyle(.plain)
         }
