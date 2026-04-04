@@ -70,7 +70,8 @@ struct ScrollHideModifier: ViewModifier {
                         headerOffset = 0
                     }
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + headerSnapDuration) {
+                Task {
+                    try? await Task.sleep(for: .seconds(headerSnapDuration))
                     isSnappingHeader = false
                 }
             }

@@ -76,7 +76,8 @@ struct TimePickerSection: View {
         viewModel.savePickerTime()
         HapticManager.success()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+        Task {
+            try? await Task.sleep(for: .milliseconds(800))
             withAnimation(.spring(duration: 0.25, bounce: 0.15)) {
                 showConfirmation = false
             }

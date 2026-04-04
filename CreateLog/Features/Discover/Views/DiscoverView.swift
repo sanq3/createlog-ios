@@ -9,6 +9,7 @@ struct DiscoverView: View {
 
     @State private var scrollPosition: ScrollPosition = .init(edge: .top)
     @State private var isRefreshing = false
+    @State private var isAtTop = true
     @State private var headerOffset: CGFloat = 0
     private let headerHeight: CGFloat = 56
 
@@ -28,27 +29,31 @@ struct DiscoverView: View {
             .scrollPosition($scrollPosition)
             .scrollIndicators(.hidden)
             .scrollHide(headerHeight: headerHeight, headerOffset: $headerOffset, tabBarOffset: $tabBarOffset)
+            .onScrollGeometryChange(for: CGFloat.self) { geo in
+                geo.contentOffset.y
+            } action: { _, newValue in
+                isAtTop = newValue <= 5
+            }
 
             searchHeader
                 .offset(y: headerOffset)
 
-            Color.clear
-                .frame(height: 0)
-                .background(Color.clBackground.ignoresSafeArea(edges: .top))
-                .allowsHitTesting(false)
         }
         .background(Color.clBackground)
         .navigationBarHidden(true)
         .onChange(of: reselectCount) {
-            if headerOffset == 0 {
+            if isAtTop {
                 isRefreshing = true
                 HapticManager.light()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                Task {
+                    try? await Task.sleep(for: .milliseconds(1500))
                     isRefreshing = false
                 }
             } else {
                 withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
                     scrollPosition.scrollTo(edge: .top)
+                    headerOffset = 0
+                    tabBarOffset = 0
                 }
                 HapticManager.light()
             }
@@ -78,6 +83,5 @@ struct DiscoverView: View {
         .padding(.horizontal, 16)
         .padding(.top, 8)
         .padding(.bottom, 8)
-        .background(Color.clBackground)
     }
 }

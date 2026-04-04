@@ -1,20 +1,6 @@
 import SwiftUI
 import SwiftData
 
-struct RecordingHeroMetrics: Equatable {
-    let todayMinutes: Int
-    let cumulativeMinutes: Int
-    let weekChange: Double?
-    let breakdown: [CategoryBreakdownItem]
-
-    static let empty = RecordingHeroMetrics(
-        todayMinutes: 0,
-        cumulativeMinutes: 0,
-        weekChange: nil,
-        breakdown: []
-    )
-}
-
 @MainActor @Observable
 final class RecordingViewModel {
 
@@ -24,9 +10,10 @@ final class RecordingViewModel {
 
     // MARK: - State
 
-    var heroMetrics: RecordingHeroMetrics = .empty
+    var heroMetrics: RecordingHeroMetrics?
     var tags: [SDProject] = []
     var recentEntries: [SDTimeEntry] = []
+    var errorMessage: String?
 
     // Time input
     var showTimeInput: Bool = false
@@ -75,28 +62,39 @@ final class RecordingViewModel {
     }
 
     private func loadTags() {
-        let descriptor = FetchDescriptor<SDProject>(sortBy: [SortDescriptor(\.createdAt)])
-        tags = (try? modelContext.fetch(descriptor)) ?? []
+        do {
+            let descriptor = FetchDescriptor<SDProject>(sortBy: [SortDescriptor(\.createdAt)])
+            tags = try modelContext.fetch(descriptor)
+        } catch {
+            tags = []
+            errorMessage = "タグの読み込みに失敗しました"
+        }
     }
 
     private func loadEntries() {
-        let descriptor = FetchDescriptor<SDTimeEntry>(sortBy: [SortDescriptor(\.startDate, order: .reverse)])
-        let allEntries = (try? modelContext.fetch(descriptor)) ?? []
+        do {
+            let descriptor = FetchDescriptor<SDTimeEntry>(sortBy: [SortDescriptor(\.startDate, order: .reverse)])
+            let allEntries = try modelContext.fetch(descriptor)
 
-        recentEntries = Array(allEntries.prefix(7))
+            recentEntries = Array(allEntries.prefix(7))
 
-        let todayEntries = allEntries.filter { Self.isToday($0.startDate) }
-        let todayTotalMinutes = Self.computeTodayTotal(from: todayEntries)
-        let categoryBreakdown = Self.computeCategoryBreakdown(from: todayEntries)
-        let cumulativeTotalMinutes = allEntries.reduce(0) { $0 + $1.durationMinutes }
-        let weekOverWeekChange = Self.computeWeekOverWeekChange(from: allEntries) ?? 0.15
+            let todayEntries = allEntries.filter { Self.isToday($0.startDate) }
+            let todayTotalMinutes = Self.computeTodayTotal(from: todayEntries)
+            let categoryBreakdown = Self.computeCategoryBreakdown(from: todayEntries)
+            let cumulativeTotalMinutes = allEntries.reduce(0) { $0 + $1.durationMinutes }
+            let weekOverWeekChange = Self.computeWeekOverWeekChange(from: allEntries) ?? 0.15
 
-        heroMetrics = RecordingHeroMetrics(
-            todayMinutes: todayTotalMinutes,
-            cumulativeMinutes: cumulativeTotalMinutes,
-            weekChange: weekOverWeekChange,
-            breakdown: categoryBreakdown
-        )
+            heroMetrics = RecordingHeroMetrics(
+                todayMinutes: todayTotalMinutes,
+                cumulativeMinutes: cumulativeTotalMinutes,
+                weekChange: weekOverWeekChange,
+                breakdown: categoryBreakdown
+            )
+        } catch {
+            recentEntries = []
+            heroMetrics = .empty
+            errorMessage = "記��の読み込みに失敗しました"
+        }
     }
 
     // MARK: - Actions
@@ -130,20 +128,11 @@ final class RecordingViewModel {
         timerTask = nil
 
         let minutes = max(1, Int(Date().timeIntervalSince(start) / 60))
-        let entry = SDTimeEntry(
-            startDate: start,
-            endDate: Date(),
-            durationMinutes: minutes,
-            projectName: tag.name,
-            categoryName: tag.category?.name ?? "その他"
-        )
-        modelContext.insert(entry)
+        saveEntry(minutes: minutes, start: start, end: Date(), tag: tag)
 
         timerTag = nil
         timerStartDate = nil
         timerElapsed = 0
-        HapticManager.success()
-        loadEntries()
     }
 
     func cancelTimer() {
@@ -167,63 +156,53 @@ final class RecordingViewModel {
     }
 
     func saveTimeEntry() {
-        guard let tag = selectedTag else { return }
+        guard selectedTag != nil else { return }
         let minutes = Self.parseDuration(from: timeInputText)
         guard minutes > 0 else { return }
-
-        let entry = SDTimeEntry(
-            startDate: Date().addingTimeInterval(-Double(minutes * 60)),
-            endDate: Date(),
-            durationMinutes: minutes,
-            projectName: tag.name,
-            categoryName: tag.category?.name ?? "その他"
-        )
-        modelContext.insert(entry)
-
-        showTimeInput = false
-        timeInputText = ""
-        HapticManager.success()
-        loadEntries()
+        saveEntry(minutes: minutes)
+        resetTimeInput()
     }
 
     func savePresetTime(minutes: Int) {
-        guard let tag = selectedTag else { return }
-
-        let entry = SDTimeEntry(
-            startDate: Date().addingTimeInterval(-Double(minutes * 60)),
-            endDate: Date(),
-            durationMinutes: minutes,
-            projectName: tag.name,
-            categoryName: tag.category?.name ?? "その他"
-        )
-        modelContext.insert(entry)
-
-        showTimeInput = false
-        timeInputText = ""
-        HapticManager.success()
-        loadEntries()
+        guard selectedTag != nil else { return }
+        saveEntry(minutes: minutes)
+        resetTimeInput()
     }
 
     func savePickerTime() {
         let minutes = pickerHours * 60 + pickerMinutes
         guard minutes > 0 else { return }
+        saveEntry(minutes: minutes)
+        resetTimeInput()
+    }
 
-        let projectName = selectedTag?.name ?? "その他"
-        let categoryName = selectedTag?.category?.name ?? "その他"
+    // MARK: - Private Helpers
+
+    private func saveEntry(
+        minutes: Int,
+        start: Date? = nil,
+        end: Date? = nil,
+        tag: SDProject? = nil
+    ) {
+        let resolvedTag = tag ?? selectedTag
+        let endDate = end ?? Date()
+        let startDate = start ?? endDate.addingTimeInterval(-Double(minutes * 60))
 
         let entry = SDTimeEntry(
-            startDate: Date().addingTimeInterval(-Double(minutes * 60)),
-            endDate: Date(),
+            startDate: startDate,
+            endDate: endDate,
             durationMinutes: minutes,
-            projectName: projectName,
-            categoryName: categoryName
+            projectName: resolvedTag?.name ?? "その���",
+            categoryName: resolvedTag?.category?.name ?? "その他"
         )
         modelContext.insert(entry)
-
-        showTimeInput = false
-        timeInputText = ""
         HapticManager.success()
         loadEntries()
+    }
+
+    private func resetTimeInput() {
+        showTimeInput = false
+        timeInputText = ""
     }
 
     // MARK: - Wizard Actions
@@ -252,7 +231,13 @@ final class RecordingViewModel {
         let descriptor = FetchDescriptor<SDCategory>(predicate: #Predicate { cat in
             cat.name == categoryName
         })
-        let category = (try? modelContext.fetch(descriptor))?.first
+        let category: SDCategory?
+        do {
+            category = try modelContext.fetch(descriptor).first
+        } catch {
+            category = nil
+            errorMessage = "カテゴリの取得に失敗しました"
+        }
 
         let tag = SDProject(name: tagName, category: category)
         modelContext.insert(tag)
@@ -374,12 +359,4 @@ final class RecordingViewModel {
     nonisolated private static func isToday(_ date: Date) -> Bool {
         Calendar.current.isDateInToday(date)
     }
-}
-
-// MARK: - Supporting Types
-
-struct CategoryBreakdownItem: Identifiable, Equatable {
-    let id = UUID()
-    let name: String
-    let minutes: Int
 }

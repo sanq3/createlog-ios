@@ -15,37 +15,24 @@ enum ComposeContentType: String {
         case .codeSnippet: "chevron.left.forwardslash.chevron.right"
         }
     }
+
+    var badgeColor: Color {
+        switch self {
+        case .post: .clAccent
+        case .article: .orange
+        case .codeSnippet: .blue
+        }
+    }
 }
 
 // MARK: - ComposeView
 
 struct ComposeView: View {
     @Environment(\.dismiss) private var dismiss
-
-    @State private var text = ""
+    @State private var viewModel = ComposeViewModel()
     @State private var selectedPhotos: [PhotosPickerItem] = []
-    @State private var attachedImages: [AttachedImageData] = []
-    @State private var attachedCode: AttachedCode?
-    @State private var showCodeEditor = false
 
-    private let articleThreshold = 300
-    private let maxImages = 4
     private let user = MockData.currentUser
-
-    private var detectedType: ComposeContentType {
-        if attachedCode != nil {
-            return .codeSnippet
-        } else if text.count > articleThreshold {
-            return .article
-        }
-        return .post
-    }
-
-    private var canPost: Bool {
-        let hasText = !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        let hasMedia = !attachedImages.isEmpty || attachedCode != nil
-        return hasText || hasMedia
-    }
 
     var body: some View {
         NavigationStack {
@@ -58,10 +45,10 @@ struct ComposeView: View {
                             status: .offline
                         )
 
-                        AutoFocusTextView(text: $text)
+                        AutoFocusTextView(text: $viewModel.text)
                             .frame(minHeight: 160)
                             .overlay(alignment: .topLeading) {
-                                if text.isEmpty {
+                                if viewModel.text.isEmpty {
                                     Text("いまなにしてる?")
                                         .font(.system(size: 17))
                                         .foregroundStyle(Color.clTextTertiary)
@@ -72,11 +59,11 @@ struct ComposeView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
 
-                    if !attachedImages.isEmpty {
+                    if !viewModel.attachedImages.isEmpty {
                         attachedImagesSection
                     }
 
-                    if let code = attachedCode {
+                    if let code = viewModel.attachedCode {
                         attachedCodeSection(code)
                     }
                 }
@@ -102,9 +89,9 @@ struct ComposeView: View {
                     } label: {
                         Text("投稿")
                             .font(.system(size: 15, weight: .bold))
-                            .foregroundStyle(canPost ? Color.clAccent : Color.clAccent.opacity(0.4))
+                            .foregroundStyle(viewModel.canPost ? Color.clAccent : Color.clAccent.opacity(0.4))
                     }
-                    .disabled(!canPost)
+                    .disabled(!viewModel.canPost)
                 }
             }
             .toolbar(.visible, for: .bottomBar)
@@ -112,79 +99,60 @@ struct ComposeView: View {
                 ToolbarItemGroup(placement: .bottomBar) {
                     PhotosPicker(
                         selection: $selectedPhotos,
-                        maxSelectionCount: maxImages - attachedImages.count,
+                        maxSelectionCount: viewModel.remainingImageSlots,
                         matching: .any(of: [.images, .videos])
                     ) {
                         Image(systemName: "photo.on.rectangle.angled")
                             .font(.system(size: 18))
                             .foregroundStyle(
-                                attachedImages.count >= maxImages
-                                    ? Color.clTextTertiary
-                                    : Color.clAccent
+                                viewModel.canAddImages
+                                    ? Color.clAccent
+                                    : Color.clTextTertiary
                             )
                     }
-                    .disabled(attachedImages.count >= maxImages)
+                    .disabled(!viewModel.canAddImages)
 
                     Button {
                         HapticManager.light()
-                        showCodeEditor = true
+                        viewModel.showCodeEditor = true
                     } label: {
                         Image(systemName: "chevron.left.forwardslash.chevron.right")
                             .font(.system(size: 16))
                             .foregroundStyle(
-                                attachedCode != nil
-                                    ? Color.clTextTertiary
-                                    : Color.clAccent
+                                viewModel.canAddCode
+                                    ? Color.clAccent
+                                    : Color.clTextTertiary
                             )
                     }
-                    .disabled(attachedCode != nil)
+                    .disabled(!viewModel.canAddCode)
 
                     Spacer()
 
                     HStack(spacing: 4) {
-                        Image(systemName: detectedType.icon)
+                        Image(systemName: viewModel.detectedType.icon)
                             .font(.system(size: 11, weight: .medium))
 
-                        Text(detectedType.rawValue)
+                        Text(viewModel.detectedType.rawValue)
                             .font(.system(size: 12, weight: .medium))
                     }
-                    .foregroundStyle(badgeColor)
+                    .foregroundStyle(viewModel.detectedType.badgeColor)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
                     .background(
                         Capsule()
-                            .fill(badgeColor.opacity(0.12))
+                            .fill(viewModel.detectedType.badgeColor.opacity(0.12))
                     )
-                    .animation(.spring(duration: 0.35, bounce: 0.15), value: detectedType)
+                    .animation(.spring(duration: 0.35, bounce: 0.15), value: viewModel.detectedType)
                 }
             }
-            .sheet(isPresented: $showCodeEditor) {
-                CodeAttachmentSheet(attachedCode: $attachedCode)
+            .sheet(isPresented: $viewModel.showCodeEditor) {
+                CodeAttachmentSheet(attachedCode: $viewModel.attachedCode)
             }
             .onChange(of: selectedPhotos) { _, newItems in
-                handlePhotoSelection(newItems)
+                viewModel.handlePhotoSelection(newItems)
+                selectedPhotos = []
             }
         }
-    }
-
-    // MARK: - Photo Selection
-
-    private func handlePhotoSelection(_ items: [PhotosPickerItem]) {
-        for item in items {
-            guard attachedImages.count < maxImages else { break }
-            Task {
-                if let data = try? await item.loadTransferable(type: Data.self),
-                   let uiImage = UIImage(data: data)
-                {
-                    await MainActor.run {
-                        withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                            attachedImages.append(AttachedImageData(image: uiImage))
-                        }
-                    }
-                }
-            }
-        }
-        selectedPhotos = []
     }
 
     // MARK: - Attached Images Section
@@ -192,7 +160,7 @@ struct ComposeView: View {
     private var attachedImagesSection: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
-                ForEach(attachedImages) { imageData in
+                ForEach(viewModel.attachedImages) { imageData in
                     ZStack(alignment: .topTrailing) {
                         Image(uiImage: imageData.image)
                             .resizable()
@@ -205,10 +173,7 @@ struct ComposeView: View {
                             )
 
                         Button {
-                            HapticManager.light()
-                            withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                                attachedImages.removeAll { $0.id == imageData.id }
-                            }
+                            viewModel.removeImage(id: imageData.id)
                         } label: {
                             Image(systemName: "xmark")
                                 .font(.system(size: 10, weight: .bold))
@@ -245,10 +210,7 @@ struct ComposeView: View {
                 Spacer()
 
                 Button {
-                    HapticManager.light()
-                    withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                        attachedCode = nil
-                    }
+                    viewModel.removeCode()
                 } label: {
                     Image(systemName: "xmark")
                         .font(.system(size: 10, weight: .bold))
@@ -280,28 +242,6 @@ struct ComposeView: View {
         .padding(.horizontal, 68)
         .padding(.vertical, 12)
     }
-
-    private var badgeColor: Color {
-        switch detectedType {
-        case .post: .clAccent
-        case .article: .orange
-        case .codeSnippet: .blue
-        }
-    }
-}
-
-// MARK: - Attached Image Data
-
-private struct AttachedImageData: Identifiable {
-    let id = UUID()
-    let image: UIImage
-}
-
-// MARK: - Attached Code Model
-
-struct AttachedCode {
-    var code: String
-    var language: String
 }
 
 // MARK: - Code Attachment Sheet

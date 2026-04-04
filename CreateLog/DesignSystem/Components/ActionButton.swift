@@ -16,7 +16,8 @@ struct ActionButton: View {
             }
             HapticManager.light()
             action()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            Task {
+                try? await Task.sleep(for: .milliseconds(150))
                 withAnimation(.snappy(duration: 0.2)) {
                     isPressed = false
                 }

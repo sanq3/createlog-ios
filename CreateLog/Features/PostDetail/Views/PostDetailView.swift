@@ -6,6 +6,8 @@ struct PostDetailView: View {
     @State private var commentText = ""
     @State private var heartScale: CGFloat = 1.0
     @FocusState private var isCommentFocused: Bool
+    @State private var showReport = false
+    @State private var showBlock = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -35,6 +37,34 @@ struct PostDetailView: View {
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(Color.clTextPrimary)
             }
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button {
+                        showReport = true
+                    } label: {
+                        Label("報告する", systemImage: "exclamationmark.bubble")
+                    }
+                    Button(role: .destructive) {
+                        showBlock = true
+                    } label: {
+                        Label("ブロックする", systemImage: "nosign")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .font(.system(size: 15))
+                        .foregroundStyle(Color.clTextTertiary)
+                }
+            }
+        }
+        .sheet(isPresented: $showReport) {
+            ReportSheet(targetName: post.name) { _, _ in }
+        }
+        .sheet(isPresented: $showBlock) {
+            BlockConfirmSheet(
+                userName: post.name,
+                userHandle: post.handle,
+                onBlock: {}
+            )
         }
     }
 
@@ -91,146 +121,15 @@ struct PostDetailView: View {
     }
 
     private func imageGrid(_ images: [PostImage]) -> some View {
-        Group {
-            switch images.count {
-            case 1:
-                imagePlaceholder(images[0], aspectRatio: images[0].aspectRatio)
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-            case 2:
-                HStack(spacing: 3) {
-                    imagePlaceholder(images[0], aspectRatio: 4 / 5)
-                    imagePlaceholder(images[1], aspectRatio: 4 / 5)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-            case 3:
-                HStack(spacing: 3) {
-                    imagePlaceholder(images[0], aspectRatio: 3 / 4)
-                    VStack(spacing: 3) {
-                        imagePlaceholder(images[1], aspectRatio: nil)
-                        imagePlaceholder(images[2], aspectRatio: nil)
-                    }
-                }
-                .aspectRatio(16 / 9, contentMode: .fit)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-            default:
-                let clamped = Array(images.prefix(4))
-                VStack(spacing: 3) {
-                    HStack(spacing: 3) {
-                        imagePlaceholder(clamped[0], aspectRatio: nil)
-                        imagePlaceholder(clamped[1], aspectRatio: nil)
-                    }
-                    HStack(spacing: 3) {
-                        imagePlaceholder(clamped[2], aspectRatio: nil)
-                        if clamped.count > 3 {
-                            imagePlaceholder(clamped[3], aspectRatio: nil)
-                        }
-                    }
-                }
-                .aspectRatio(16 / 9, contentMode: .fit)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-            }
-        }
-    }
-
-    private func imagePlaceholder(_ image: PostImage, aspectRatio: CGFloat?) -> some View {
-        Rectangle()
-            .fill(
-                LinearGradient(
-                    colors: [
-                        Color(
-                            red: image.placeholderColor.red,
-                            green: image.placeholderColor.green,
-                            blue: image.placeholderColor.blue
-                        ),
-                        Color(
-                            red: image.placeholderColor.red * 0.7,
-                            green: image.placeholderColor.green * 0.7,
-                            blue: image.placeholderColor.blue * 0.7
-                        ),
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .aspectRatio(aspectRatio, contentMode: .fill)
-            .overlay(
-                Image(systemName: "photo")
-                    .font(.system(size: 20))
-                    .foregroundStyle(.white.opacity(0.3))
-            )
+        PostImageGrid(images: images)
     }
 
     private func videoThumbnail(_ video: PostVideo) -> some View {
-        Rectangle()
-            .fill(
-                LinearGradient(
-                    colors: [
-                        Color(
-                            red: video.placeholderColor.red,
-                            green: video.placeholderColor.green,
-                            blue: video.placeholderColor.blue
-                        ),
-                        Color(
-                            red: video.placeholderColor.red * 0.6,
-                            green: video.placeholderColor.green * 0.6,
-                            blue: video.placeholderColor.blue * 0.6
-                        ),
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .aspectRatio(video.aspectRatio, contentMode: .fill)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
-            .overlay(
-                ZStack {
-                    Circle()
-                        .fill(.ultraThinMaterial)
-                        .frame(width: 52, height: 52)
-                    Image(systemName: "play.fill")
-                        .font(.system(size: 20))
-                        .foregroundStyle(.white)
-                }
-            )
-            .overlay(alignment: .bottomTrailing) {
-                Text(video.duration)
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Capsule().fill(.black.opacity(0.6)))
-                    .padding(10)
-            }
+        PostVideoThumbnail(video: video)
     }
 
     private func codeBlock(_ code: PostCode) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                Text(code.language)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color.clAccent)
-
-                Spacer()
-
-                Image(systemName: "doc.on.doc")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.clTextTertiary)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(Color.clSurfaceHigh)
-
-            Text(code.code)
-                .font(.system(size: 13, design: .monospaced))
-                .foregroundStyle(Color.clTextSecondary)
-                .padding(12)
-        }
-        .background(Color.clSurfaceLow)
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .strokeBorder(Color.clBorder, lineWidth: 1)
-        )
+        PostCodeBlock(code: code)
     }
 
     // MARK: - Timestamp
@@ -288,7 +187,8 @@ struct PostDetailView: View {
                     heartScale = 1.4
                 }
                 HapticManager.light()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                Task {
+                    try? await Task.sleep(for: .milliseconds(200))
                     withAnimation(.spring(duration: 0.3)) {
                         heartScale = 1.0
                     }

@@ -533,7 +533,8 @@ struct ProfileShareSheet: View {
             withAnimation(.spring(duration: 0.35, bounce: 0.2).delay(0.4)) {
                 copied = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            Task {
+                try? await Task.sleep(for: .milliseconds(2500))
                 withAnimation(.spring(duration: 0.3)) {
                     copied = false
                 }
@@ -546,43 +547,43 @@ struct ProfileShareSheet: View {
             ShareDestination(
                 id: "line", label: "LINE",
                 assetIcon: "icon-line", systemIcon: "bubble.fill",
-                brandColor: Color(red: 0.0, green: 0.78, blue: 0.33),
+                platform: .line,
                 urlScheme: "line", shareURL: { "https://line.me/R/share?text=\($0.encodedForURL)" }
             ),
             ShareDestination(
                 id: "instagram", label: "Instagram",
                 assetIcon: "icon-instagram", systemIcon: "camera.fill",
-                brandColor: Color(red: 0.88, green: 0.19, blue: 0.42),
+                platform: .instagram,
                 urlScheme: "instagram", shareURL: { _ in "instagram://app" }
             ),
             ShareDestination(
                 id: "x", label: "X",
                 assetIcon: "icon-x", systemIcon: "xmark",
-                brandColor: .black,
+                platform: .x,
                 urlScheme: "twitter", shareURL: { "https://twitter.com/intent/tweet?text=\($0.encodedForURL)" }
             ),
             ShareDestination(
                 id: "discord", label: "Discord",
                 assetIcon: "icon-discord", systemIcon: "bubble.fill",
-                brandColor: Color(red: 0.35, green: 0.40, blue: 0.95),
+                platform: .discord,
                 urlScheme: "discord", shareURL: { _ in "discord://app" }
             ),
             ShareDestination(
                 id: "github", label: "GitHub",
                 assetIcon: "icon-github", systemIcon: "chevron.left.forwardslash.chevron.right",
-                brandColor: .black,
+                platform: .github,
                 urlScheme: nil, shareURL: { _ in "" }
             ),
             ShareDestination(
                 id: "messages", label: "メッセージ",
                 assetIcon: nil, systemIcon: "message.fill",
-                brandColor: Color.green,
+                platform: .messages,
                 urlScheme: nil, shareURL: { "sms:&body=\($0.encodedForURL)" }
             ),
             ShareDestination(
                 id: "mail", label: "メール",
                 assetIcon: nil, systemIcon: "envelope.fill",
-                brandColor: Color.blue,
+                platform: .mail,
                 urlScheme: nil, shareURL: { "mailto:?subject=CreateLog&body=\($0.encodedForURL)" }
             ),
         ]

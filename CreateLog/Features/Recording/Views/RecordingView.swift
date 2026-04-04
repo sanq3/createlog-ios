@@ -80,12 +80,24 @@ struct RecordingView: View {
                     .presentationDragIndicator(.visible)
             }
         }
+        .alert("エラー", isPresented: showErrorBinding) {
+            Button("OK") { viewModel?.errorMessage = nil }
+        } message: {
+            Text(viewModel?.errorMessage ?? "")
+        }
     }
 
     private var showCreateTagBinding: Binding<Bool> {
         Binding(
             get: { viewModel?.showCreateTag ?? false },
             set: { newValue in viewModel?.showCreateTag = newValue }
+        )
+    }
+
+    private var showErrorBinding: Binding<Bool> {
+        Binding(
+            get: { viewModel?.errorMessage != nil },
+            set: { if !$0 { viewModel?.errorMessage = nil } }
         )
     }
 

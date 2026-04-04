@@ -6,6 +6,7 @@ struct MainTabView: View {
     @State private var showSideMenu = false
     @State private var sideMenuDragOffset: CGFloat = 0
     @State private var showSettings = false
+    @State private var showPremium = false
     @State private var homeReselectCount = 0
     @State private var discoverReselectCount = 0
 
@@ -46,6 +47,11 @@ struct MainTabView: View {
         .sheet(isPresented: $showSettings) {
             NavigationStack {
                 SettingsView()
+            }
+        }
+        .sheet(isPresented: $showPremium) {
+            NavigationStack {
+                PremiumView()
             }
         }
     }
@@ -132,8 +138,14 @@ struct MainTabView: View {
         switch destination {
         case .profile:
             selectedTab = 4
+        case .premium:
+            Task {
+                try? await Task.sleep(for: .milliseconds(350))
+                showPremium = true
+            }
         case .settings:
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            Task {
+                try? await Task.sleep(for: .milliseconds(350))
                 showSettings = true
             }
         default:

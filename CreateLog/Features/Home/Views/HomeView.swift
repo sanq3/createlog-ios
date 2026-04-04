@@ -117,7 +117,8 @@ struct HomeView: View {
                 isRefreshing = true
                 HapticManager.light()
                 // Simulate refresh (replace with real API call later)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                Task {
+                    try? await Task.sleep(for: .milliseconds(1500))
                     isRefreshing = false
                 }
             } else {
@@ -129,7 +130,8 @@ struct HomeView: View {
                     tabBarOffset = 0
                 }
                 HapticManager.light()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                Task {
+                    try? await Task.sleep(for: .milliseconds(500))
                     isScrollingToTop = false
                     accumulatedDistance = 0
                 }

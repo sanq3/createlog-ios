@@ -3,6 +3,8 @@ import SwiftUI
 struct PostCardView: View {
     @State var post: Post
     @State private var heartScale: CGFloat = 1.0
+    @State private var showReport = false
+    @State private var showBlock = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -24,6 +26,24 @@ struct PostCardView: View {
                         Text(post.timeAgo)
                             .font(.system(size: 13))
                             .foregroundStyle(Color.clTextTertiary)
+
+                        Menu {
+                            Button {
+                                showReport = true
+                            } label: {
+                                Label("報告する", systemImage: "exclamationmark.bubble")
+                            }
+                            Button(role: .destructive) {
+                                showBlock = true
+                            } label: {
+                                Label("ブロックする", systemImage: "nosign")
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis")
+                                .font(.system(size: 13))
+                                .foregroundStyle(Color.clTextTertiary)
+                                .frame(width: 28, height: 28)
+                        }
                     }
 
                     HStack(spacing: 5) {
@@ -55,6 +75,16 @@ struct PostCardView: View {
         .padding(18)
         .glassEffect(.regular, in: .rect(cornerRadius: 22))
         .padding(.horizontal, 16)
+        .sheet(isPresented: $showReport) {
+            ReportSheet(targetName: post.name) { _, _ in }
+        }
+        .sheet(isPresented: $showBlock) {
+            BlockConfirmSheet(
+                userName: post.name,
+                userHandle: post.handle,
+                onBlock: {}
+            )
+        }
     }
 
     // MARK: - Media
@@ -74,144 +104,15 @@ struct PostCardView: View {
     }
 
     private func imageGrid(_ images: [PostImage]) -> some View {
-        Group {
-            switch images.count {
-            case 1:
-                singleImage(images[0])
-            case 2:
-                HStack(spacing: 3) {
-                    imagePlaceholder(images[0], aspectRatio: 4 / 5)
-                    imagePlaceholder(images[1], aspectRatio: 4 / 5)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-            case 3:
-                HStack(spacing: 3) {
-                    imagePlaceholder(images[0], aspectRatio: 3 / 4)
-                    VStack(spacing: 3) {
-                        imagePlaceholder(images[1], aspectRatio: nil)
-                        imagePlaceholder(images[2], aspectRatio: nil)
-                    }
-                }
-                .aspectRatio(16 / 9, contentMode: .fit)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-            default:
-                let clamped = Array(images.prefix(4))
-                VStack(spacing: 3) {
-                    HStack(spacing: 3) {
-                        imagePlaceholder(clamped[0], aspectRatio: nil)
-                        imagePlaceholder(clamped[1], aspectRatio: nil)
-                    }
-                    HStack(spacing: 3) {
-                        imagePlaceholder(clamped[2], aspectRatio: nil)
-                        if clamped.count > 3 {
-                            imagePlaceholder(clamped[3], aspectRatio: nil)
-                        }
-                    }
-                }
-                .aspectRatio(16 / 9, contentMode: .fit)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-            }
-        }
-    }
-
-    private func singleImage(_ image: PostImage) -> some View {
-        imagePlaceholder(image, aspectRatio: image.aspectRatio)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
-    }
-
-    private func imagePlaceholder(_ image: PostImage, aspectRatio: CGFloat?) -> some View {
-        Rectangle()
-            .fill(
-                LinearGradient(
-                    colors: [
-                        Color(
-                            red: image.placeholderColor.red,
-                            green: image.placeholderColor.green,
-                            blue: image.placeholderColor.blue
-                        ),
-                        Color(
-                            red: image.placeholderColor.red * 0.7,
-                            green: image.placeholderColor.green * 0.7,
-                            blue: image.placeholderColor.blue * 0.7
-                        ),
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .aspectRatio(aspectRatio, contentMode: .fill)
-            .overlay(
-                Image(systemName: "photo")
-                    .font(.system(size: 20))
-                    .foregroundStyle(.white.opacity(0.3))
-            )
+        PostImageGrid(images: images)
     }
 
     private func videoThumbnail(_ video: PostVideo) -> some View {
-        Rectangle()
-            .fill(
-                LinearGradient(
-                    colors: [
-                        Color(
-                            red: video.placeholderColor.red,
-                            green: video.placeholderColor.green,
-                            blue: video.placeholderColor.blue
-                        ),
-                        Color(
-                            red: video.placeholderColor.red * 0.6,
-                            green: video.placeholderColor.green * 0.6,
-                            blue: video.placeholderColor.blue * 0.6
-                        ),
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .aspectRatio(video.aspectRatio, contentMode: .fill)
-            .clipShape(RoundedRectangle(cornerRadius: 14))
-            .overlay(
-                ZStack {
-                    Image(systemName: "play.fill")
-                        .font(.system(size: 20))
-                        .foregroundStyle(.white)
-                        .frame(width: 52, height: 52)
-                        .glassEffect(.regular, in: .circle)
-                }
-            )
-            .overlay(alignment: .bottomTrailing) {
-                Text(video.duration)
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .glassEffect(.regular, in: .capsule)
-                    .padding(10)
-            }
+        PostVideoThumbnail(video: video)
     }
 
     private func codeBlock(_ code: PostCode) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                Text(code.language)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color.clAccent)
-
-                Spacer()
-
-                Image(systemName: "doc.on.doc")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.clTextTertiary)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-
-            Text(code.code)
-                .font(.system(size: 13, design: .monospaced))
-                .foregroundStyle(Color.clTextSecondary)
-                .lineLimit(10)
-                .padding(12)
-        }
-        .glassEffect(.regular, in: .rect(cornerRadius: 12))
+        PostCodeBlock(code: code, maxLines: 10)
     }
 
     // MARK: - Actions
@@ -230,7 +131,8 @@ struct PostCardView: View {
                     heartScale = 1.4
                 }
                 HapticManager.light()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                Task {
+                    try? await Task.sleep(for: .milliseconds(200))
                     withAnimation(.spring(duration: 0.3)) {
                         heartScale = 1.0
                     }

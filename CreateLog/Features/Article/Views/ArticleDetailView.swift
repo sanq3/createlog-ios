@@ -64,7 +64,7 @@ struct ArticleDetailView: View {
     private var metaInfo: some View {
         HStack(spacing: 12) {
             Button {
-                print("プロフィール遷移: @\(article.authorHandle)")
+                // TODO: プロフィール遷移
             } label: {
                 AvatarView(initials: article.authorInitials, size: 40)
             }
@@ -72,7 +72,7 @@ struct ArticleDetailView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Button {
-                    print("プロフィール遷移: @\(article.authorHandle)")
+                    // TODO: プロフィール遷移
                 } label: {
                     Text(article.authorName)
                         .font(.subheadline)
@@ -102,7 +102,7 @@ struct ArticleDetailView: View {
     }
 
     private var tagRow: some View {
-        FlowLayoutDetail(spacing: 8) {
+        FlowLayout(spacing: 8) {
             ForEach(article.tags, id: \.self) { tag in
                 Text(tag)
                     .font(.caption)
@@ -168,46 +168,3 @@ struct ArticleDetailView: View {
 
 // MARK: - Flow Layout
 
-private struct FlowLayoutDetail: Layout {
-    let spacing: CGFloat
-
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let result = arrangeSubviews(proposal: proposal, subviews: subviews)
-        return result.size
-    }
-
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let result = arrangeSubviews(proposal: proposal, subviews: subviews)
-        for (index, position) in result.positions.enumerated() {
-            subviews[index].place(
-                at: CGPoint(x: bounds.minX + position.x, y: bounds.minY + position.y),
-                proposal: .unspecified
-            )
-        }
-    }
-
-    private func arrangeSubviews(proposal: ProposedViewSize, subviews: Subviews) -> (positions: [CGPoint], size: CGSize) {
-        let maxWidth = proposal.width ?? .infinity
-        var positions: [CGPoint] = []
-        var currentX: CGFloat = 0
-        var currentY: CGFloat = 0
-        var lineHeight: CGFloat = 0
-        var totalSize: CGSize = .zero
-
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if currentX + size.width > maxWidth, currentX > 0 {
-                currentX = 0
-                currentY += lineHeight + spacing
-                lineHeight = 0
-            }
-            positions.append(CGPoint(x: currentX, y: currentY))
-            lineHeight = max(lineHeight, size.height)
-            currentX += size.width + spacing
-            totalSize.width = max(totalSize.width, currentX - spacing)
-            totalSize.height = max(totalSize.height, currentY + lineHeight)
-        }
-
-        return (positions, totalSize)
-    }
-}

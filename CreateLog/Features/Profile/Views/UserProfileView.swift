@@ -35,12 +35,12 @@ struct UserProfileView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
                     Button(role: .destructive) {
-                        print("[UserProfile] Report user: \(user.handle)")
+                        // TODO: 通報機能
                     } label: {
                         Label("報告する", systemImage: "exclamationmark.triangle")
                     }
                     Button(role: .destructive) {
-                        print("[UserProfile] Block user: \(user.handle)")
+                        // TODO: ブロック機能
                     } label: {
                         Label("ブロックする", systemImage: "slash.circle")
                     }

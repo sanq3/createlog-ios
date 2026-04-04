@@ -5,11 +5,23 @@ import SwiftData
 struct CreateLogApp: App {
     @AppStorage("appearanceMode") private var appearanceMode: String = AppearanceMode.system.rawValue
 
-    let modelContainer: ModelContainer = {
+    let modelContainer: ModelContainer
+
+    init() {
         let schema = Schema([SDCategory.self, SDProject.self, SDTimeEntry.self])
-        let config = ModelConfiguration(isStoredInMemoryOnly: false)
-        return try! ModelContainer(for: schema, configurations: [config])
-    }()
+        do {
+            let config = ModelConfiguration(isStoredInMemoryOnly: false)
+            modelContainer = try ModelContainer(for: schema, configurations: [config])
+        } catch {
+            print("ModelContainer failed: \(error). Falling back to inMemory.")
+            do {
+                let fallback = ModelConfiguration(isStoredInMemoryOnly: true)
+                modelContainer = try ModelContainer(for: schema, configurations: [fallback])
+            } catch {
+                fatalError("Could not create even in-memory ModelContainer: \(error)")
+            }
+        }
+    }
 
     var body: some Scene {
         WindowGroup {

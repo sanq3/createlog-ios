@@ -137,7 +137,8 @@ struct TagCreationWizard: View {
                 withAnimation(.spring(duration: 0.25, bounce: 0.15)) {
                     viewModel.selectActivity(activity)
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                Task {
+                    try? await Task.sleep(for: .milliseconds(100))
                     isProjectNameFocused = true
                 }
             } label: {
@@ -236,7 +237,8 @@ struct TagCreationWizard: View {
                     withAnimation(.spring(duration: 0.25, bounce: 0.15)) {
                         showNewProjectInput = true
                     }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    Task {
+                        try? await Task.sleep(for: .milliseconds(150))
                         isProjectNameFocused = true
                     }
                 } label: {
