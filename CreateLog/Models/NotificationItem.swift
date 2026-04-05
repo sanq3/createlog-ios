@@ -16,8 +16,8 @@ enum NotificationTimeSection: String {
     case earlier = "それ以前"
 }
 
-struct NotificationItem: Identifiable {
-    let id = UUID()
+struct NotificationItem: Identifiable, Sendable {
+    let id: UUID
     let type: NotificationType
     let primaryActor: String
     let groupedActors: [String]
@@ -28,6 +28,7 @@ struct NotificationItem: Identifiable {
     let avatarColor: Int
 
     init(
+        id: UUID = UUID(),
         type: NotificationType,
         primaryActor: String,
         groupedActors: [String] = [],
@@ -36,6 +37,7 @@ struct NotificationItem: Identifiable {
         isRead: Bool = false,
         contentPreview: String? = nil
     ) {
+        self.id = id
         self.type = type
         self.primaryActor = primaryActor
         self.groupedActors = groupedActors

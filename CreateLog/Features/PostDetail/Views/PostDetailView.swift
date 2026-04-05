@@ -2,7 +2,7 @@ import SwiftUI
 
 struct PostDetailView: View {
     @State var post: Post
-    @State private var comments: [Comment] = MockData.comments
+    @State private var comments: [Comment] = []
     @State private var commentText = ""
     @State private var heartScale: CGFloat = 1.0
     @FocusState private var isCommentFocused: Bool
@@ -339,9 +339,9 @@ struct PostDetailView: View {
 
             HStack(spacing: 10) {
                 AvatarView(
-                    initials: MockData.currentUser.initials,
+                    initials: "?",
                     size: 32,
-                    status: MockData.currentUser.status
+                    status: .offline
                 )
 
                 TextField("コメントを追加...", text: $commentText)

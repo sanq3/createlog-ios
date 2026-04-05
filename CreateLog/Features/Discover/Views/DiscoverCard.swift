@@ -12,15 +12,22 @@ struct DiscoverCard: View {
             VStack(alignment: .leading, spacing: 0) {
                 // Visual area
                 ZStack(alignment: .topTrailing) {
-                    // Background
-                    item.placeholderColor.color
-                        .overlay(
-                            VStack(spacing: 8) {
-                                Image(systemName: item.iconName)
-                                    .font(.system(size: item.size == .tall ? 32 : 24))
-                                    .foregroundStyle(.white.opacity(0.15))
-                            }
-                        )
+                    // Gradient background
+                    LinearGradient(
+                        colors: [
+                            item.placeholderColor.color,
+                            item.placeholderColor.color.opacity(0.6)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .overlay(
+                        VStack(spacing: 8) {
+                            Image(systemName: item.iconName)
+                                .font(.system(size: item.size == .tall ? 32 : 24))
+                                .foregroundStyle(.white.opacity(0.12))
+                        }
+                    )
 
                     // Type badge
                     typeBadge
@@ -58,6 +65,7 @@ struct DiscoverCard: View {
                 RoundedRectangle(cornerRadius: 14)
                     .strokeBorder(Color.clBorder, lineWidth: 1)
             )
+            .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
         }
         .buttonStyle(.plain)
     }
@@ -71,14 +79,10 @@ struct DiscoverCard: View {
             Text(label)
                 .font(.system(size: 9, weight: .semibold))
         }
-        .foregroundStyle(.white.opacity(0.9))
+        .foregroundStyle(.white)
         .padding(.horizontal, 7)
         .padding(.vertical, 4)
-        .background(
-            Capsule()
-                .fill(.black.opacity(0.5))
-                .background(.ultraThinMaterial, in: Capsule())
-        )
+        .background(.ultraThinMaterial, in: Capsule())
     }
 
     private var typeInfo: (String, String) {

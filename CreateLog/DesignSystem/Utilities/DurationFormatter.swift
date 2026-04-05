@@ -16,6 +16,15 @@ enum DurationFormat: String, CaseIterable {
 
 
 enum DurationFormatter {
+    struct KPIDisplayParts {
+        let primaryValue: Int
+        let primaryUnit: String
+        let secondaryValue: String?
+        let secondaryUnit: String?
+    }
+
+    private static let compactKPIHourThreshold = 100
+
     static var isJapanese: Bool {
         let stored = UserDefaults.standard.string(forKey: "durationFormat") ?? DurationFormat.system.rawValue
         switch DurationFormat(rawValue: stored) ?? .system {
@@ -117,7 +126,37 @@ enum DurationFormatter {
         return "\(m)m"
     }
 
-    /// Locale for UIDatePicker based on current setting
+    static func kpiDisplayParts(minutes: Int, referenceMinutes: Int? = nil) -> KPIDisplayParts {
+        let h = minutes / 60
+        let m = minutes % 60
+        let referenceHours = (referenceMinutes ?? minutes) / 60
+
+        if referenceHours >= compactKPIHourThreshold {
+            return KPIDisplayParts(
+                primaryValue: h,
+                primaryUnit: "h",
+                secondaryValue: nil,
+                secondaryUnit: nil
+            )
+        }
+
+        if h > 0 {
+            return KPIDisplayParts(
+                primaryValue: h,
+                primaryUnit: "h",
+                secondaryValue: String(format: "%02d", m),
+                secondaryUnit: "m"
+            )
+        }
+
+        return KPIDisplayParts(
+            primaryValue: m,
+            primaryUnit: "m",
+            secondaryValue: nil,
+            secondaryUnit: nil
+        )
+    }
+
     static var pickerLocale: Locale {
         isJapanese ? Locale(identifier: "ja_JP") : Locale(identifier: "en_US")
     }

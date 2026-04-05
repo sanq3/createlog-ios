@@ -8,17 +8,21 @@ struct TodayHeroView: View {
     @State private var lastAnimatedMetrics: RecordingHeroMetrics?
 
     let metrics: RecordingHeroMetrics?
+    var pickerHours: Binding<Int>?
+    var pickerMinutes: Binding<Int>?
+
+    private static let pickerHeight: CGFloat = 230
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 0) {
             kpiRow
 
-            if currentBreakdown.count >= 2 {
-                categoryBar
+            if let hours = pickerHours, let minutes = pickerMinutes {
+                pickerRow(hours: hours, minutes: minutes)
             }
         }
         .padding(.top, 4)
-        .padding(.bottom, 12)
+        .padding(.bottom, 0)
         .onAppear {
             resetDisplayedMetrics()
             if let metrics {
@@ -38,35 +42,15 @@ struct TodayHeroView: View {
 
     private var kpiRow: some View {
         HStack(spacing: 0) {
-            kpiItem(hours: Double(displayedTodayMinutes) / 60.0, label: "今日")
-            kpiItem(hours: Double(displayedCumulativeMinutes) / 60.0, label: "累計")
+            kpiItem(minutes: displayedTodayMinutes, referenceMinutes: targetTodayMinutes, label: "今日")
+            kpiItem(minutes: displayedCumulativeMinutes, referenceMinutes: targetCumulativeMinutes, label: "累計")
             weekChangeItem
         }
     }
 
-    private func kpiItem(hours: Double, label: String) -> some View {
-        let minutes = Int(hours * 60)
-        let h = minutes / 60
-        let m = minutes % 60
-
+    private func kpiItem(minutes: Int, referenceMinutes: Int, label: String) -> some View {
         return VStack(spacing: 3) {
-            HStack(alignment: .firstTextBaseline, spacing: 1) {
-                if h > 0 {
-                    Text("\(h)")
-                        .font(.system(size: 30, weight: .heavy, design: .rounded))
-                        .foregroundStyle(Color.clTextPrimary)
-                    Text("h")
-                        .font(.system(size: 13, weight: .bold, design: .rounded))
-                        .foregroundStyle(Color.clTextTertiary)
-                }
-                Text("\(h > 0 ? String(format: "%02d", m) : "\(m)")")
-                    .font(.system(size: 30, weight: .heavy, design: .rounded))
-                    .foregroundStyle(Color.clTextPrimary)
-                Text("m")
-                    .font(.system(size: 13, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color.clTextTertiary)
-            }
-            .contentTransition(.numericText())
+            DurationKPIValueView(minutes: minutes, referenceMinutes: referenceMinutes)
 
             Text(label)
                 .font(.system(size: 11, weight: .medium))
@@ -75,6 +59,13 @@ struct TodayHeroView: View {
                 .opacity(animateIn ? 1 : 0)
         }
         .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - Picker Row (2-component, full width)
+
+    private func pickerRow(hours: Binding<Int>, minutes: Binding<Int>) -> some View {
+        DurationPicker(hours: hours, minutes: minutes)
+            .frame(height: Self.pickerHeight)
     }
 
     // MARK: - Week Change
@@ -101,32 +92,14 @@ struct TodayHeroView: View {
         .frame(maxWidth: .infinity)
     }
 
-    // MARK: - Category Bar
-
-    private var categoryBar: some View {
-        GeometryReader { geo in
-            HStack(spacing: 2) {
-                ForEach(currentBreakdown) { item in
-                    let ratio = displayedTodayMinutes > 0
-                        ? CGFloat(item.minutes) / CGFloat(displayedTodayMinutes)
-                        : 0
-
-                    RoundedRectangle(cornerRadius: 3)
-                        .fill(LogEntry.color(for: item.name))
-                        .frame(width: animateIn ? max(geo.size.width * ratio - 2, 4) : 0)
-                }
-            }
-            .animation(.spring(duration: 0.5, bounce: 0.15), value: animateIn)
-        }
-        .frame(height: 5)
-        .clipShape(RoundedRectangle(cornerRadius: 3))
-        .padding(.horizontal, 12)
-    }
-
     // MARK: - Formatting
 
-    private var currentBreakdown: [CategoryBreakdownItem] {
-        metrics?.breakdown ?? []
+    private var targetTodayMinutes: Int {
+        metrics?.todayMinutes ?? displayedTodayMinutes
+    }
+
+    private var targetCumulativeMinutes: Int {
+        metrics?.cumulativeMinutes ?? displayedCumulativeMinutes
     }
 
     private func formatPercent(_ value: Double) -> String {

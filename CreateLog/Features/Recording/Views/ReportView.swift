@@ -6,6 +6,12 @@ struct ReportView: View {
 
     private let totalCategories: Double = 28.5
 
+    /// 空状態フォールバック
+    static let demoWeeklyHours: [(day: String, hours: Double)] = [
+        ("月", 0), ("火", 0), ("水", 0), ("木", 0), ("金", 0), ("土", 0), ("日", 0)
+    ]
+    static let demoCategoryItems: [CategoryItem] = []
+
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -68,11 +74,11 @@ struct ReportView: View {
                 .padding(.horizontal, 20)
 
                 // Weekly chart
-                WeeklyChart(data: MockData.weeklyHours)
+                WeeklyChart(data: Self.demoWeeklyHours)
                     .padding(.horizontal, 20)
 
                 // Category breakdown
-                CategoryBreakdown(categories: MockData.categoryItems)
+                CategoryBreakdown(categories: Self.demoCategoryItems)
                     .padding(.horizontal, 20)
 
                 // Share button

@@ -1,7 +1,7 @@
 import Foundation
 
-struct Article: Identifiable {
-    let id = UUID()
+struct Article: Identifiable, Sendable {
+    let id: UUID
     let title: String
     let body: String
     let authorName: String
@@ -17,6 +17,7 @@ struct Article: Identifiable {
     let tags: [String]
 
     init(
+        id: UUID = UUID(),
         title: String,
         body: String,
         authorName: String,
@@ -31,6 +32,7 @@ struct Article: Identifiable {
         visibility: ArticleVisibility = .public,
         tags: [String] = []
     ) {
+        self.id = id
         self.title = title
         self.body = body
         self.authorName = authorName
@@ -47,7 +49,7 @@ struct Article: Identifiable {
     }
 }
 
-enum ArticleVisibility {
+enum ArticleVisibility: Sendable {
     case `public`
     case followersOnly
     case draft

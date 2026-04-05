@@ -7,6 +7,18 @@ struct UserProfileView: View {
         _user = State(initialValue: user)
     }
 
+    /// 空状態フォールバック (実データ取得前)
+    static let demoWeeklyHours: [(day: String, hours: Double)] = [
+        ("月", 0), ("火", 0), ("水", 0), ("木", 0), ("金", 0), ("土", 0), ("日", 0)
+    ]
+    #if DEBUG
+    static let demoProjects: [Project] = Array(MockData.projects.prefix(2))
+    static let demoPosts: [Post] = Array(MockData.posts.prefix(3))
+    #else
+    static let demoProjects: [Project] = []
+    static let demoPosts: [Post] = []
+    #endif
+
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
@@ -14,7 +26,7 @@ struct UserProfileView: View {
                 actionButtons
 
                 // 週間チャート
-                WeeklyChart(data: MockData.weeklyHours)
+                WeeklyChart(data: Self.demoWeeklyHours)
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
 
@@ -166,7 +178,7 @@ struct UserProfileView: View {
                 .foregroundStyle(Color.clTextSecondary)
                 .padding(.horizontal, 16)
 
-            ForEach(Array(MockData.projects.prefix(2))) { project in
+            ForEach(Self.demoProjects) { project in
                 serviceCard(project: project)
             }
         }
@@ -183,7 +195,7 @@ struct UserProfileView: View {
                 .padding(.horizontal, 16)
 
             LazyVStack(spacing: 12) {
-                ForEach(Array(MockData.posts.prefix(3))) { post in
+                ForEach(Self.demoPosts) { post in
                     PostCardView(post: post)
                 }
             }

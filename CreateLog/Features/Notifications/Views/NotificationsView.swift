@@ -1,10 +1,22 @@
 import SwiftUI
 
 struct NotificationsView: View {
+    @Environment(\.dependencies) private var deps
+    @State private var viewModel: NotificationViewModel?
     @State private var filterIndex = 0
 
-    private let allNotifications = MockData.notifications
     private let filterLabels = ["すべて", "いいね", "フォロー", "メンション", "システム"]
+
+    private var allNotifications: [NotificationItem] {
+        if let vmItems = viewModel?.notifications, !vmItems.isEmpty {
+            return vmItems
+        }
+        #if DEBUG
+        return MockData.notifications
+        #else
+        return []
+        #endif
+    }
 
     private var filteredNotifications: [NotificationItem] {
         guard filterIndex > 0 else { return allNotifications }
@@ -51,6 +63,12 @@ struct NotificationsView: View {
         .scrollIndicators(.hidden)
         .background(Color.clBackground)
         .navigationTitle("通知")
+        .task {
+            if viewModel == nil {
+                viewModel = NotificationViewModel(repository: deps.notificationRepository)
+            }
+            await viewModel?.loadNotifications()
+        }
     }
 
     // MARK: - Notification List

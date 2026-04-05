@@ -4,8 +4,14 @@ import SwiftData
 @main
 struct CreateLogApp: App {
     @AppStorage("appearanceMode") private var appearanceMode: String = AppearanceMode.system.rawValue
+    @AppStorage("onboardingCompleted") private var onboardingCompleted = true
 
     let modelContainer: ModelContainer
+    let dependencies: DependencyContainer
+    @State private var authViewModel: AuthViewModel
+    @State private var deepLinkHandler = DeepLinkHandler()
+    @State private var storeKitManager = StoreKitManager()
+    @State private var splashFinished = false
 
     init() {
         let schema = Schema([SDCategory.self, SDProject.self, SDTimeEntry.self])
@@ -21,19 +27,50 @@ struct CreateLogApp: App {
                 fatalError("Could not create even in-memory ModelContainer: \(error)")
             }
         }
+        let deps = DependencyContainer()
+        dependencies = deps
+        _authViewModel = State(initialValue: AuthViewModel(authService: deps.authService))
     }
 
     var body: some Scene {
         WindowGroup {
-            MainTabView()
-                .modelContainer(modelContainer)
-                .onAppear {
-                    applyTheme(animated: false)
-                    seedDefaultCategories()
+            ZStack {
+                // Base: 本編 (onboarding or main)
+                if onboardingCompleted {
+                    MainTabView()
+                        .modelContainer(modelContainer)
+                        .environment(\.dependencies, dependencies)
+                        .onAppear {
+                            applyTheme(animated: false)
+                            seedDefaultCategories()
+                        }
+                        .onChange(of: appearanceMode) {
+                            applyTheme(animated: true)
+                        }
+                        .task { await authViewModel.observeAuthState() }
+                        .onOpenURL { url in deepLinkHandler.handle(url) }
+                } else {
+                    OnboardingView(isPresented: Binding(
+                        get: { !onboardingCompleted },
+                        set: { if !$0 { onboardingCompleted = true } }
+                    ))
+                    .modelContainer(modelContainer)
+                    .environment(\.dependencies, dependencies)
+                    .onAppear { applyTheme(animated: false) }
+                    .onChange(of: appearanceMode) { applyTheme(animated: true) }
                 }
-                .onChange(of: appearanceMode) {
-                    applyTheme(animated: true)
+
+                // Overlay: 起動時動画スプラッシュ (onboarding/main を覆って再生、終了後に fade out)
+                if !splashFinished {
+                    SplashView {
+                        withAnimation(.easeOut(duration: 0.45)) {
+                            splashFinished = true
+                        }
+                    }
+                    .transition(.opacity)
+                    .zIndex(1)
                 }
+            }
         }
     }
 

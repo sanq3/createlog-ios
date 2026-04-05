@@ -7,6 +7,8 @@ final class RecordingViewModel {
     // MARK: - Dependencies
 
     @ObservationIgnored private let modelContext: ModelContext
+    @ObservationIgnored private let logRepository: any LogRepositoryProtocol
+    @ObservationIgnored private let categoryRepository: any CategoryRepositoryProtocol
 
     // MARK: - State
 
@@ -37,6 +39,9 @@ final class RecordingViewModel {
     var pickerHours: Int = 0
     var pickerMinutes: Int = 0
 
+    // Supabase categories.name → categories.id マップ (リモート保存時の categoryId 解決用)
+    @ObservationIgnored private var remoteCategoryCache: [String: UUID] = [:]
+
     // MARK: - Constants
 
     static let genres: [(name: String, activities: [String])] = [
@@ -50,8 +55,14 @@ final class RecordingViewModel {
 
     // MARK: - Init
 
-    init(modelContext: ModelContext) {
+    init(
+        modelContext: ModelContext,
+        logRepository: any LogRepositoryProtocol = NoOpLogRepository(),
+        categoryRepository: any CategoryRepositoryProtocol = NoOpCategoryRepository()
+    ) {
         self.modelContext = modelContext
+        self.logRepository = logRepository
+        self.categoryRepository = categoryRepository
     }
 
     // MARK: - Data Loading
@@ -59,6 +70,35 @@ final class RecordingViewModel {
     func loadData() {
         loadTags()
         loadEntries()
+        Task { await syncRemoteCategories() }
+    }
+
+    /// Supabase の categories を取得して name → id マップをキャッシュ。
+    /// リモート保存時に SDProject のカテゴリ名から UUID を解決するために使う。
+    /// 失敗はサイレント (ローカル記録は継続可能)。
+    func syncRemoteCategories() async {
+        do {
+            let categories = try await categoryRepository.fetchCategories()
+            var map: [String: UUID] = [:]
+            for c in categories {
+                map[c.name] = c.id
+            }
+            remoteCategoryCache = map
+        } catch {
+            // ネットワーク未設定/未認証では空のまま (NoOpCategoryRepository も空を返す)
+        }
+    }
+
+    /// SDCategory.name から Supabase categories.id を解決する。
+    /// 一致しない場合は「その他」にフォールバックし、それも無ければ nil。
+    private func resolveRemoteCategoryId(for categoryName: String?) -> UUID? {
+        guard let name = categoryName else {
+            return remoteCategoryCache["その他"]
+        }
+        if let id = remoteCategoryCache[name] {
+            return id
+        }
+        return remoteCategoryCache["その他"]
     }
 
     private func loadTags() {
@@ -198,6 +238,14 @@ final class RecordingViewModel {
         modelContext.insert(entry)
         HapticManager.success()
         loadEntries()
+
+        // バックグラウンドでリモートにも保存
+        let title = resolvedTag?.name ?? "その他"
+        let categoryName = resolvedTag?.category?.name
+        let remoteCategoryId = resolveRemoteCategoryId(for: categoryName)
+        Task {
+            await saveToRemote(minutes: minutes, start: startDate, end: endDate, title: title, categoryId: remoteCategoryId)
+        }
     }
 
     private func resetTimeInput() {
@@ -272,6 +320,59 @@ final class RecordingViewModel {
     func goBackWizard() {
         if wizardStep > 0 {
             wizardStep -= 1
+        }
+    }
+
+    // MARK: - Remote Sync
+
+    /// Supabase からログを同期 (Stale-While-Revalidate)
+    func syncWithRemote() async {
+        do {
+            let remoteLogs = try await logRepository.fetchLogs(for: Date())
+            // リモートデータでローカルキャッシュを更新
+            for remoteLog in remoteLogs {
+                let remoteIdString = remoteLog.id.uuidString
+                let descriptor = FetchDescriptor<SDTimeEntry>(
+                    predicate: #Predicate<SDTimeEntry> { entry in
+                        entry.memo == remoteIdString
+                    }
+                )
+                let existing = try? modelContext.fetch(descriptor)
+                if existing?.isEmpty != false {
+                    // ローカルに存在しないエントリを追加
+                    let entry = SDTimeEntry(
+                        startDate: remoteLog.startedAt,
+                        endDate: remoteLog.endedAt,
+                        durationMinutes: remoteLog.durationMinutes,
+                        projectName: remoteLog.title,
+                        categoryName: "その他",
+                        memo: remoteLog.id.uuidString
+                    )
+                    modelContext.insert(entry)
+                }
+            }
+            loadEntries()
+        } catch {
+            // リモート同期失敗はサイレント（ローカルデータで継続）
+        }
+    }
+
+    /// ログをリモートにも保存
+    private func saveToRemote(minutes: Int, start: Date, end: Date, title: String, categoryId: UUID?) async {
+        // categoryIdが未解決ならリモート保存をスキップ (FK制約違反を防ぐ)
+        guard let resolvedCategoryId = categoryId else { return }
+        let dto = LogInsertDTO(
+            title: title,
+            categoryId: resolvedCategoryId,
+            startedAt: start,
+            endedAt: end,
+            durationMinutes: minutes,
+            isTimer: false
+        )
+        do {
+            _ = try await logRepository.insertLog(dto)
+        } catch {
+            // リモート保存失敗はサイレント（ローカルには保存済み）
         }
     }
 

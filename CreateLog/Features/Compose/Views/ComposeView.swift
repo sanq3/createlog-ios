@@ -32,7 +32,11 @@ struct ComposeView: View {
     @State private var viewModel = ComposeViewModel()
     @State private var selectedPhotos: [PhotosPickerItem] = []
 
-    private let user = MockData.currentUser
+    #if DEBUG
+    private let user: User = MockData.currentUser
+    #else
+    private let user: User = User(name: "", handle: "")
+    #endif
 
     var body: some View {
         NavigationStack {
@@ -152,6 +156,7 @@ struct ComposeView: View {
                 viewModel.handlePhotoSelection(newItems)
                 selectedPhotos = []
             }
+            .errorBanner($viewModel.errorMessage)
         }
     }
 

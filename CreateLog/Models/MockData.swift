@@ -1,12 +1,6 @@
 import Foundation
 
-struct WeeklyStackedEntry: Identifiable {
-    let id = UUID()
-    let day: String
-    let category: String
-    let hours: Double
-}
-
+#if DEBUG
 enum MockData {
 
     // MARK: - Charts
@@ -318,3 +312,5 @@ enum MockData {
         ),
     ]
 }
+
+#endif

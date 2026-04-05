@@ -2,11 +2,21 @@ import SwiftUI
 import CoreImage.CIFilterBuiltins
 
 struct ProfileView: View {
+    @Environment(\.dependencies) private var deps
     @State private var showShareSheet = false
     @State private var showEditProfile = false
     @State private var selectedPostTab: PostTab = .posts
-
-    private let user = MockData.currentUser
+    #if DEBUG
+    @State private var userPosts: [Post] = MockData.posts
+    @State private var userProjects: [Project] = MockData.projects
+    @State private var weeklyHours: [(String, Double)] = MockData.weeklyHours
+    @State private var user: User = MockData.currentUser
+    #else
+    @State private var userPosts: [Post] = []
+    @State private var userProjects: [Project] = []
+    @State private var weeklyHours: [(String, Double)] = []
+    @State private var user: User = User(name: "", handle: "")
+    #endif
 
     private enum PostTab: String, CaseIterable {
         case posts = "投稿"
@@ -17,16 +27,19 @@ struct ProfileView: View {
     private var profileURL: String { "https://createlog.app/\(user.handle)" }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                // Header row: Avatar + Stats
+        ZStack(alignment: .top) {
+            ScrollView {
+                VStack(spacing: 0) {
+                    // Spacer equal to custom header height so content starts right below it
+                    Color.clear.frame(height: 44)
+                    // Header row: Avatar + Stats
                 HStack(spacing: 0) {
                     AvatarView(initials: user.initials, size: 86, status: .offline)
 
                     Spacer()
 
                     HStack(spacing: 0) {
-                        profileStat(value: "\(MockData.posts.count)", label: "投稿")
+                        profileStat(value: "\(userPosts.count)", label: "投稿")
                         Spacer()
                         NavigationLink {
                             FollowListView(initialTab: .followers)
@@ -115,7 +128,7 @@ struct ProfileView: View {
                 .padding(.bottom, 16)
 
                 // Mini chart
-                WeeklyChart(data: MockData.weeklyHours)
+                WeeklyChart(data: weeklyHours)
                     .padding(.horizontal, 16)
 
                 // マイサービス
@@ -125,7 +138,7 @@ struct ProfileView: View {
                         .foregroundStyle(Color.clTextSecondary)
                         .padding(.horizontal, 16)
 
-                    ForEach(MockData.projects) { project in
+                    ForEach(userProjects) { project in
                         serviceCard(project: project)
                     }
                 }
@@ -177,27 +190,35 @@ struct ProfileView: View {
                 Spacer(minLength: 100)
             }
         }
-        .scrollIndicators(.hidden)
-        .background(Color.clBackground)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
+            .scrollIndicators(.hidden)
+
+            // Custom header overlay (no SwiftUI navigation bar gap)
+            ZStack {
                 Text(handle)
                     .font(.system(size: 20, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary)
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink {
-                    SettingsView()
-                } label: {
-                    Image(systemName: "line.3.horizontal")
-                        .font(.system(size: 20))
-                        .foregroundStyle(Color.clTextPrimary)
+
+                HStack {
+                    Spacer()
+                    NavigationLink {
+                        SettingsView()
+                    } label: {
+                        Image(systemName: "line.3.horizontal")
+                            .font(.system(size: 20))
+                            .foregroundStyle(Color.clTextPrimary)
+                            .frame(width: 44, height: 44)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
+            .frame(height: 44)
+            .padding(.horizontal, 8)
+            .background(Color.clBackground)
         }
-        .navigationBarTitleDisplayMode(.inline)
+        .background(Color.clBackground)
+        .navigationBarHidden(true)
         .sheet(isPresented: $showEditProfile) {
-            ProfileEditView()
+            ProfileEditView(user: user, profileRepository: deps.profileRepository)
         }
         .sheet(isPresented: $showShareSheet) {
             ProfileShareSheet(name: user.name, handle: handle, profileURL: profileURL, initials: user.initials)
@@ -210,11 +231,11 @@ struct ProfileView: View {
     private func postsFor(_ tab: PostTab) -> [Post] {
         switch tab {
         case .posts:
-            Array(MockData.posts.prefix(3))
+            Array(userPosts.prefix(3))
         case .likes:
-            Array(MockData.posts.dropFirst(3).prefix(3))
+            Array(userPosts.dropFirst(min(3, userPosts.count)).prefix(3))
         case .bookmarks:
-            Array(MockData.posts.dropFirst(6).prefix(3))
+            Array(userPosts.dropFirst(min(6, userPosts.count)).prefix(3))
         }
     }
 

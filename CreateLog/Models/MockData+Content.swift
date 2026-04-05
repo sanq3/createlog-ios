@@ -1,5 +1,6 @@
 import Foundation
 
+#if DEBUG
 extension MockData {
 
     // MARK: - Articles
@@ -214,3 +215,5 @@ extension MockData {
         ),
     ]
 }
+
+#endif

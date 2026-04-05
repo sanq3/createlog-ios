@@ -1,10 +1,10 @@
 import Foundation
 
+#if DEBUG
 extension MockData {
     static let currentUser = User(
         name: "山田太郎",
         handle: "yamada_dev",
-        initials: "山",
         bio: "iOS Developer / 個人開発が好き",
         status: .coding,
         followerCount: 234,
@@ -29,7 +29,6 @@ extension MockData {
         User(
             name: "田中ゆうき",
             handle: "tanaka_dev",
-            initials: "田",
             bio: "SwiftUI大好きエンジニア / 個人開発3年目",
             status: .coding,
             followerCount: 1205,
@@ -48,7 +47,6 @@ extension MockData {
         User(
             name: "Emily Chen",
             handle: "emily_codes",
-            initials: "E",
             bio: "Flutter & iOS dev. Building cool stuff.",
             status: .online,
             followerCount: 892,
@@ -67,7 +65,6 @@ extension MockData {
         User(
             name: "佐藤健太",
             handle: "sato_k",
-            initials: "佐",
             bio: "プログラミング初心者 / 毎日30分コーディング中",
             status: .offline,
             followerCount: 156,
@@ -86,7 +83,6 @@ extension MockData {
         User(
             name: "Alex Kim",
             handle: "alexkim",
-            initials: "A",
             bio: "Full-stack engineer. React + Node.js + Supabase.",
             status: .coding,
             followerCount: 2340,
@@ -105,7 +101,6 @@ extension MockData {
         User(
             name: "高橋リョウ",
             handle: "ryo_codes",
-            initials: "高",
             bio: "インフラエンジニア / Docker / Kubernetes",
             status: .coding,
             followerCount: 567,
@@ -124,7 +119,6 @@ extension MockData {
         User(
             name: "Maria Santos",
             handle: "maria_dev",
-            initials: "M",
             bio: "Web designer & frontend developer",
             status: .offline,
             followerCount: 445,
@@ -142,3 +136,5 @@ extension MockData {
         ),
     ]
 }
+
+#endif

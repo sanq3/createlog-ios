@@ -28,5 +28,9 @@
 		<string>fb-messenger</string>
 		<string>discord</string>
 	</array>
+	<key>SUPABASE_ANON_KEY</key>
+	<string>$(SUPABASE_ANON_KEY)</string>
+	<key>SUPABASE_URL</key>
+	<string>$(SUPABASE_URL)</string>
 </dict>
 </plist>

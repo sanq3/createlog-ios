@@ -2,7 +2,16 @@ import SwiftUI
 import Charts
 
 struct ReportDashboardView: View {
+    @Environment(\.modelContext) private var modelContext
     @State private var animateIn = false
+    @State private var showShare = false
+    #if DEBUG
+    @State private var weeklyStackedData: [WeeklyStackedEntry] = MockData.weeklyStackedHours
+    @State private var weeklyHoursData: [(day: String, hours: Double)] = MockData.weeklyHours
+    #else
+    @State private var weeklyStackedData: [WeeklyStackedEntry] = []
+    @State private var weeklyHoursData: [(day: String, hours: Double)] = []
+    #endif
 
     // Mock data
     private let todayHours: Double = 4.25
@@ -72,11 +81,15 @@ struct ReportDashboardView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     HapticManager.medium()
+                    showShare = true
                 } label: {
                     Image(systemName: "square.and.arrow.up")
                         .font(.system(size: 15, weight: .light))
                 }
             }
+        }
+        .sheet(isPresented: $showShare) {
+            ShareReportView()
         }
         .onAppear {
             withAnimation(.spring(duration: 1.0, bounce: 0.1).delay(0.1)) {
@@ -300,7 +313,7 @@ struct ReportDashboardView: View {
             }
 
             Chart {
-                ForEach(MockData.weeklyStackedHours) { entry in
+                ForEach(weeklyStackedData) { entry in
                     BarMark(
                         x: .value("Day", entry.day),
                         y: .value("Hours", entry.hours)
@@ -309,7 +322,7 @@ struct ReportDashboardView: View {
                     .cornerRadius(2)
                 }
 
-                ForEach(Array(MockData.weeklyHours.enumerated()), id: \.offset) { index, item in
+                ForEach(Array(weeklyHoursData.enumerated()), id: \.offset) { index, item in
                     PointMark(
                         x: .value("Day", item.day),
                         y: .value("Hours", item.hours)

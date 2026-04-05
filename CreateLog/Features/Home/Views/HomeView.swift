@@ -1,12 +1,26 @@
 import SwiftUI
 
 struct HomeView: View {
+    @Environment(\.dependencies) private var deps
+    @State private var viewModel: FeedViewModel?
     @State private var segmentIndex = 0
-    @State private var posts = MockData.posts
+
+    /// ViewModelにデータが入ればそちらを優先、なければDEBUGビルドでMockDataにフォールバック
+    private var posts: [Post] {
+        if let vmPosts = viewModel?.posts, !vmPosts.isEmpty {
+            return vmPosts
+        }
+        #if DEBUG
+        return MockData.posts
+        #else
+        return []
+        #endif
+    }
     @Binding var tabBarOffset: CGFloat
-    @Binding var showSideMenu: Bool
-    @Binding var sideMenuDragOffset: CGFloat
     let reselectCount: Int
+
+    // DEBUG
+    @State private var showOnboarding = false
 
     @State private var feedScrollPosition: ScrollPosition = .init(edge: .top)
     @State private var isRefreshing = false
@@ -69,7 +83,19 @@ struct HomeView: View {
                         .foregroundStyle(Color.clTextPrimary)
 
                     HStack {
+                        // DEBUG: onboarding
+                        Button {
+                            showOnboarding = true
+                        } label: {
+                            Image(systemName: "arrow.counterclockwise")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundStyle(Color.clTextTertiary)
+                                .frame(width: 40, height: 40)
+                        }
+                        .buttonStyle(.plain)
+
                         Spacer()
+
                         NavigationLink {
                             NotificationsView()
                         } label: {
@@ -110,7 +136,23 @@ struct HomeView: View {
         .fullScreenCover(isPresented: $showCompose) {
             ComposeView()
         }
+        .fullScreenCover(isPresented: $showOnboarding) {
+            OnboardingView(isPresented: $showOnboarding)
+        }
+        .errorBanner(Binding(
+            get: { viewModel?.errorMessage },
+            set: { viewModel?.errorMessage = $0 }
+        ))
         .navigationBarHidden(true)
+        .task {
+            if viewModel == nil {
+                viewModel = FeedViewModel(
+                    postRepository: deps.postRepository,
+                    likeRepository: deps.likeRepository
+                )
+            }
+            await viewModel?.loadFeed()
+        }
         .onChange(of: reselectCount) {
             if isAtTop {
                 // Already at top → refresh
@@ -144,25 +186,6 @@ struct HomeView: View {
                 viewWidth = newWidth
             }
         }
-        // Edge swipe for side menu (UIGestureRecognizerRepresentable, priority over ScrollView)
-        .gesture(
-            EdgePanGesture(
-                dragOffset: $sideMenuDragOffset,
-                isEnabled: segmentIndex == 0,
-                onEnd: { shouldOpen in
-                    if shouldOpen {
-                        withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                            showSideMenu = true
-                            sideMenuDragOffset = 0
-                        }
-                    } else {
-                        withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                            sideMenuDragOffset = 0
-                        }
-                    }
-                }
-            )
-        )
     }
 
     private func feedPage(for pagePosts: [Post]) -> some View {

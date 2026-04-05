@@ -1,7 +1,7 @@
 import Foundation
 
-struct Comment: Identifiable {
-    let id = UUID()
+struct Comment: Identifiable, Sendable {
+    let id: UUID
     let authorName: String
     let authorHandle: String
     let authorInitials: String
@@ -12,6 +12,7 @@ struct Comment: Identifiable {
     let replies: [Comment]
 
     init(
+        id: UUID = UUID(),
         authorName: String,
         authorHandle: String,
         authorInitials: String,
@@ -21,6 +22,7 @@ struct Comment: Identifiable {
         isLiked: Bool = false,
         replies: [Comment] = []
     ) {
+        self.id = id
         self.authorName = authorName
         self.authorHandle = authorHandle
         self.authorInitials = authorInitials
@@ -32,8 +34,8 @@ struct Comment: Identifiable {
     }
 }
 
-struct Review: Identifiable {
-    let id = UUID()
+struct Review: Identifiable, Sendable {
+    let id: UUID
     let authorName: String
     let authorHandle: String
     let authorInitials: String
@@ -43,6 +45,7 @@ struct Review: Identifiable {
     var developerReply: String?
 
     init(
+        id: UUID = UUID(),
         authorName: String,
         authorHandle: String,
         authorInitials: String,
@@ -51,6 +54,7 @@ struct Review: Identifiable {
         timestamp: Date = Date(),
         developerReply: String? = nil
     ) {
+        self.id = id
         self.authorName = authorName
         self.authorHandle = authorHandle
         self.authorInitials = authorInitials

@@ -8,7 +8,11 @@ struct FollowListView: View {
 
     @State private var selectedTab: Tab
     @State private var searchText = ""
+    #if DEBUG
     @State private var users: [User] = MockData.users
+    #else
+    @State private var users: [User] = []
+    #endif
     @Namespace private var tabNamespace
 
     private let followerCount: Int

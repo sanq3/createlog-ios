@@ -4,7 +4,11 @@ struct ProjectDetailView: View {
     let project: Project
 
     private var reviews: [Review] {
-        MockData.reviews
+        #if DEBUG
+        return MockData.reviews
+        #else
+        return []
+        #endif
     }
 
     var body: some View {
@@ -457,9 +461,11 @@ struct ProjectDetailView: View {
 // MARK: - WrappingHStack
 
 
+#if DEBUG
 #Preview {
     NavigationStack {
         ProjectDetailView(project: MockData.projects[0])
     }
     .preferredColorScheme(.dark)
 }
+#endif

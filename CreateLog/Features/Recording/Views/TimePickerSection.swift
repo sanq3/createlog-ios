@@ -17,12 +17,7 @@ struct TimePickerSection: View {
     }
 
     var body: some View {
-        VStack(spacing: 12) {
-            // Picker (always visible)
-            DurationPicker(hours: $viewModel.pickerHours, minutes: $viewModel.pickerMinutes)
-                .frame(height: 100)
-
-            // Selected tag + record button
+        VStack(spacing: 0) {
             HStack(spacing: 10) {
                 if let tag = viewModel.selectedTag {
                     HStack(spacing: 6) {

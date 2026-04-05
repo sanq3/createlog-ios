@@ -1,10 +1,9 @@
 import Foundation
 
-struct User: Identifiable {
-    let id = UUID()
+struct User: Identifiable, Sendable {
+    let id: UUID
     let name: String
     let handle: String
-    let initials: String
     let bio: String
     let status: OnlineStatus
     let followerCount: Int
@@ -22,9 +21,9 @@ struct User: Identifiable {
     let interests: [String]
 
     init(
+        id: UUID = UUID(),
         name: String,
         handle: String,
-        initials: String,
         bio: String = "",
         status: OnlineStatus = .offline,
         followerCount: Int = 0,
@@ -41,9 +40,9 @@ struct User: Identifiable {
         skills: [String] = [],
         interests: [String] = []
     ) {
+        self.id = id
         self.name = name
         self.handle = handle
-        self.initials = initials
         self.bio = bio
         self.status = status
         self.followerCount = followerCount
@@ -59,6 +58,13 @@ struct User: Identifiable {
         self.experienceLevel = experienceLevel
         self.skills = skills
         self.interests = interests
+    }
+
+    // MARK: - UI Derived Properties
+
+    /// 表示用の頭文字 (name先頭から導出)
+    var initials: String {
+        name.isEmpty ? "?" : String(name.prefix(1))
     }
 }
 
@@ -80,11 +86,18 @@ enum ExperienceLevel: String, CaseIterable, Sendable {
     }
 }
 
-struct UserLink: Identifiable {
-    let id = UUID()
+struct UserLink: Identifiable, Sendable {
+    let id: UUID
     let type: LinkType
     let url: String
     let label: String
+
+    init(id: UUID = UUID(), type: LinkType, url: String, label: String) {
+        self.id = id
+        self.type = type
+        self.url = url
+        self.label = label
+    }
 
     enum LinkType {
         case website

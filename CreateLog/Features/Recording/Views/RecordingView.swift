@@ -4,6 +4,7 @@ import SwiftData
 struct RecordingView: View {
     @Binding var tabBarOffset: CGFloat
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dependencies) private var deps
 
     @State private var viewModel: RecordingViewModel?
 
@@ -16,9 +17,14 @@ struct RecordingView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             if viewModel == nil {
-                let vm = RecordingViewModel(modelContext: modelContext)
+                let vm = RecordingViewModel(
+                    modelContext: modelContext,
+                    logRepository: deps.logRepository,
+                    categoryRepository: deps.categoryRepository
+                )
                 viewModel = vm
                 vm.loadData()
+                await vm.syncWithRemote()
             } else {
                 viewModel?.loadData()
             }
@@ -28,13 +34,15 @@ struct RecordingView: View {
     private var mainContent: some View {
         ScrollView {
             VStack(spacing: 0) {
-                // Stats (glass card)
-                TodayHeroView(
-                    metrics: viewModel?.heroMetrics
-                )
-                .padding(.horizontal, 16)
-
                 if let vm = viewModel {
+                    // Stats + integrated picker wheels
+                    TodayHeroView(
+                        metrics: vm.heroMetrics,
+                        pickerHours: Binding(get: { vm.pickerHours }, set: { vm.pickerHours = $0 }),
+                        pickerMinutes: Binding(get: { vm.pickerMinutes }, set: { vm.pickerMinutes = $0 })
+                    )
+                    .padding(.horizontal, 16)
+
                     // Active timer
                     if vm.isTimerRunning {
                         timerBanner(vm)
@@ -42,10 +50,10 @@ struct RecordingView: View {
                             .padding(.top, 12)
                     }
 
-                    // Picker + record button (always visible)
+                    // Tag + record button
                     TimePickerSection(viewModel: vm)
                         .padding(.horizontal, 16)
-                        .padding(.top, 16)
+                        .padding(.top, 8)
 
                     // Tags
                     TagChipsView(
@@ -67,6 +75,9 @@ struct RecordingView: View {
                     RecentHistoryView(entries: vm.recentEntries)
                         .padding(.top, 20)
                         .padding(.horizontal, 16)
+                } else {
+                    TodayHeroView(metrics: nil)
+                        .padding(.horizontal, 16)
                 }
 
                 Spacer(minLength: 100)
@@ -80,24 +91,16 @@ struct RecordingView: View {
                     .presentationDragIndicator(.visible)
             }
         }
-        .alert("エラー", isPresented: showErrorBinding) {
-            Button("OK") { viewModel?.errorMessage = nil }
-        } message: {
-            Text(viewModel?.errorMessage ?? "")
-        }
+        .errorBanner(Binding(
+            get: { viewModel?.errorMessage },
+            set: { viewModel?.errorMessage = $0 }
+        ))
     }
 
     private var showCreateTagBinding: Binding<Bool> {
         Binding(
             get: { viewModel?.showCreateTag ?? false },
             set: { newValue in viewModel?.showCreateTag = newValue }
-        )
-    }
-
-    private var showErrorBinding: Binding<Bool> {
-        Binding(
-            get: { viewModel?.errorMessage != nil },
-            set: { if !$0 { viewModel?.errorMessage = nil } }
         )
     }
 

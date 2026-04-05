@@ -4,8 +4,11 @@ struct ProfileEditView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: ProfileEditViewModel
 
-    init() {
-        _viewModel = State(initialValue: ProfileEditViewModel(user: MockData.currentUser))
+    init(user: User, profileRepository: any ProfileRepositoryProtocol) {
+        _viewModel = State(initialValue: ProfileEditViewModel(
+            user: user,
+            profileRepository: profileRepository
+        ))
     }
 
     var body: some View {
@@ -27,16 +30,21 @@ struct ProfileEditView: View {
                         dismiss()
                     }
                     .foregroundStyle(Color.clTextPrimary)
+                    .disabled(viewModel.isSaving)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("保存") {
                         HapticManager.light()
-                        dismiss()
+                        Task { await viewModel.save() }
                     }
                     .fontWeight(.semibold)
                     .foregroundStyle(viewModel.canSave ? Color.clAccent : Color.clTextTertiary)
                     .disabled(!viewModel.canSave)
                 }
+            }
+            .errorBanner($viewModel.errorMessage)
+            .onChange(of: viewModel.didSaveSuccessfully) { _, saved in
+                if saved { dismiss() }
             }
         }
     }

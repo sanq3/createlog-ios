@@ -3,7 +3,13 @@ import SwiftUI
 // MARK: - Discover View
 
 struct DiscoverView: View {
+    @Environment(\.dependencies) private var deps
     @State private var searchText = ""
+    #if DEBUG
+    @State private var discoverItems: [DiscoverItem] = MockData.discoverItems
+    #else
+    @State private var discoverItems: [DiscoverItem] = []
+    #endif
     @Binding var tabBarOffset: CGFloat
     let reselectCount: Int
 
@@ -21,7 +27,7 @@ struct DiscoverView: View {
                         .padding(.top, headerHeight + 16)
                 }
 
-                MasonryGrid(items: MockData.discoverItems)
+                MasonryGrid(items: discoverItems)
                     .padding(.horizontal, 12)
                     .padding(.top, headerHeight + 8)
                     .padding(.bottom, 100)

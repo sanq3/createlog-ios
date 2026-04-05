@@ -3,6 +3,10 @@ import Foundation
 @MainActor @Observable
 final class ProfileEditViewModel {
 
+    // MARK: - Dependencies
+
+    @ObservationIgnored private let profileRepository: any ProfileRepositoryProtocol
+
     // MARK: - Editable State
 
     var displayName: String
@@ -14,6 +18,13 @@ final class ProfileEditViewModel {
     var skills: [String]
     var newSkill: String = ""
     var interests: Set<String>
+
+    // MARK: - Save State
+
+    var isSaving: Bool = false
+    var errorMessage: String?
+    /// 保存成功フラグ。View はこれを監視して dismiss する。
+    var didSaveSuccessfully: Bool = false
 
     // MARK: - Originals (for change detection)
 
@@ -45,7 +56,7 @@ final class ProfileEditViewModel {
     }
 
     var canSave: Bool {
-        hasChanges && isHandleValid
+        hasChanges && isHandleValid && !isSaving
     }
 
     static let interestOptions = [
@@ -56,7 +67,12 @@ final class ProfileEditViewModel {
 
     // MARK: - Init
 
-    init(user: User) {
+    init(
+        user: User,
+        profileRepository: any ProfileRepositoryProtocol = NoOpProfileRepository()
+    ) {
+        self.profileRepository = profileRepository
+
         displayName = user.name
         handle = user.handle
         bio = user.bio
@@ -74,6 +90,55 @@ final class ProfileEditViewModel {
         originalLinks = user.links.map { EditableLink(url: $0.url) }
         originalSkills = user.skills
         originalInterests = Set(user.interests)
+    }
+
+    // MARK: - Save
+
+    /// 編集内容を Supabase に保存する。
+    /// サーバー粒度に合わせてサブセット (handle/displayName/bio/occupation/experienceYears) のみ更新する。
+    /// links/skills/interests はサーバースキーマ未対応のためここでは送信しない。
+    func save() async {
+        guard canSave else { return }
+
+        isSaving = true
+        errorMessage = nil
+        defer { isSaving = false }
+
+        // ハンドル変更時は衝突チェック
+        if handle != originalHandle {
+            do {
+                let available = try await profileRepository.checkHandleAvailability(handle)
+                guard available else {
+                    errorMessage = "このハンドルは既に使われています"
+                    return
+                }
+            } catch {
+                errorMessage = "ハンドルの確認に失敗しました"
+                return
+            }
+        }
+
+        let updates = ProfileUpdateDTO(
+            handle: handle,
+            displayName: displayName.isEmpty ? nil : displayName,
+            avatarUrl: nil,
+            ageGroup: nil,
+            gender: nil,
+            occupation: occupation.isEmpty ? nil : occupation,
+            workType: nil,
+            incomeStatus: nil,
+            experienceYears: experienceLevel.serverValue,
+            bio: bio.isEmpty ? nil : bio,
+            notificationEnabled: nil,
+            onboardingCompleted: nil
+        )
+
+        do {
+            _ = try await profileRepository.updateProfile(updates)
+            didSaveSuccessfully = true
+        } catch {
+            errorMessage = "プロフィールの保存に失敗しました"
+        }
     }
 
     // MARK: - Actions
