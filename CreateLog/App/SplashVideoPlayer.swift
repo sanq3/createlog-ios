@@ -8,14 +8,33 @@ import AVFoundation
 /// 再生完了時に `onFinish` を 1 回だけ呼ぶ (重複呼び出し防止は呼び出し側で行う)。
 struct SplashVideoPlayer: UIViewRepresentable {
     let url: URL
+    let invertColors: Bool
     let onFinish: () -> Void
 
     func makeUIView(context: Context) -> SplashVideoPlayerView {
         let view = SplashVideoPlayerView()
-        view.backgroundColor = .black
+        view.backgroundColor = invertColors ? .white : .black
         view.playerLayer.videoGravity = .resizeAspect
 
-        let player = AVPlayer(url: url)
+        let asset = AVAsset(url: url)
+        let item = AVPlayerItem(asset: asset)
+
+        if invertColors {
+            item.videoComposition = AVVideoComposition(asset: asset, applyingCIFiltersWithHandler: { request in
+                let source = request.sourceImage.clampedToExtent()
+                // CIColorMatrix で反転 + bias 1.05 により H.264 YUV 丸め誤差を吸収し
+                // 背景の「ほぼ白」を完全白に飽和させる
+                let output = source.applyingFilter("CIColorMatrix", parameters: [
+                    "inputRVector": CIVector(x: -1, y: 0, z: 0, w: 0),
+                    "inputGVector": CIVector(x: 0, y: -1, z: 0, w: 0),
+                    "inputBVector": CIVector(x: 0, y: 0, z: -1, w: 0),
+                    "inputBiasVector": CIVector(x: 1.05, y: 1.05, z: 1.05, w: 0),
+                ])
+                request.finish(with: output.cropped(to: request.sourceImage.extent), context: nil)
+            })
+        }
+
+        let player = AVPlayer(playerItem: item)
         player.actionAtItemEnd = .pause
         player.isMuted = true
         view.playerLayer.player = player
@@ -23,7 +42,7 @@ struct SplashVideoPlayer: UIViewRepresentable {
         context.coordinator.player = player
         context.coordinator.endObserver = NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,
-            object: player.currentItem,
+            object: item,
             queue: .main
         ) { _ in
             onFinish()
@@ -65,11 +84,14 @@ final class SplashVideoPlayerView: UIView {
 struct SplashView: View {
     let onFinish: () -> Void
 
+    @Environment(\.colorScheme) private var colorScheme
     @State private var hasFinished = false
+
+    private var isLight: Bool { colorScheme == .light }
 
     var body: some View {
         ZStack {
-            Color.black
+            (isLight ? Color.white : Color.black)
                 .ignoresSafeArea()
                 .contentShape(Rectangle())
                 .onTapGesture {
@@ -77,19 +99,15 @@ struct SplashView: View {
                 }
 
             if let url = Bundle.main.url(forResource: "onboarding_wordmark", withExtension: "mp4") {
-                SplashVideoPlayer(url: url) {
-                    // 再生完了後 0.35 秒ホールドしてから遷移 (最終フレームを一瞬見せる)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                        finish(natural: true)
-                    }
+                SplashVideoPlayer(url: url, invertColors: isLight) {
+                    finish(natural: true)
                 }
                 .ignoresSafeArea()
                 .allowsHitTesting(false)
             } else {
-                // Fallback: 動画がバンドルされていない場合の保険
                 Text("CreateLog")
                     .font(.system(size: 48, weight: .black))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(isLight ? .black : .white)
                     .onAppear {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             finish(natural: true)

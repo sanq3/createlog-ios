@@ -153,8 +153,8 @@ struct NotificationsView: View {
                     .fill(Color.clSurfaceHigh)
                     .frame(width: 44, height: 44)
                     .overlay(
-                        Image(systemName: "square.stack.3d.up.fill")
-                            .font(.system(size: 18, weight: .medium))
+                        Text("CL")
+                            .font(.system(size: 14, weight: .bold, design: .rounded))
                             .foregroundStyle(Color.clTextSecondary)
                     )
             } else {

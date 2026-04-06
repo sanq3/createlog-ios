@@ -4,7 +4,7 @@ import SwiftData
 @main
 struct CreateLogApp: App {
     @AppStorage("appearanceMode") private var appearanceMode: String = AppearanceMode.system.rawValue
-    @AppStorage("onboardingCompleted") private var onboardingCompleted = true
+    @AppStorage("onboardingCompleted") private var onboardingCompleted = false
 
     let modelContainer: ModelContainer
     let dependencies: DependencyContainer
@@ -49,6 +49,8 @@ struct CreateLogApp: App {
                         }
                         .task { await authViewModel.observeAuthState() }
                         .onOpenURL { url in deepLinkHandler.handle(url) }
+                        .opacity(splashFinished ? 1.0 : 0.0)
+                        .animation(.easeIn(duration: 0.15), value: splashFinished)
                 } else {
                     OnboardingView(isPresented: Binding(
                         get: { !onboardingCompleted },
@@ -58,16 +60,24 @@ struct CreateLogApp: App {
                     .environment(\.dependencies, dependencies)
                     .onAppear { applyTheme(animated: false) }
                     .onChange(of: appearanceMode) { applyTheme(animated: true) }
+                    .opacity(splashFinished ? 1.0 : 0.0)
+                    .animation(.easeIn(duration: 0.15), value: splashFinished)
                 }
 
                 // Overlay: 起動時動画スプラッシュ (onboarding/main を覆って再生、終了後に fade out)
                 if !splashFinished {
                     SplashView {
-                        withAnimation(.easeOut(duration: 0.45)) {
+                        withAnimation(.spring(duration: 0.35, bounce: 0.0)) {
                             splashFinished = true
                         }
                     }
-                    .transition(.opacity)
+                    .transition(.asymmetric(
+                        insertion: .opacity,
+                        removal: .modifier(
+                            active: SplashDismissModifier(active: true),
+                            identity: SplashDismissModifier(active: false)
+                        )
+                    ))
                     .zIndex(1)
                 }
             }
@@ -89,6 +99,8 @@ struct CreateLogApp: App {
             context.insert(SDCategory(name: item.0, colorIndex: item.1, isStandard: true, sortOrder: index))
         }
     }
+
+    // MARK: - Theme
 
     private func applyTheme(animated: Bool) {
         let mode = AppearanceMode(rawValue: appearanceMode) ?? .system
@@ -112,5 +124,17 @@ struct CreateLogApp: App {
         } else {
             window.overrideUserInterfaceStyle = style
         }
+    }
+}
+
+/// スプラッシュ退場: わずかに拡大 + ブラー + フェードアウト
+private struct SplashDismissModifier: ViewModifier {
+    let active: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(active ? 1.06 : 1.0)
+            .opacity(active ? 0.0 : 1.0)
+            .blur(radius: active ? 12 : 0)
     }
 }

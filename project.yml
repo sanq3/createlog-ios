@@ -5,6 +5,10 @@ options:
     iOS: "26.0"
   xcodeVersion: "16.0"
   createIntermediateGroups: true
+packages:
+  Supabase:
+    url: https://github.com/supabase/supabase-swift
+    from: "2.0.0"
 targets:
   CreateLog:
     type: application
@@ -15,12 +19,17 @@ targets:
       path: CreateLog/Info.plist
       properties:
         ITSAppUsesNonExemptEncryption: false
+        SUPABASE_URL: $(SUPABASE_URL)
+        SUPABASE_ANON_KEY: $(SUPABASE_ANON_KEY)
         LSApplicationQueriesSchemes:
           - line
           - instagram
           - twitter
           - fb-messenger
           - discord
+    configFiles:
+      Debug: Config/Debug.xcconfig
+      Release: Config/Release.xcconfig
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.sanq3.createlog
@@ -36,6 +45,9 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         CURRENT_PROJECT_VERSION: 1
         MARKETING_VERSION: "2.0.0"
+    dependencies:
+      - package: Supabase
+        product: Supabase
   CreateLogTests:
     type: bundle.unit-test
     platform: iOS

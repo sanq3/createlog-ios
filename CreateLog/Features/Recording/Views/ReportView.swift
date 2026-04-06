@@ -57,22 +57,6 @@ struct ReportView: View {
                     }
                 }
 
-                // Streak
-                StreakCard(
-                    days: 12,
-                    weekProgress: [true, true, true, true, true, true, true]
-                )
-                .padding(.horizontal, 20)
-
-                // Stats grid
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                    StatBadge(value: "4.5h", label: "今日", change: "↑ 1.2h 昨日比")
-                    StatBadge(value: "28.5h", label: "今週", change: "↑ 3h 先週比")
-                    StatBadge(value: "1,240h", label: "累計", change: "上位 12%")
-                    StatBadge(value: "4.1h", label: "日平均", change: "↓ 0.3h 先週比", changePositive: false)
-                }
-                .padding(.horizontal, 20)
-
                 // Weekly chart
                 WeeklyChart(data: Self.demoWeeklyHours)
                     .padding(.horizontal, 20)

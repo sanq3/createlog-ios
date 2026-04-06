@@ -82,7 +82,7 @@ struct ProfileView: View {
                             .padding(.top, 2)
                     }
 
-                    Text("累計 \(Int(user.totalHours))h / 連続 \(user.streak)日")
+                    Text("累計 \(Int(user.totalHours))h")
                         .font(.clCaption)
                         .foregroundStyle(Color.clTextTertiary)
                         .padding(.top, 2)

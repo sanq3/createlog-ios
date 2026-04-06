@@ -5,12 +5,17 @@ struct AvatarView: View {
     var size: CGFloat = 44
     var status: OnlineStatus = .offline
 
+    private static let gradientTopSaturation: Double = 0.15
+    private static let gradientTopBrightness: Double = 0.35
+    private static let gradientBottomSaturation: Double = 0.1
+    private static let gradientBottomBrightness: Double = 0.2
+
     private var gradientColors: [Color] {
         let hash = initials.unicodeScalars.reduce(0) { $0 + Int($1.value) }
         let hue = Double(hash % 360) / 360.0
         return [
-            Color(hue: hue, saturation: 0.15, brightness: 0.35),
-            Color(hue: hue, saturation: 0.1, brightness: 0.2)
+            Color(hue: hue, saturation: Self.gradientTopSaturation, brightness: Self.gradientTopBrightness),
+            Color(hue: hue, saturation: Self.gradientBottomSaturation, brightness: Self.gradientBottomBrightness)
         ]
     }
 

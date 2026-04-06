@@ -52,12 +52,12 @@ extension NotificationType {
 extension NotificationItem {
     /// イニシャルアバター用のカラーパレット
     static let avatarPalette: [Color] = [
-        Color(red: 0.35, green: 0.56, blue: 0.97),  // Blue
-        Color(red: 0.90, green: 0.45, blue: 0.45),  // Red
-        Color(red: 0.40, green: 0.78, blue: 0.58),  // Green
-        Color(red: 0.85, green: 0.60, blue: 0.30),  // Orange
-        Color(red: 0.65, green: 0.45, blue: 0.85),  // Purple
-        Color(red: 0.45, green: 0.72, blue: 0.82),  // Teal
+        .clAvatarBlue,
+        .clAvatarRed,
+        .clAvatarGreen,
+        .clAvatarOrange,
+        .clAvatarPurple,
+        .clAvatarTeal,
     ]
 
     var avatarBackgroundColor: Color {

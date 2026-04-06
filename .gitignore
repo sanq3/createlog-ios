@@ -29,3 +29,6 @@ supabase/.temp/
 .claude/session-state.md
 .claude/session-state.md.bak
 HANDOFF.md
+# .mcp.json is committed (contains no secrets, shared across team).
+# For credential-backed MCPs, create .mcp.local.json instead:
+.mcp.local.json

@@ -47,8 +47,9 @@ struct PostCardView: View {
                     }
 
                     HStack(spacing: 5) {
-                        Image(systemName: "bolt.fill")
-                            .font(.system(size: 9))
+                        Circle()
+                            .fill(Color.clAccent)
+                            .frame(width: 6, height: 6)
                         Text(post.workTime)
                             .font(.system(size: 12, weight: .bold, design: .rounded))
                             .monospacedDigit()

@@ -26,8 +26,20 @@ xcodebuild -project CreateLog.xcodeproj -scheme CreateLogTests -destination 'pla
 ```
 CreateLog/
 ├── App/                          # エントリ + MainTabView (5タブ)
-├── Models/                       # ドメインモデル (Foundation-only)
-│   └── MockData.swift            # 開発用モックデータ
+│   ├── DependencyContainer.swift # Composition Root (全Repository/Service集約)
+│   ├── AppConfig.swift           # 定数集約 (pagination/timeout等)
+│   ├── DeepLinkHandler.swift     # ディープリンクルーティング
+│   ├── StoreKitManager.swift     # StoreKit 2 サブスクリプション管理
+│   ├── SupabaseClient.swift      # Supabase接続 (xcconfig未設定時はダミー)
+│   ├── SupabaseAuthService.swift # 認証サービス実装
+│   └── Networking/               # NetworkError等
+├── Core/                         # 横断的関心事
+│   └── Data/
+│       └── Supabase/             # Repository具象実装 (全Feature共有)
+├── Models/                       # ドメインモデル (Foundation-only, Sendable)
+│   ├── DTO/                      # Supabaseテーブル対応DTO + DTOConversions
+│   ├── Repositories/             # Repository protocol定義 + NoOp実装
+│   └── MockData.swift            # 開発用モックデータ (#if DEBUG)
 ├── Features/{Feature}/Views/     # 画面別View
 ├── Features/{Feature}/ViewModels/ # @MainActor @Observable ViewModel
 ├── DesignSystem/

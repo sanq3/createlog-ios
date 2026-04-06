@@ -10,7 +10,7 @@ extension MockData {
         followerCount: 234,
         followingCount: 156,
         totalHours: 1247,
-        streak: 14,
+
         projectCount: 3,
         reviewCount: 12,
         trustScore: 4.8,
@@ -35,7 +35,7 @@ extension MockData {
             followingCount: 342,
             isFollowing: true,
             totalHours: 3420,
-            streak: 42,
+
             projectCount: 5,
             reviewCount: 28,
             trustScore: 4.9,
@@ -53,7 +53,7 @@ extension MockData {
             followingCount: 201,
             isFollowing: true,
             totalHours: 2100,
-            streak: 7,
+
             projectCount: 4,
             reviewCount: 15,
             trustScore: 4.7,
@@ -71,7 +71,7 @@ extension MockData {
             followingCount: 89,
             isFollowing: false,
             totalHours: 180,
-            streak: 14,
+    
             projectCount: 1,
             reviewCount: 3,
             trustScore: 5.0,
@@ -89,7 +89,7 @@ extension MockData {
             followingCount: 567,
             isFollowing: false,
             totalHours: 5600,
-            streak: 89,
+
             projectCount: 8,
             reviewCount: 45,
             trustScore: 4.6,
@@ -107,7 +107,7 @@ extension MockData {
             followingCount: 234,
             isFollowing: true,
             totalHours: 4200,
-            streak: 21,
+
             projectCount: 3,
             reviewCount: 19,
             trustScore: 4.8,
@@ -125,7 +125,7 @@ extension MockData {
             followingCount: 178,
             isFollowing: false,
             totalHours: 1890,
-            streak: 5,
+
             projectCount: 6,
             reviewCount: 8,
             trustScore: 4.5,

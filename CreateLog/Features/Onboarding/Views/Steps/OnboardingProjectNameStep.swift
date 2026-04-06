@@ -1,9 +1,8 @@
 import SwiftUI
 
-/// Step 03: 何を作ってる？ テキスト入力。
-/// 質問文 + テキストフィールド 1 個だけ。
+/// Step 05: プロダクトの名前は？ テキスト入力。
+/// 選択式ステップ (tag/duration) の後に配置される唯一のテキスト入力。
 /// 入力が空でない時、「続ける」ボタンが下から spring-up する。
-/// Linear の「1 画面 1 アクション」原則、下部 CTA は浮上演出で常設しない。
 struct OnboardingProjectNameStep: View {
     @Binding var projectName: String
     let canAdvance: Bool
@@ -20,7 +19,7 @@ struct OnboardingProjectNameStep: View {
             VStack(alignment: .leading, spacing: 0) {
                 Spacer().frame(height: 120)
 
-                Text("何を作ってる？")
+                Text("プロダクトの名前は？")
                     .font(.system(size: 32, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary)
                     .tracking(-0.5)

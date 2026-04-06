@@ -29,7 +29,6 @@ final class ReportViewModel {
     var totalMinutes: Int = 0
     var dailyAverage: Int = 0
     var weekOverWeekChange: Double?
-    var streak: Int = 0
     var categoryBreakdown: [CategoryBreakdownItem] = []
     var weeklyTotals: [(day: String, minutes: Int)] = []
     var isLoading = false
@@ -105,8 +104,6 @@ final class ReportViewModel {
             // 前週比
             weekOverWeekChange = RecordingViewModel.computeWeekOverWeekChange(from: allEntries)
 
-            // ストリーク
-            streak = computeStreak(from: allEntries)
         } catch {
             totalMinutes = 0
             categoryBreakdown = []
@@ -130,24 +127,4 @@ final class ReportViewModel {
         }
     }
 
-    // MARK: - Helpers
-
-    private func computeStreak(from entries: [SDTimeEntry]) -> Int {
-        let calendar = Calendar.current
-        let days = Set(entries.map { calendar.startOfDay(for: $0.startDate) }).sorted(by: >)
-        guard let first = days.first, calendar.isDateInToday(first) || calendar.isDate(first, inSameDayAs: calendar.date(byAdding: .day, value: -1, to: Date())!) else {
-            return 0
-        }
-
-        var count = 1
-        for i in 1..<days.count {
-            let diff = calendar.dateComponents([.day], from: days[i], to: days[i - 1]).day ?? 0
-            if diff == 1 {
-                count += 1
-            } else {
-                break
-            }
-        }
-        return count
-    }
 }

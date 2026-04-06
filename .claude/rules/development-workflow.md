@@ -1,6 +1,9 @@
-# Development Workflow
+---
+description: 機能実装ワークフロー (研究→計画→TDD→レビュー→コミット) とビルドコマンド
+globs: ["**/*.swift"]
+---
 
-> This file extends [common/git-workflow.md](./git-workflow.md) with the full feature development process that happens before git operations.
+# Development Workflow
 
 The Feature Implementation Workflow describes the development pipeline: research, planning, TDD, code review, and then committing to git.
 
@@ -9,10 +12,8 @@ The Feature Implementation Workflow describes the development pipeline: research
 0. **Research & Reuse** _(mandatory before any new implementation)_
    - **GitHub code search first:** Run `gh search repos` and `gh search code` to find existing implementations, templates, and patterns before writing anything new.
    - **Library docs second:** Use Context7 or primary vendor docs to confirm API behavior, package usage, and version-specific details before implementing.
-   - **Exa only when the first two are insufficient:** Use Exa for broader web research or discovery after GitHub search and primary docs.
-   - **Check package registries:** Search npm, PyPI, crates.io, and other registries before writing utility code. Prefer battle-tested libraries over hand-rolled solutions.
    - **Search for adaptable implementations:** Look for open-source projects that solve 80%+ of the problem and can be forked, ported, or wrapped.
-   - Prefer adopting or porting a proven approach over writing net-new code when it meets the requirement.
+   - Apple純正APIで代替できるなら純正を使え。SPM パッケージ導入前にメンテナンス状況を確認
 
 1. **Plan First**
    - Use **planner** agent to create implementation plan
@@ -37,8 +38,14 @@ The Feature Implementation Workflow describes the development pipeline: research
    - Follow conventional commits format
    - See [git-workflow.md](./git-workflow.md) for commit message format and PR process
 
-5. **Pre-Review Checks**
-   - Verify all automated checks (CI/CD) are passing
-   - Resolve any merge conflicts
-   - Ensure branch is up to date with target branch
-   - Only request review after these checks pass
+## Build Commands
+
+### `static let` 変更時は clean build 必須
+
+Swift の `static let` / `private static let` / コンパイル時定数を編集したビルドコマンドには必ず `clean` を付けろ:
+
+```bash
+xcodebuild -project CreateLog.xcodeproj -scheme CreateLog clean build
+```
+
+**Why:** インクリメンタルビルドは `static let` の再コンパイルを skip することがあり、値を変更してもバイナリに反映されない。通常の編集では incremental build で問題ない。static/const 変更時だけ clean を強制する。

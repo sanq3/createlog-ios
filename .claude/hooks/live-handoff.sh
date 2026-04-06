@@ -22,6 +22,20 @@ if [ ! -f "$STATE_FILE" ]; then
 INIT
 fi
 
+# Cooldown: skip if session-state.md was modified within last 5 minutes (reduce noise from repeated prompts)
+if [ -f "$STATE_FILE" ]; then
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        STATE_MTIME=$(stat -f %m "$STATE_FILE" 2>/dev/null || echo 0)
+    else
+        STATE_MTIME=$(stat -c %Y "$STATE_FILE" 2>/dev/null || echo 0)
+    fi
+    NOW=$(date +%s)
+    ELAPSED=$((NOW - STATE_MTIME))
+    if [ "$ELAPSED" -lt 300 ]; then
+        exit 0
+    fi
+fi
+
 LINE_COUNT=$(wc -l < "$STATE_FILE" | tr -d ' ')
 
 if [ "$LINE_COUNT" -gt 80 ]; then

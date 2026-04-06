@@ -45,3 +45,10 @@ globs: ["**/*.sql", "**/supabase/**", "**/migrations/**", "docs/supabase-schema.
 - N+1クエリを書くな。joinかバッチフェッチを使え
 - リスト取得は必ずページネーション付きにしろ
 - 識別子は全て小文字スネークケースにしろ
+
+## Supabase操作ルール
+
+- Supabaseの操作（テーブル確認、マイグレーション、Auth設定、API設定等）はダッシュボードではなく `supabase` CLIから行え
+- プロジェクトref: `aeycoojfugzzuvrpfjhj`（リンク済み）
+- service_roleキーをクライアントコード・コミットに含めるな。anon keyのみ使用可
+- スキーマ変更はマイグレーションファイル経由で行え。手動SQL実行禁止

@@ -1,3 +1,8 @@
+---
+description: コード変更時のレビュー基準とチェックリスト
+globs: ["**/*.swift"]
+---
+
 # Code Review Standards
 
 ## Purpose
@@ -65,10 +70,6 @@ Use these agents for code review:
 |-------|---------|
 | **code-reviewer** | General code quality, patterns, best practices |
 | **security-reviewer** | Security vulnerabilities, OWASP Top 10 |
-| **typescript-reviewer** | TypeScript/JavaScript specific issues |
-| **python-reviewer** | Python specific issues |
-| **go-reviewer** | Go specific issues |
-| **rust-reviewer** | Rust specific issues |
 
 ## Review Workflow
 

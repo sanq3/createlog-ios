@@ -19,7 +19,6 @@ final class ProfileViewModel {
     var followingCount = 0
     var isFollowing = false
     var totalMinutes = 0
-    var streak = 0
     var isLoading = false
     var errorMessage: String?
 

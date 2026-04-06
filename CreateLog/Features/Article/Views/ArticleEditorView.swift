@@ -157,8 +157,8 @@ struct ArticleEditorView: View {
 
     private var tagInputField: some View {
         HStack(spacing: 8) {
-            Image(systemName: "tag")
-                .font(.caption)
+            Text("#")
+                .font(.system(size: 16, weight: .semibold, design: .monospaced))
                 .foregroundStyle(Color.clTextTertiary)
 
             TextField("タグを追加（最大\(maxTags)つ）", text: $tagInput)

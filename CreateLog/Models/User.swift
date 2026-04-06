@@ -10,7 +10,6 @@ struct User: Identifiable, Sendable {
     let followingCount: Int
     var isFollowing: Bool
     let totalHours: Double
-    let streak: Int
     let projectCount: Int
     let reviewCount: Int
     let trustScore: Double
@@ -30,7 +29,6 @@ struct User: Identifiable, Sendable {
         followingCount: Int = 0,
         isFollowing: Bool = false,
         totalHours: Double = 0,
-        streak: Int = 0,
         projectCount: Int = 0,
         reviewCount: Int = 0,
         trustScore: Double = 5.0,
@@ -49,7 +47,6 @@ struct User: Identifiable, Sendable {
         self.followingCount = followingCount
         self.isFollowing = isFollowing
         self.totalHours = totalHours
-        self.streak = streak
         self.projectCount = projectCount
         self.reviewCount = reviewCount
         self.trustScore = trustScore

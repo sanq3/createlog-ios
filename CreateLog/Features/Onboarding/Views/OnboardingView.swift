@@ -1,11 +1,8 @@
 import SwiftUI
 import SwiftData
 
-/// オンボーディング root。
-/// Linear 流 hands-on learning + Day One 流 "first entry" を融合した 6 画面フロー。
-/// 世界観 (wordmark) は起動時 SplashView (動画ロゴ) が担当するため onboarding 内では省略。
-/// すべての step 間遷移は `.onboardingStep` (offset+opacity+blur) で繋がる。
-/// step 05 (saving) に入った瞬間に本物の SDTimeEntry を 1 件挿入する。
+/// オンボーディング root。8 画面フロー:
+/// welcome → appShowcase → tag → duration → projectName → saving → accountPrompt → profileSetup
 struct OnboardingView: View {
     @Binding var isPresented: Bool
     @Environment(\.modelContext) private var modelContext
@@ -45,16 +42,19 @@ struct OnboardingView: View {
     @ViewBuilder
     private func currentStepView(_ viewModel: OnboardingViewModel) -> some View {
         switch viewModel.currentStep {
-        case .tagline:
-            OnboardingTaglineStep(onAdvance: { viewModel.advance() })
+        case .welcome:
+            OnboardingWelcomeHeroStep(onAdvance: { viewModel.advance() })
 
-        case .projectName:
-            OnboardingProjectNameStep(
-                projectName: Binding(
-                    get: { viewModel.projectName },
-                    set: { viewModel.projectName = $0 }
+        case .appShowcase:
+            OnboardingAppShowcaseStep(onAdvance: { viewModel.advance() })
+
+        case .tag:
+            OnboardingTagStep(
+                selectedTag: Binding(
+                    get: { viewModel.selectedTag },
+                    set: { viewModel.selectedTag = $0 }
                 ),
-                canAdvance: viewModel.canAdvanceFromProjectName,
+                options: OnboardingViewModel.tagOptions,
                 onAdvance: { viewModel.advance() }
             )
 
@@ -71,13 +71,13 @@ struct OnboardingView: View {
                 onAdvance: { viewModel.advance() }
             )
 
-        case .tag:
-            OnboardingTagStep(
-                selectedTag: Binding(
-                    get: { viewModel.selectedTag },
-                    set: { viewModel.selectedTag = $0 }
+        case .projectName:
+            OnboardingProjectNameStep(
+                projectName: Binding(
+                    get: { viewModel.projectName },
+                    set: { viewModel.projectName = $0 }
                 ),
-                options: OnboardingViewModel.tagOptions,
+                canAdvance: viewModel.canAdvanceFromProjectName,
                 onAdvance: { viewModel.advance() }
             )
 
@@ -89,11 +89,26 @@ struct OnboardingView: View {
                 onAdvance: { viewModel.advance() }
             )
 
-        case .welcome:
-            OnboardingWelcomeStep(
+        case .accountPrompt:
+            OnboardingAccountPromptStep(
                 projectName: viewModel.savedProjectName,
                 durationMinutes: viewModel.savedDurationMinutes,
                 categoryName: viewModel.savedCategoryName,
+                onAdvance: { viewModel.advance() },
+                onSkip: { isPresented = false }
+            )
+
+        case .profileSetup:
+            OnboardingProfileSetupStep(
+                displayName: Binding(
+                    get: { viewModel.displayName },
+                    set: { viewModel.displayName = $0 }
+                ),
+                selectedInterests: Binding(
+                    get: { viewModel.selectedInterests },
+                    set: { viewModel.selectedInterests = $0 }
+                ),
+                interestOptions: OnboardingViewModel.interestOptions,
                 onFinish: { isPresented = false }
             )
         }

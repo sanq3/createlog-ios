@@ -92,8 +92,8 @@ struct ShareReportView: View {
                 Spacer()
                 // App logo watermark
                 VStack(spacing: 2) {
-                    Image(systemName: "hammer.fill")
-                        .font(.system(size: 16))
+                    Text("つくろぐ")
+                        .font(.system(size: 11, weight: .heavy))
                     Text("CreateLog")
                         .font(.system(size: 9, weight: .bold))
                 }

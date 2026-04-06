@@ -13,6 +13,19 @@ extension Color {
     static let clRecording = Color("clRecording")
     static let clBorder = Color("clBorder")
 
+    // Avatar palette
+    static let clAvatarBlue = Color("clAvatarBlue")
+    static let clAvatarRed = Color("clAvatarRed")
+    static let clAvatarGreen = Color("clAvatarGreen")
+    static let clAvatarOrange = Color("clAvatarOrange")
+    static let clAvatarPurple = Color("clAvatarPurple")
+    static let clAvatarTeal = Color("clAvatarTeal")
+
+    // Brand colors
+    static let clBrandLine = Color("clBrandLine")
+    static let clBrandInstagram = Color("clBrandInstagram")
+    static let clBrandDiscord = Color("clBrandDiscord")
+
     // Category palette
     static let clCat01 = Color("clCat01")
     static let clCat02 = Color("clCat02")

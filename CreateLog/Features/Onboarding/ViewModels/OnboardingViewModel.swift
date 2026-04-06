@@ -1,28 +1,31 @@
 import Foundation
 import SwiftData
 
-/// オンボーディングの 6 画面フローを駆動する状態ホルダ。
-/// 起動時動画スプラッシュ (SplashView) が世界観を提示するため、wordmark step は不要。
-/// Linear 流の hands-on learning を採用: step 02-05 で本物の入力を受け取り、
-/// step 05 で実際に SwiftData へ 1 件の SDTimeEntry を保存する。
+/// オンボーディングの 8 画面フローを駆動する状態ホルダ。
+/// welcome → appShowcase → 選択式 (tag/duration) → projectName(唯一のテキスト入力) → saving → accountPrompt → profileSetup
 @MainActor
 @Observable
 final class OnboardingViewModel {
     enum Step: Int, CaseIterable {
-        case tagline = 0      // 01 「作ったことを、残していく。」
-        case projectName = 1  // 02 何を作ってる？
-        case duration = 2     // 03 今日、どれだけやった？
-        case tag = 3          // 04 どんな作業だった？
-        case saving = 4       // 05 保存中 → 保存した
-        case welcome = 5      // 06 ようこそ
+        case welcome = 0        // ようこそ、CreateLog へ。
+        case appShowcase = 1    // アプリ機能プレビュー (実在機能のみ)
+        case tag = 2            // どんな作業？ (選択式)
+        case duration = 3       // どれくらいやった？ (ピッカー)
+        case projectName = 4    // プロダクト名 (唯一のテキスト入力)
+        case saving = 5         // 保存演出
+        case accountPrompt = 6  // アカウント作成促進
+        case profileSetup = 7   // プロフィール設定
     }
 
-    /// タグ候補 (標準カテゴリから抜粋、記号ゼロ)
+    /// タグ候補 (標準カテゴリから抜粋)
     static let tagOptions = ["開発", "デザイン", "学習", "設計", "ミーティング", "調査", "ライティング"]
+
+    /// 興味分野候補
+    static let interestOptions = ["iOS", "Android", "Web Frontend", "Backend", "AI / ML", "DevOps", "Game Dev", "Design"]
 
     // MARK: - State
 
-    var currentStep: Step = .tagline
+    var currentStep: Step = .welcome
     var projectName: String = ""
     var durationHours: Int = 0
     var durationMinutes: Int = 30
@@ -31,6 +34,10 @@ final class OnboardingViewModel {
     var savedProjectName: String = ""
     var savedDurationMinutes: Int = 0
     var savedCategoryName: String = ""
+
+    // Profile (ローカル保持、Auth 実装後にサーバー同期)
+    var displayName: String = ""
+    var selectedInterests: Set<String> = []
 
     @ObservationIgnored private let modelContext: ModelContext
 
@@ -57,7 +64,7 @@ final class OnboardingViewModel {
 
     // MARK: - Save
 
-    /// step 06 に入った瞬間に呼ばれる。実際に SwiftData に 1 件挿入する。
+    /// saving step に入った瞬間に呼ばれる。SwiftData に 1 件挿入。
     func performSave() {
         guard !isSaved else { return }
 

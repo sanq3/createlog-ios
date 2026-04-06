@@ -17,9 +17,9 @@ struct TimelineBlockView: View {
                         .font(.system(size: 11, weight: .medium))
 
                     if entry.isAutoTracked {
-                        Image(systemName: "bolt.fill")
-                            .font(.system(size: 8))
-                            .foregroundStyle(Color.clTextTertiary)
+                        Circle()
+                            .fill(Color.clTextTertiary)
+                            .frame(width: 5, height: 5)
                     }
                 }
                 .foregroundStyle(entry.categoryColor)
