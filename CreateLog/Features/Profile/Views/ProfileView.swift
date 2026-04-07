@@ -1,8 +1,10 @@
 import SwiftUI
+import SwiftData
 import CoreImage.CIFilterBuiltins
 
 struct ProfileView: View {
     @Environment(\.dependencies) private var deps
+    @Query(sort: \SDProject.createdAt, order: .reverse) private var localProjects: [SDProject]
     @State private var showShareSheet = false
     @State private var showEditProfile = false
     @State private var selectedPostTab: PostTab = .posts
@@ -27,12 +29,9 @@ struct ProfileView: View {
     private var profileURL: String { "https://createlog.app/\(user.handle)" }
 
     var body: some View {
-        ZStack(alignment: .top) {
-            ScrollView {
-                VStack(spacing: 0) {
-                    // Spacer equal to custom header height so content starts right below it
-                    Color.clear.frame(height: 44)
-                    // Header row: Avatar + Stats
+        ScrollView {
+            VStack(spacing: 0) {
+                // Header row: Avatar + Stats
                 HStack(spacing: 0) {
                     AvatarView(initials: user.initials, size: 86, status: .offline)
 
@@ -131,13 +130,19 @@ struct ProfileView: View {
                 WeeklyChart(data: weeklyHours)
                     .padding(.horizontal, 16)
 
-                // マイサービス
+                // マイプロダクト (ローカル SDProject + リモート Project)
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("マイサービス")
+                    Text("マイプロダクト")
                         .font(.clHeadline)
                         .foregroundStyle(Color.clTextSecondary)
                         .padding(.horizontal, 16)
 
+                    // ローカル (オンボーディングで登録した SDProject)
+                    ForEach(localProjects) { project in
+                        localProjectCard(project: project)
+                    }
+
+                    // リモート (Supabase から取得した Project)
                     ForEach(userProjects) { project in
                         serviceCard(project: project)
                     }
@@ -175,48 +180,29 @@ struct ProfileView: View {
                     Divider()
                         .foregroundStyle(Color.clBorder)
 
-                    // スワイプ可能な投稿リスト
-                    TabView(selection: $selectedPostTab) {
-                        ForEach(PostTab.allCases, id: \.self) { tab in
-                            postList(for: tab)
-                                .tag(tab)
-                        }
-                    }
-                    .tabViewStyle(.page(indexDisplayMode: .never))
-                    .frame(height: postListHeight)
+                    // 投稿リスト
+                    postList(for: selectedPostTab)
                 }
                 .padding(.top, 20)
 
                 Spacer(minLength: 100)
             }
         }
-            .scrollIndicators(.hidden)
-
-            // Custom header overlay (no SwiftUI navigation bar gap)
-            ZStack {
-                Text(handle)
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(Color.clTextPrimary)
-
-                HStack {
-                    Spacer()
-                    NavigationLink {
-                        SettingsView()
-                    } label: {
-                        Image(systemName: "line.3.horizontal")
-                            .font(.system(size: 20))
-                            .foregroundStyle(Color.clTextPrimary)
-                            .frame(width: 44, height: 44)
-                    }
-                    .buttonStyle(.plain)
+        .scrollIndicators(.hidden)
+        .background(Color.clBackground)
+        .navigationTitle(handle)
+        .toolbarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink {
+                    SettingsView()
+                } label: {
+                    Image(systemName: "line.3.horizontal")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Color.clTextPrimary)
                 }
             }
-            .frame(height: 44)
-            .padding(.horizontal, 8)
-            .background(Color.clBackground)
         }
-        .background(Color.clBackground)
-        .navigationBarHidden(true)
         .sheet(isPresented: $showEditProfile) {
             ProfileEditView(user: user, profileRepository: deps.profileRepository)
         }
@@ -239,12 +225,6 @@ struct ProfileView: View {
         }
     }
 
-    // 各投稿カードの推定高さ x 件数 + spacing
-    private var postListHeight: CGFloat {
-        let count = CGFloat(postsFor(selectedPostTab).count)
-        return count * 200 + (count - 1) * 12 + 24
-    }
-
     private func postList(for tab: PostTab) -> some View {
         LazyVStack(spacing: 12) {
             ForEach(postsFor(tab)) { post in
@@ -264,6 +244,47 @@ struct ProfileView: View {
                 .font(.system(size: 13))
                 .foregroundStyle(Color.clTextSecondary)
         }
+    }
+
+    private func localProjectCard(project: SDProject) -> some View {
+        HStack(spacing: 12) {
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.clCat01)
+                .frame(width: 44, height: 44)
+                .overlay(
+                    Text(String(project.name.prefix(1)))
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.9))
+                )
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(project.name)
+                    .font(.clHeadline)
+                    .foregroundStyle(Color.clTextPrimary)
+
+                if !project.platforms.isEmpty {
+                    Text(project.platforms.joined(separator: " / "))
+                        .font(.clCaption)
+                        .foregroundStyle(Color.clTextTertiary)
+                }
+
+                if !project.techStack.isEmpty {
+                    Text(project.techStack.prefix(4).joined(separator: ", "))
+                        .font(.system(size: 10))
+                        .foregroundStyle(Color.clTextTertiary.opacity(0.7))
+                        .lineLimit(1)
+                }
+            }
+
+            Spacer()
+        }
+        .padding(12)
+        .background(Color.clSurfaceLow, in: RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(Color.clBorder, lineWidth: 1)
+        )
+        .padding(.horizontal, 16)
     }
 
     private func serviceCard(project: Project) -> some View {

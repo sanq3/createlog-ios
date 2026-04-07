@@ -46,7 +46,7 @@ struct DiscoverView: View {
 
         }
         .background(Color.clBackground)
-        .navigationBarHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
         .onChange(of: reselectCount) {
             if isAtTop {
                 isRefreshing = true

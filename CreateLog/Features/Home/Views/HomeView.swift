@@ -137,13 +137,16 @@ struct HomeView: View {
             ComposeView()
         }
         .fullScreenCover(isPresented: $showOnboarding) {
-            OnboardingView(isPresented: $showOnboarding)
+            OnboardingView(
+                isPresented: $showOnboarding,
+                authViewModel: AuthViewModel(authService: NoOpAuthService())
+            )
         }
         .errorBanner(Binding(
             get: { viewModel?.errorMessage },
             set: { viewModel?.errorMessage = $0 }
         ))
-        .navigationBarHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
         .task {
             if viewModel == nil {
                 viewModel = FeedViewModel(
