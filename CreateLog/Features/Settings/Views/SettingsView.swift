@@ -210,7 +210,10 @@ struct SettingsView: View {
         .navigationTitle("設定")
         .navigationBarTitleDisplayMode(.inline)
         .fullScreenCover(isPresented: $showOnboarding) {
-            OnboardingView(isPresented: $showOnboarding)
+            OnboardingView(
+                isPresented: $showOnboarding,
+                authViewModel: AuthViewModel(authService: NoOpAuthService())
+            )
         }
     }
 

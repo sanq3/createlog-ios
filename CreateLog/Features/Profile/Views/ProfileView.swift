@@ -249,7 +249,13 @@ struct ProfileView: View {
     private func localProjectCard(project: SDProject) -> some View {
         HStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 10)
-                .fill(Color.clCat01)
+                .fill(
+                    LinearGradient(
+                        colors: [project.iconColor, project.iconColor.opacity(0.7)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .frame(width: 44, height: 44)
                 .overlay(
                     Text(String(project.name.prefix(1)))

@@ -32,3 +32,6 @@ HANDOFF.md
 # .mcp.json is committed (contains no secrets, shared across team).
 # For credential-backed MCPs, create .mcp.local.json instead:
 .mcp.local.json
+
+# Serena MCP tool cache
+.serena/

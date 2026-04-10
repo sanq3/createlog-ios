@@ -1,10 +1,11 @@
 import SwiftUI
 import SwiftData
 
-/// オンボーディング root。8 画面フロー:
-/// welcome → appShowcase → tag → duration → projectName → saving → accountPrompt → profileSetup
+/// オンボーディング root。8 画面フロー (マイプロダクト登録):
+/// welcome → appShowcase → tutorialIntro → platform → techStack → projectName → saving → accountPrompt
 struct OnboardingView: View {
     @Binding var isPresented: Bool
+    var authViewModel: AuthViewModel
     @Environment(\.modelContext) private var modelContext
 
     @State private var viewModel: OnboardingViewModel?
@@ -48,26 +49,25 @@ struct OnboardingView: View {
         case .appShowcase:
             OnboardingAppShowcaseStep(onAdvance: { viewModel.advance() })
 
-        case .tag:
-            OnboardingTagStep(
-                selectedTag: Binding(
-                    get: { viewModel.selectedTag },
-                    set: { viewModel.selectedTag = $0 }
+        case .tutorialIntro:
+            OnboardingTutorialIntroStep(onAdvance: { viewModel.advance() })
+
+        case .platform:
+            OnboardingPlatformStep(
+                selectedPlatforms: Binding(
+                    get: { viewModel.selectedPlatforms },
+                    set: { viewModel.selectedPlatforms = $0 }
                 ),
-                options: OnboardingViewModel.tagOptions,
                 onAdvance: { viewModel.advance() }
             )
 
-        case .duration:
-            OnboardingDurationStep(
-                hours: Binding(
-                    get: { viewModel.durationHours },
-                    set: { viewModel.durationHours = $0 }
+        case .techStack:
+            OnboardingTechStackStep(
+                selectedStack: Binding(
+                    get: { viewModel.selectedTechStack },
+                    set: { viewModel.selectedTechStack = $0 }
                 ),
-                minutes: Binding(
-                    get: { viewModel.durationMinutes },
-                    set: { viewModel.durationMinutes = $0 }
-                ),
+                selectedPlatforms: viewModel.selectedPlatforms,
                 onAdvance: { viewModel.advance() }
             )
 
@@ -84,32 +84,20 @@ struct OnboardingView: View {
         case .saving:
             OnboardingSavingStep(
                 projectName: viewModel.savedProjectName.isEmpty ? viewModel.projectName : viewModel.savedProjectName,
-                durationMinutes: viewModel.savedDurationMinutes == 0 ? max(1, viewModel.totalMinutes) : viewModel.savedDurationMinutes,
-                categoryName: viewModel.savedCategoryName.isEmpty ? (viewModel.selectedTag ?? "開発") : viewModel.savedCategoryName,
+                platform: viewModel.savedPlatforms.isEmpty
+                    ? viewModel.selectedPlatforms.joined(separator: " / ")
+                    : viewModel.savedPlatforms.joined(separator: " / "),
+                languages: Array(viewModel.selectedTechStack),
                 onAdvance: { viewModel.advance() }
             )
 
         case .accountPrompt:
             OnboardingAccountPromptStep(
                 projectName: viewModel.savedProjectName,
-                durationMinutes: viewModel.savedDurationMinutes,
-                categoryName: viewModel.savedCategoryName,
-                onAdvance: { viewModel.advance() },
+                platform: viewModel.savedPlatforms.joined(separator: " / "),
+                authViewModel: authViewModel,
+                onAdvance: { isPresented = false },
                 onSkip: { isPresented = false }
-            )
-
-        case .profileSetup:
-            OnboardingProfileSetupStep(
-                displayName: Binding(
-                    get: { viewModel.displayName },
-                    set: { viewModel.displayName = $0 }
-                ),
-                selectedInterests: Binding(
-                    get: { viewModel.selectedInterests },
-                    set: { viewModel.selectedInterests = $0 }
-                ),
-                interestOptions: OnboardingViewModel.interestOptions,
-                onFinish: { isPresented = false }
             )
         }
     }

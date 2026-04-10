@@ -1,6 +1,6 @@
 import Foundation
 
-/// Supabase `apps` テーブル対応DTO (ポートフォリオ/マイサービス)
+/// Supabase `apps` テーブル対応DTO (ポートフォリオ/マイプロダクト)
 struct AppDTO: Codable, Sendable, Identifiable {
     let id: UUID
     let userId: UUID

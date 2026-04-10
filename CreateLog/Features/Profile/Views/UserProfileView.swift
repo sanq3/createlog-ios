@@ -173,7 +173,7 @@ struct UserProfileView: View {
 
     private var servicesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("マイサービス")
+            Text("マイプロダクト")
                 .font(.clHeadline)
                 .foregroundStyle(Color.clTextSecondary)
                 .padding(.horizontal, 16)

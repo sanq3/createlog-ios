@@ -51,6 +51,10 @@ struct TagChipsView: View {
                         Text(cat.name)
                             .font(.system(size: 10, weight: .medium))
                             .foregroundStyle(isSelected ? color : Color.clTextTertiary)
+                    } else if !tag.platforms.isEmpty {
+                        Text(tag.platforms.joined(separator: " / "))
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundStyle(isSelected ? color : Color.clTextTertiary)
                     }
                 }
 

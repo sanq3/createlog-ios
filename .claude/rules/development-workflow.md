@@ -16,27 +16,23 @@ The Feature Implementation Workflow describes the development pipeline: research
    - Apple純正APIで代替できるなら純正を使え。SPM パッケージ導入前にメンテナンス状況を確認
 
 1. **Plan First**
-   - Use **planner** agent to create implementation plan
-   - Generate planning docs before coding: PRD, architecture, system_design, tech_doc, task_list
-   - Identify dependencies and risks
+   - Use **ios-planner** agent to create implementation plan
+   - Identify dependencies, risks, affected files
    - Break down into phases
 
-2. **TDD Approach**
-   - Use **tdd-guide** agent
-   - Write tests first (RED)
-   - Implement to pass tests (GREEN)
-   - Refactor (IMPROVE)
-   - Verify 80%+ coverage
+2. **Implement**
+   - Use **swift-implementer** agent (worktree分離)
+   - 計画書に従って実装。計画外のことはやらない
+   - テストを書く。80%+ coverage目標
 
 3. **Code Review**
-   - Use **code-reviewer** agent immediately after writing code
+   - Use **swift-reviewer** agent immediately after writing code
    - Address CRITICAL and HIGH issues
    - Fix MEDIUM issues when possible
 
 4. **Commit & Push**
    - Detailed commit messages
    - Follow conventional commits format
-   - See [git-workflow.md](./git-workflow.md) for commit message format and PR process
 
 ## Build Commands
 

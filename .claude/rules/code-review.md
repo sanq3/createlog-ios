@@ -5,121 +5,63 @@ globs: ["**/*.swift"]
 
 # Code Review Standards
 
-## Purpose
+## レビュートリガー
 
-Code review ensures quality, security, and maintainability before code is merged. This rule defines when and how to conduct code reviews.
+以下の変更後は必ずレビューする:
 
-## When to Review
+- コード追加・変更後
+- 認証・課金・ユーザーデータに関わるコード変更
+- アーキテクチャ変更
+- PR マージ前
 
-**MANDATORY review triggers:**
+## レビューチェックリスト
 
-- After writing or modifying code
-- Before any commit to shared branches
-- When security-sensitive code is changed (auth, payments, user data)
-- When architectural changes are made
-- Before merging pull requests
+- [ ] 関数は50行以下
+- [ ] ファイルは200行以下（超えたら分割検討）
+- [ ] ネスト4階層以下
+- [ ] エラーハンドリングが明示的
+- [ ] 機密情報がハードコードされていない
+- [ ] print / debugPrint が残っていない
+- [ ] 新機能にテストがある
 
-**Pre-Review Requirements:**
+## セキュリティ（iOS固有）
 
-Before requesting review, ensure:
+**swift-reviewer エージェントを使え:**
 
-- All automated checks (CI/CD) are passing
-- Merge conflicts are resolved
-- Branch is up to date with target branch
+- 認証・認可コード
+- Supabase クエリ
+- Keychain 操作
+- StoreKit 課金処理
+- ユーザー入力処理
+- ディープリンク処理
 
-## Review Checklist
+**検出すべき問題:**
 
-Before marking code complete:
+- 機密情報のハードコード（API key, secret, Supabase service_role key）
+- UserDefaults への認証情報保存（Keychain 必須）
+- RLS なしの Supabase テーブルアクセス
+- xcconfig 外の環境依存値
+- ATS 例外の不必要な追加
+- Info.plist の過剰な権限要求
 
-- [ ] Code is readable and well-named
-- [ ] Functions are focused (<50 lines)
-- [ ] Files are cohesive (<800 lines)
-- [ ] No deep nesting (>4 levels)
-- [ ] Errors are handled explicitly
-- [ ] No hardcoded secrets or credentials
-- [ ] No console.log or debug statements
-- [ ] Tests exist for new functionality
-- [ ] Test coverage meets 80% minimum
+## 重大度
 
-## Security Review Triggers
+| Level | 意味 | アクション |
+|-------|------|-----------|
+| CRITICAL | セキュリティ脆弱性・データ損失リスク | **ブロック** - マージ前に必ず修正 |
+| HIGH | バグ・重大な品質問題 | **警告** - マージ前に修正推奨 |
+| MEDIUM | 保守性の懸念 | **情報** - 修正検討 |
+| LOW | スタイル・軽微な提案 | **任意** |
 
-**STOP and use security-reviewer agent when:**
+## エージェント
 
-- Authentication or authorization code
-- User input handling
-- Database queries
-- File system operations
-- External API calls
-- Cryptographic operations
-- Payment or financial code
+| Agent | 用途 |
+|-------|------|
+| **swift-reviewer** | Swift/iOS コード品質、アーキテクチャ準拠、デザインシステム準拠、セキュリティ |
+| **ios-planner** | 設計判断・影響範囲分析 |
 
-## Review Severity Levels
+## 承認基準
 
-| Level | Meaning | Action |
-|-------|---------|--------|
-| CRITICAL | Security vulnerability or data loss risk | **BLOCK** - Must fix before merge |
-| HIGH | Bug or significant quality issue | **WARN** - Should fix before merge |
-| MEDIUM | Maintainability concern | **INFO** - Consider fixing |
-| LOW | Style or minor suggestion | **NOTE** - Optional |
-
-## Agent Usage
-
-Use these agents for code review:
-
-| Agent | Purpose |
-|-------|---------|
-| **code-reviewer** | General code quality, patterns, best practices |
-| **security-reviewer** | Security vulnerabilities, OWASP Top 10 |
-
-## Review Workflow
-
-```
-1. Run git diff to understand changes
-2. Check security checklist first
-3. Review code quality checklist
-4. Run relevant tests
-5. Verify coverage >= 80%
-6. Use appropriate agent for detailed review
-```
-
-## Common Issues to Catch
-
-### Security
-
-- Hardcoded credentials (API keys, passwords, tokens)
-- SQL injection (string concatenation in queries)
-- XSS vulnerabilities (unescaped user input)
-- Path traversal (unsanitized file paths)
-- CSRF protection missing
-- Authentication bypasses
-
-### Code Quality
-
-- Large functions (>50 lines) - split into smaller
-- Large files (>800 lines) - extract modules
-- Deep nesting (>4 levels) - use early returns
-- Missing error handling - handle explicitly
-- Mutation patterns - prefer immutable operations
-- Missing tests - add test coverage
-
-### Performance
-
-- N+1 queries - use JOINs or batching
-- Missing pagination - add LIMIT to queries
-- Unbounded queries - add constraints
-- Missing caching - cache expensive operations
-
-## Approval Criteria
-
-- **Approve**: No CRITICAL or HIGH issues
-- **Warning**: Only HIGH issues (merge with caution)
-- **Block**: CRITICAL issues found
-
-## Integration with Other Rules
-
-This rule works with:
-
-- [testing.md](testing.md) - Test coverage requirements
-- [security.md](security.md) - Security checklist
-- [git-workflow.md](git-workflow.md) - Commit standards
-- [agents.md](agents.md) - Agent delegation
+- **Approve**: CRITICAL/HIGH なし
+- **Warning**: HIGH のみ（注意付きマージ可）
+- **Block**: CRITICAL あり

@@ -26,11 +26,15 @@ final class SDCategory {
 @Model
 final class SDProject {
     var name: String
+    var platforms: [String]
+    var techStack: [String]
     var category: SDCategory?
     var createdAt: Date
 
-    init(name: String, category: SDCategory? = nil) {
+    init(name: String, platforms: [String] = [], techStack: [String] = [], category: SDCategory? = nil) {
         self.name = name
+        self.platforms = platforms
+        self.techStack = techStack
         self.category = category
         self.createdAt = Date()
     }

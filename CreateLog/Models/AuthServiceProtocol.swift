@@ -47,3 +47,15 @@ protocol AuthSessionProtocol: Sendable {
 
 /// 認証サービスの統合プロトコル (全認証機能を提供する実装用)
 typealias AuthServiceProtocol = OAuthSignInProtocol & EmailAuthProtocol & AuthSessionProtocol
+
+/// Preview / 未接続時用の NoOp 実装
+final class NoOpAuthService: AuthServiceProtocol {
+    var currentState: AuthState { get async { .unauthenticated } }
+    func signInWithApple(idToken: String, nonce: String) async throws -> String { "" }
+    func signInWithGoogle(idToken: String, accessToken: String) async throws -> String { "" }
+    func signUp(email: String, password: String) async throws -> String { "" }
+    func signIn(email: String, password: String) async throws -> String { "" }
+    func signOut() async throws {}
+    func deleteAccount() async throws {}
+    func observeAuthChanges() -> AsyncStream<AuthState> { AsyncStream { $0.finish() } }
+}

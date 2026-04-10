@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Step 05: プロダクトの名前は？ テキスト入力。
-/// 選択式ステップ (tag/duration) の後に配置される唯一のテキスト入力。
+/// Step 06: プロジェクトの名前は？ テキスト入力。
+/// 選択式ステップ (platform/language) の後に配置される唯一のテキスト入力。
 /// 入力が空でない時、「続ける」ボタンが下から spring-up する。
 struct OnboardingProjectNameStep: View {
     @Binding var projectName: String
@@ -19,7 +19,7 @@ struct OnboardingProjectNameStep: View {
             VStack(alignment: .leading, spacing: 0) {
                 Spacer().frame(height: 120)
 
-                Text("プロダクトの名前は？")
+                Text("プロジェクトの名前は？")
                     .font(.system(size: 32, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary)
                     .tracking(-0.5)
@@ -31,8 +31,8 @@ struct OnboardingProjectNameStep: View {
 
                 VStack(alignment: .leading, spacing: 14) {
                     TextField("", text: $projectName, prompt:
-                        Text("例 つくろぐ iOS")
-                            .foregroundStyle(Color.clTextTertiary.opacity(0.6))
+                        Text("例 つくろぐ")
+                            .foregroundStyle(Color.clTextPrimary.opacity(0.3))
                     )
                     .font(.system(size: 24, weight: .semibold))
                     .foregroundStyle(Color.clTextPrimary)

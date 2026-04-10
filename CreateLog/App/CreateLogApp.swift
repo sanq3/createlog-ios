@@ -52,10 +52,13 @@ struct CreateLogApp: App {
                         .opacity(splashFinished ? 1.0 : 0.0)
                         .animation(.easeIn(duration: 0.15), value: splashFinished)
                 } else {
-                    OnboardingView(isPresented: Binding(
-                        get: { !onboardingCompleted },
-                        set: { if !$0 { onboardingCompleted = true } }
-                    ))
+                    OnboardingView(
+                        isPresented: Binding(
+                            get: { !onboardingCompleted },
+                            set: { if !$0 { onboardingCompleted = true } }
+                        ),
+                        authViewModel: authViewModel
+                    )
                     .modelContainer(modelContainer)
                     .environment(\.dependencies, dependencies)
                     .onAppear { applyTheme(animated: false) }
