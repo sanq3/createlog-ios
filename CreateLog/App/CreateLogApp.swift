@@ -14,7 +14,19 @@ struct CreateLogApp: App {
     @State private var splashFinished = false
 
     init() {
-        let schema = Schema([SDCategory.self, SDProject.self, SDTimeEntry.self])
+        let schema = Schema([
+            SDCategory.self,
+            SDProject.self,
+            SDTimeEntry.self,
+            SDOfflineOperation.self,
+            SDLogCache.self,
+            // T7c: SNS キャッシュ層 5 種
+            SDPostCache.self,
+            SDLikeCache.self,
+            SDFollowCache.self,
+            SDCommentCache.self,
+            SDNotificationCache.self
+        ])
         do {
             let config = ModelConfiguration(isStoredInMemoryOnly: false)
             modelContainer = try ModelContainer(for: schema, configurations: [config])
@@ -27,7 +39,7 @@ struct CreateLogApp: App {
                 fatalError("Could not create even in-memory ModelContainer: \(error)")
             }
         }
-        let deps = DependencyContainer()
+        let deps = DependencyContainer(modelContainer: modelContainer)
         dependencies = deps
         _authViewModel = State(initialValue: AuthViewModel(authService: deps.authService))
     }

@@ -1,6 +1,7 @@
 import Foundation
 import Supabase
 import Auth
+import AuthenticationServices
 
 /// Supabaseを使った認証サービスの実装
 final class SupabaseAuthService: AuthServiceProtocol, Sendable {
@@ -37,6 +38,45 @@ final class SupabaseAuthService: AuthServiceProtocol, Sendable {
             let session = try await client.auth.signInWithIdToken(
                 credentials: .init(provider: .google, idToken: idToken, accessToken: accessToken)
             )
+            return session.user.id.uuidString
+        } catch {
+            throw mapError(error)
+        }
+    }
+
+    // MARK: - T5: OAuth web flow
+
+    /// Google OAuth (web flow)。
+    /// Supabase SDK が内部で ASWebAuthenticationSession を起動し、
+    /// OAuth consent → callback URL で session を直接返す。
+    /// `prefersEphemeralWebBrowserSession = true` で既存 Safari session を使わず fresh auth を強制。
+    func signInWithGoogleOAuth() async throws -> String {
+        do {
+            let session = try await client.auth.signInWithOAuth(
+                provider: .google,
+                redirectTo: URL(string: "createlog://auth-callback"),
+                scopes: "openid email profile"
+            ) { webSession in
+                webSession.prefersEphemeralWebBrowserSession = true
+            }
+            return session.user.id.uuidString
+        } catch {
+            throw mapError(error)
+        }
+    }
+
+    /// GitHub OAuth (web flow)。
+    /// GitHub は OpenID Connect 非対応のため idToken 経路は使えない、web flow 一択。
+    /// scopes: `user:email` (email 取得) + `read:user` (profile 取得)。
+    func signInWithGitHub() async throws -> String {
+        do {
+            let session = try await client.auth.signInWithOAuth(
+                provider: .github,
+                redirectTo: URL(string: "createlog://auth-callback"),
+                scopes: "user:email read:user"
+            ) { webSession in
+                webSession.prefersEphemeralWebBrowserSession = true
+            }
             return session.user.id.uuidString
         } catch {
             throw mapError(error)

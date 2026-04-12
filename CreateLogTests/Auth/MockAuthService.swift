@@ -29,6 +29,18 @@ final class MockAuthService: AuthServiceProtocol, @unchecked Sendable {
         return stubbedUserId
     }
 
+    func signInWithGoogleOAuth() async throws -> String {
+        if let error = stubbedError { throw error }
+        stubbedState = .authenticated(userId: stubbedUserId)
+        return stubbedUserId
+    }
+
+    func signInWithGitHub() async throws -> String {
+        if let error = stubbedError { throw error }
+        stubbedState = .authenticated(userId: stubbedUserId)
+        return stubbedUserId
+    }
+
     func signUp(email: String, password: String) async throws -> String {
         if let error = stubbedError { throw error }
         stubbedState = .authenticated(userId: stubbedUserId)

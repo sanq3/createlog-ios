@@ -48,11 +48,26 @@ extension NotificationItem {
 
 extension User {
     init(from dto: ProfileDTO) {
+        // T4-B: SNS 3 URL を UserLink 配列に変換 (empty は除外)
+        var links: [UserLink] = []
+        if let github = dto.githubUrl, !github.isEmpty {
+            links.append(UserLink(type: .github, url: github, label: "GitHub"))
+        }
+        if let x = dto.xUrl, !x.isEmpty {
+            links.append(UserLink(type: .twitter, url: x, label: "X"))
+        }
+        if let web = dto.websiteUrl, !web.isEmpty {
+            links.append(UserLink(type: .website, url: web, label: "Website"))
+        }
+
         self.init(
             id: dto.id,
             name: dto.displayName ?? "",
             handle: dto.handle ?? "",
             bio: dto.bio ?? "",
+            followerCount: dto.followersCount,
+            followingCount: dto.followingCount,
+            links: links,
             occupation: dto.occupation ?? "",
             experienceLevel: ExperienceLevel(serverValue: dto.experienceYears)
         )

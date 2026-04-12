@@ -4,8 +4,14 @@
 
 - 目的: Supabase テーブル定義、RLS 方針、関連 SQL を一元管理し、スキーマ変更時の基準とする。
 - 対象読者: バックエンド開発者、データベース管理者、Codex エージェント。
-- 最終更新: 2025-11-06（Codex）
-- 関連ドキュメント: `sql/` ディレクトリ, `docs/agents-handbook.md`, `docs/documentation-guidelines.md`
+- 最終更新: 2026-04-12 (T3, Phase 1 baseline audit 反映)
+- 正本: `supabase/migrations/20260410152527_remote_baseline.sql` (3,483 行、24 table + 1 view + 74 RLS policy + 29 function、T1 で remote dump)
+- 関連ドキュメント: `supabase/migrations/`, `supabase/baseline_audit.md`, `docs/agents-handbook.md`
+
+> **NOTE (2026-04-12)**: 本ドキュメントは T1 baseline audit 前の記述を部分的に保持している。
+> 実装の正本は `supabase/migrations/20260410152527_remote_baseline.sql` を参照し、
+> 齟齬があれば baseline SQL を優先すること。v2 MVP 実テーブル数は **24 テーブル** (baseline audit 確定)。
+> 個別テーブル定義の最新は baseline SQL `CREATE TABLE public.<name>` ブロックを直接読むのが最速。
 
 ## 概要
 

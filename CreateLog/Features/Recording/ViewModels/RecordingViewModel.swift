@@ -239,12 +239,22 @@ final class RecordingViewModel {
         HapticManager.success()
         loadEntries()
 
-        // バックグラウンドでリモートにも保存
+        // T7b: OfflineFirstLogRepository 経由で remote 同期 (失敗時は OfflineQueue に enqueue)
         let title = resolvedTag?.name ?? "その他"
         let categoryName = resolvedTag?.category?.name
         let remoteCategoryId = resolveRemoteCategoryId(for: categoryName)
-        Task {
-            await saveToRemote(minutes: minutes, start: startDate, end: endDate, title: title, categoryId: remoteCategoryId)
+        if let resolvedCategoryId = remoteCategoryId {
+            let dto = LogInsertDTO(
+                title: title,
+                categoryId: resolvedCategoryId,
+                startedAt: startDate,
+                endedAt: endDate,
+                durationMinutes: minutes,
+                isTimer: false
+            )
+            Task {
+                _ = try? await logRepository.insertLog(dto)
+            }
         }
     }
 
@@ -325,55 +335,12 @@ final class RecordingViewModel {
 
     // MARK: - Remote Sync
 
-    /// Supabase からログを同期 (Stale-While-Revalidate)
+    /// T7b: OfflineFirstLogRepository 経由で remote ログを取得し SDLogCache に cache する。
+    /// OfflineFirstLogRepository.fetchLogs は remote 成功時 cache upsert、失敗時 cache fallback (SWR)。
+    /// SDTimeEntry の memo ハック経路は撤廃 (MigrationService で移行済)。
     func syncWithRemote() async {
-        do {
-            let remoteLogs = try await logRepository.fetchLogs(for: Date())
-            // リモートデータでローカルキャッシュを更新
-            for remoteLog in remoteLogs {
-                let remoteIdString = remoteLog.id.uuidString
-                let descriptor = FetchDescriptor<SDTimeEntry>(
-                    predicate: #Predicate<SDTimeEntry> { entry in
-                        entry.memo == remoteIdString
-                    }
-                )
-                let existing = try? modelContext.fetch(descriptor)
-                if existing?.isEmpty != false {
-                    // ローカルに存在しないエントリを追加
-                    let entry = SDTimeEntry(
-                        startDate: remoteLog.startedAt,
-                        endDate: remoteLog.endedAt,
-                        durationMinutes: remoteLog.durationMinutes,
-                        projectName: remoteLog.title,
-                        categoryName: "その他",
-                        memo: remoteLog.id.uuidString
-                    )
-                    modelContext.insert(entry)
-                }
-            }
-            loadEntries()
-        } catch {
-            // リモート同期失敗はサイレント（ローカルデータで継続）
-        }
-    }
-
-    /// ログをリモートにも保存
-    private func saveToRemote(minutes: Int, start: Date, end: Date, title: String, categoryId: UUID?) async {
-        // categoryIdが未解決ならリモート保存をスキップ (FK制約違反を防ぐ)
-        guard let resolvedCategoryId = categoryId else { return }
-        let dto = LogInsertDTO(
-            title: title,
-            categoryId: resolvedCategoryId,
-            startedAt: start,
-            endedAt: end,
-            durationMinutes: minutes,
-            isTimer: false
-        )
-        do {
-            _ = try await logRepository.insertLog(dto)
-        } catch {
-            // リモート保存失敗はサイレント（ローカルには保存済み）
-        }
+        _ = try? await logRepository.fetchLogs(for: Date())
+        loadEntries()
     }
 
     // MARK: - Pure Functions (nonisolated, Testable)

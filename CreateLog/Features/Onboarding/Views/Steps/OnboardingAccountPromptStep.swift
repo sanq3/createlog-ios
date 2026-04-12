@@ -105,18 +105,46 @@ struct OnboardingAccountPromptStep: View {
                     )
                     .padding(.horizontal, 32)
 
-                    // Google Sign In
+                    // Google Sign In (T5: OAuth web flow)
                     Button {
-                        Task {
-                            // TODO: Supabase OAuth flow for Google
-                            HapticManager.light()
-                            onAdvance()
+                        Task { @MainActor in
+                            await authViewModel.handleGoogleSignIn()
+                            if case .authenticated = authViewModel.authState {
+                                onAdvance()
+                            }
                         }
                     } label: {
                         HStack(spacing: 8) {
                             GoogleLogo()
                                 .frame(width: 18, height: 18)
                             Text("Googleでログイン")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundStyle(Color.clTextPrimary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            Capsule()
+                                .strokeBorder(Color.clTextPrimary.opacity(0.35), lineWidth: 1.5)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 32)
+
+                    // GitHub Sign In (T5: OAuth web flow)
+                    Button {
+                        Task { @MainActor in
+                            await authViewModel.handleGitHubSignIn()
+                            if case .authenticated = authViewModel.authState {
+                                onAdvance()
+                            }
+                        }
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "chevron.left.forwardslash.chevron.right")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundStyle(Color.clTextPrimary)
+                            Text("GitHubでログイン")
                                 .font(.system(size: 16, weight: .medium))
                                 .foregroundStyle(Color.clTextPrimary)
                         }

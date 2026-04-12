@@ -27,6 +27,11 @@ targets:
           - twitter
           - fb-messenger
           - discord
+        CFBundleURLTypes:
+          - CFBundleTypeRole: Editor
+            CFBundleURLName: com.sanq3.createlog.auth
+            CFBundleURLSchemes:
+              - createlog
     configFiles:
       Debug: Config/Debug.xcconfig
       Release: Config/Release.xcconfig

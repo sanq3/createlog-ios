@@ -34,11 +34,19 @@ CreateLog/
 │   ├── SupabaseAuthService.swift # 認証サービス実装
 │   └── Networking/               # NetworkError等
 ├── Core/                         # 横断的関心事
-│   └── Data/
-│       └── Supabase/             # Repository具象実装 (全Feature共有)
+│   ├── Data/
+│   │   └── Supabase/             # Repository具象実装 (全Feature共有)
+│   └── Sync/                     # Offline-first 同期基盤 (T7a/T7b/T7c)
+│       ├── OfflineQueueActor     # @ModelActor で SDOfflineOperation queue 排他
+│       ├── OfflineSyncService    # drain loop + RetryPolicy + NetworkMonitor
+│       ├── LogFlushExecutor      # T7b: Log entity の remote 同期
+│       ├── SNSFlushExecutors     # T7c: Post/Like/Follow/Comment/Notification
+│       ├── OfflineFirst*Repo     # T7c: SNS Decorator 5 本 (read cache + write enqueue)
+│       └── NetworkMonitor        # NWPathMonitor wrapper
 ├── Models/                       # ドメインモデル (Foundation-only, Sendable)
 │   ├── DTO/                      # Supabaseテーブル対応DTO + DTOConversions
 │   ├── Repositories/             # Repository protocol定義 + NoOp実装
+│   ├── Sync/                     # SD*Cache (@Model) + SyncStatus/Error/State 等
 │   └── MockData.swift            # 開発用モックデータ (#if DEBUG)
 ├── Features/{Feature}/Views/     # 画面別View
 ├── Features/{Feature}/ViewModels/ # @MainActor @Observable ViewModel

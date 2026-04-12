@@ -8,6 +8,8 @@ protocol LogRepositoryProtocol: Sendable {
     func fetchLogs(from start: Date, to end: Date) async throws -> [LogDTO]
     /// ログを保存
     func insertLog(_ log: LogInsertDTO) async throws -> LogDTO
+    /// ログを部分更新 (T7b)
+    func updateLog(_ update: LogUpdateDTO) async throws -> LogDTO
     /// ログを削除
     func deleteLog(id: UUID) async throws
 }

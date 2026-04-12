@@ -160,6 +160,75 @@ SF Symbols は「安っぽく見えない」用途に限定しろ。アイコン
 **設計判断:**
 - 実装前に「この設計は2年後も成立するか」を考えろ。スケールや要件変更で破綻が見える設計は採用するな
 
+### AsyncStream continuation と lock の組み合わせ
+
+複数 subscriber の AsyncStream continuation を lock protected dictionary で管理する場合、**lock 内で continuation の snapshot 配列を取得し、lock 外で yield/finish を呼ぶ** pattern を厳守しろ。
+
+**禁止パターン (nested lock deadlock):**
+```swift
+lock.withLock { state in
+    for continuation in state.continuations.values {
+        continuation.yield(value)  // yield が onTermination を同期発火 → 再 lock → deadlock
+    }
+}
+```
+
+**正解パターン (snapshot + lock 外 yield):**
+```swift
+let snapshot = lock.withLock { state -> [AsyncStream<T>.Continuation] in
+    state.currentValue = value
+    return Array(state.continuations.values)
+}
+for continuation in snapshot {
+    continuation.yield(value)
+}
+```
+
+**initial value 取得と継続登録の atomic 化**: `observe()` で「現在値 snapshot → continuation 登録」を別 lock scope で行うと race window ができる。1 lock scope 内で「登録 + 値取得」を atomic に実施しろ。
+```swift
+let initial = lock.withLock { state -> T in
+    state.continuations[id] = continuation
+    return state.currentValue
+}
+continuation.yield(initial)  // lock 外で yield
+```
+
+**stop 時の race 防止**: `continuations.removeAll()` を lock 内で実行 → lock 外で `finish()` を呼ぶ。onTermination 内の `removeValue(forKey:)` は no-op になる (既に removeAll 済)。
+
+**由来**: T7a-2 NetworkMonitor 実装時に実 deadlock risk を発見 (2026-04-11)。`OSAllocatedUnfairLock` は iOS 16+ で **非再帰 (non-reentrant)** のため特に注意。`@unchecked Sendable` + internal lock pattern の defensive プログラミングとして必須。OfflineSyncService.observeState() / updateState() でも同 pattern 適用必須 (T7a-3)。
+
+### Offline-first Decorator パターン (T7c, 2026-04-12)
+
+新規 Repository を作るときは **Supabase 直接 repository** を書くだけでなく、**Offline-first Decorator** で wrap するかを判断しろ。
+
+**何をするか:**
+- `SupabaseXxxRepository` (underlying) — 既存の直接 remote 呼び出し実装
+- `OfflineFirstXxxRepository` (Decorator) — underlying + `ModelContainer?` + `SyncServiceProtocol` を注入
+  - **read**: remote fetch 試行 → 成功時 SD*Cache に upsert、失敗時 cache fallback
+  - **write**: remote 試行 → 成功時 cache upsert + return、失敗時 `syncService.enqueue` で OfflineQueue に積む
+  - **delete**: 先に SD*Cache.isDeleted = true (tombstone) → remote 試行 → 失敗時 enqueue
+- `DependencyContainer` で Decorator を 5 SNS repo property に注入。preview/未注入時は underlying 直接使用 (cache 無効)
+
+**どのタイプを Decorator 化するか:**
+- **必須**: 書き込みがあるもの (Post/Like/Follow/Comment など) → data loss 回避
+- **推奨**: 読み込み頻度が高くオフラインでも表示したいもの (Feed/Notification)
+- **不要**: サーバー集計が必要なもの (unread_count/followers_count etc. — 直接 fetch で OK、一部 local cache で補完)
+
+**SD*Cache (@Model) 必須フィールド:**
+- `remoteId: UUID` — PK として使用、remote 確定前は local UUID
+- `syncedAt: Date` — SWR 判定
+- `isDeleted: Bool` — tombstone
+- `updatedAtRemote: Date` — LWW conflict resolution
+- `syncStatusRaw: String` — .queued / .synced / .failed 等 (SwiftData の制約で String 保持)
+
+**lightweight migration 要件**: 全非 optional に宣言時 default 値 (SDProject 事故の教訓)。`[String]` は `Data` で保持 (migration 耐性)。
+
+**禁止:**
+- ViewModels から直接 Decorator の内部 @Model に触らない (protocol 経由で transparent)
+- Decorator の `syncService` を `nil` にしない → 必ず `NoOpSyncService()` で fallback
+
+**由来**: T7c (2026-04-12) で SNS 5 entity の offline-first infra を team-lead が一括実装。MVP scope では Decorator + FlushExecutor + SD*Cache のみで realtime subscribe は v1.1 後回し (T7d)。既存 ViewModels は変更ゼロで offline 耐性を獲得。
+
 ## Supabase / Postgres
 
 - SwiftからSupabaseクエリを書くときも `.claude/rules/supabase-postgres.md` のルールに従え

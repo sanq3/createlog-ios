@@ -188,6 +188,42 @@
 
 決定事項をここに記録する。日付と理由を必ず書く。
 
+### 2026-04-12: Phase 1 完了 (認証・Recording・SNS・Offline-first 基盤)
+
+Phase 1 リリース候補 (App Store 公開ルート C 準備) の完了マーカー。
+
+**完了した T1-T8 (10 task):**
+
+| Task | 内容 | 実装 |
+|---|---|---|
+| T1 | Supabase 現状監査 + baseline schema dump | planner (3,483 行 SQL, 24 table + 29 function) |
+| T2 | xcconfig 配線 + Supabase 接続 smoke test | team-lead |
+| T3 | v2 MVP スキーマ整理 + handle_new_user security fix + REPLICA IDENTITY FULL 3 table | team-lead |
+| T4 | Repository 補完 4 新規 (Subscription/MonthlyRevenue/Hashtag/AutoTracking) | team-lead |
+| T4-B | ProfileDTO 13 SNS/status column 拡張 | implementer |
+| T5 | GitHub + Google OAuth 統合 (`signInWithOAuth` + ASWebAuth 統一) | team-lead |
+| T6 | OnboardingHandleStep 新規 (handle 重複チェック + 登録) | team-lead |
+| T7a | Sync 基盤 (OfflineQueueActor + SDOfflineOperation + RetryPolicy) | implementer |
+| T7b | Log 同期完全化 (削除/更新/SWR + MigrationService) | implementer |
+| T7c | SNS キャッシュ層 5 種 (Post/Like/Follow/Comment/Notification Decorator) | team-lead |
+
+**Phase 1 で達成した「リリースできる状態」:**
+- 認証 3 provider (Apple/Google/GitHub) + profile 登録フロー完結
+- Repository protocol 9 種網羅、DependencyContainer 本番/preview 分離
+- Offline-first 基盤: Log + SNS 5 entity の書き込み queue + 読み込み cache
+- データ損失ゼロ (SDxxxCache tombstone + OfflineQueue dead letter)
+- baseline migration 確立、以降は diff migration 運用
+
+**Phase 1.1 (T7d) に後回し:**
+- Supabase Realtime subscribe (recipient_id filter / scenePhase 連動)
+- Sync telemetry (queue stats / dead letter UI)
+- HomeViewModel / PostDetailViewModel / NotificationViewModel の SWR polling + realtime 統合
+- conflict resolution (LWW 以外の 3-way merge pattern)
+
+**Phase 2 準備:**
+- UX polish (アニメーション品質、タブバー挙動、hero view 演出)
+- 機能追加は保留、既存体験の品質底上げ優先
+
 ### 2026-04-01: 記録タブHeroの3カラムは表示値を直接アニメーションする
 
 - レポートタブのKPI行は `onAppear + spring(delay)` で 0 から最終値へ遷移する挙動を基準とする

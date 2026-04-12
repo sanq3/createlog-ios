@@ -1,12 +1,13 @@
 import SwiftUI
 import SwiftData
 
-/// オンボーディング root。8 画面フロー (マイプロダクト登録):
-/// welcome → appShowcase → tutorialIntro → platform → techStack → projectName → saving → accountPrompt
+/// オンボーディング root。9 画面フロー (マイプロダクト登録 + ハンドル選択):
+/// welcome → appShowcase → tutorialIntro → platform → techStack → projectName → saving → accountPrompt → handleSetup
 struct OnboardingView: View {
     @Binding var isPresented: Bool
     var authViewModel: AuthViewModel
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dependencies) private var dependencies
 
     @State private var viewModel: OnboardingViewModel?
 
@@ -20,7 +21,10 @@ struct OnboardingView: View {
         }
         .task {
             if viewModel == nil {
-                viewModel = OnboardingViewModel(modelContext: modelContext)
+                viewModel = OnboardingViewModel(
+                    modelContext: modelContext,
+                    profileRepository: dependencies.profileRepository
+                )
             }
         }
     }
@@ -96,7 +100,14 @@ struct OnboardingView: View {
                 projectName: viewModel.savedProjectName,
                 platform: viewModel.savedPlatforms.joined(separator: " / "),
                 authViewModel: authViewModel,
-                onAdvance: { isPresented = false },
+                onAdvance: { viewModel.advance() },
+                onSkip: { isPresented = false }
+            )
+
+        case .handleSetup:
+            OnboardingHandleStep(
+                viewModel: viewModel,
+                onComplete: { isPresented = false },
                 onSkip: { isPresented = false }
             )
         }

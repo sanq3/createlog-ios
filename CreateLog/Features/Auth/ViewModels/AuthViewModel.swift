@@ -72,6 +72,51 @@ final class AuthViewModel {
         }
     }
 
+    // MARK: - Sign in with Google (OAuth web flow)
+
+    /// T5 (2026-04-12): Google OAuth web flow ハンドラ。
+    /// SDK 内部で ASWebAuthenticationSession 起動 → callback → session 確立。
+    /// user cancel は silent return (errorMessage を触らない、X/Instagram UX 踏襲)。
+    func handleGoogleSignIn() async {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+
+        do {
+            _ = try await authService.signInWithGoogleOAuth()
+        } catch {
+            if Self.isUserCancel(error) { return }
+            errorMessage = mapErrorMessage(error)
+        }
+    }
+
+    // MARK: - Sign in with GitHub (OAuth web flow)
+
+    /// T5 (2026-04-12): GitHub OAuth web flow ハンドラ。
+    /// scopes: user:email + read:user。user cancel は silent return。
+    func handleGitHubSignIn() async {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+
+        do {
+            _ = try await authService.signInWithGitHub()
+        } catch {
+            if Self.isUserCancel(error) { return }
+            errorMessage = mapErrorMessage(error)
+        }
+    }
+
+    /// ASWebAuthenticationSession の user cancel 検出
+    private nonisolated static func isUserCancel(_ error: Error) -> Bool {
+        let nsError = error as NSError
+        // ASWebAuthenticationSessionError.canceledLogin = 1
+        if nsError.domain == "com.apple.AuthenticationServices.WebAuthenticationSession" && nsError.code == 1 {
+            return true
+        }
+        return false
+    }
+
     // MARK: - Email Auth
 
     func signInWithEmail() async {
