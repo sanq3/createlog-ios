@@ -13,10 +13,10 @@ import Foundation
 /// `snapshot.idempotencyKey` を remote に渡し、server-side dedup に委譲する。
 /// local 側は「同一 idempotencyKey で 2 回 execute されても 1 回分の効果」を保証しなくてよい。
 ///
-/// ## T7a-3 scope
-/// - `LogFlushExecutor` (具象 1 本) のみ提供
-/// - body は `// TODO: T7b` コメント付きの empty success
-/// - DI 配線と protocol 経路の検証が目的 (実 Supabase 呼び出しは T7b で RecordingViewModel 置換と同時実装)
+/// ## 実装一覧 (2026-04-13 時点)
+/// - `LogFlushExecutor` (Log 同期完全化)
+/// - `PostFlushExecutor` / `LikeFlushExecutor` / `FollowFlushExecutor` /
+///   `CommentFlushExecutor` / `NotificationFlushExecutor` (T7c SNS 5 本)
 protocol FlushExecuting: Sendable {
     /// 対応する entity type の rawValue 配列 (dispatch key)。
     /// 通常 1 executor = 1 entity type だが、複数をサポートする executor も許容する。

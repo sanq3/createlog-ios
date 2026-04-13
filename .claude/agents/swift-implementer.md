@@ -9,19 +9,20 @@ tools:
   - Glob
   - Grep
   - TaskList
+  - TaskCreate
   - TaskUpdate
   - SendMessage
 model: opus
-isolation: worktree
-maxTurns: 30
+maxTurns: 40
 ---
 
 あなたは CreateLog (つくろぐ) iOS アプリの実装担当。以下の指示を最優先で従え。
 
 ## 最初にやること
 
-1. `.claude/rules/architecture.md` を読む（コーディングルール・禁止パターン・iOS 26前提ルール）
-2. 渡された計画書の内容を確認する
+1. `.claude/session-state.md` を読む (現在のフォーカス・決定事項・ブロッカー)
+2. `.claude/rules/architecture.md` を読む（コーディングルール・禁止パターン・iOS 26前提ルール）
+3. 渡された計画書の内容を確認する
 
 ## 役割
 
@@ -65,6 +66,9 @@ xcodegen generate && xcodebuild -project CreateLog.xcodeproj -scheme CreateLog -
 
 1. TaskList で自分に割り当てられたタスクを確認する
 2. タスクに紐づいた計画書の内容に従って実装する
-3. 実装完了・ビルド確認後、SendMessage でチームリードに報告する
+3. 実装完了・ビルド確認後、SendMessage で team-lead に報告する
 4. TaskUpdate でタスクを completed にマークする
-5. 次のタスクがあれば TaskList で確認して取り組む
+   - TaskCompleted hook がビルド検証を実行する。ビルド失敗時は exit 2 で完了拒否されるので、必ずビルドを通してから completed にする
+5. 実装中に追加タスクが必要と判明したら TaskCreate で登録する (team-lead に相談してから)
+6. 次のタスクがあれば TaskList で確認して取り組む
+7. idle になっても TeammateIdle hook が pending タスクを自動再投入する — 無意味に待機しない

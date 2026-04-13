@@ -7,6 +7,15 @@ enum AuthState: Equatable, Sendable {
     case authenticated(userId: String)
 }
 
+/// 現在ユーザーの概要 (AccountSettings 表示用)。
+/// `email` は外部 IdP 経由だと nil 可能性あり。
+/// `linkedProviders` は Supabase の `identities[].provider` を小文字文字列で保持。
+struct CurrentUserInfo: Equatable, Sendable {
+    let userId: String
+    let email: String?
+    let linkedProviders: [String]
+}
+
 /// 認証エラー
 enum AuthError: Error, Equatable, Sendable {
     case invalidCredentials
@@ -39,12 +48,16 @@ protocol EmailAuthProtocol: Sendable {
     func signUp(email: String, password: String) async throws -> String
     /// メール+パスワードでサインイン
     func signIn(email: String, password: String) async throws -> String
+    /// パスワードリセット用メール送信
+    func sendPasswordResetEmail(to email: String) async throws
 }
 
 /// セッション管理
 protocol AuthSessionProtocol: Sendable {
     /// 現在の認証状態を取得
     var currentState: AuthState { get async }
+    /// 現在ユーザーの詳細 (メール + 連携プロバイダ)。未ログイン時 nil
+    var currentUserInfo: CurrentUserInfo? { get async }
     /// サインアウト
     func signOut() async throws
     /// アカウント削除
@@ -58,14 +71,20 @@ typealias AuthServiceProtocol = OAuthSignInProtocol & EmailAuthProtocol & AuthSe
 
 /// Preview / 未接続時用の NoOp 実装
 final class NoOpAuthService: AuthServiceProtocol {
+    private func runtimeUsageError(_ function: StaticString = #function) -> AuthError {
+        .unknown("NoOpAuthService(\(function)) が実行されました。Preview/未接続専用のため、本番画面に注入しないでください。")
+    }
+
     var currentState: AuthState { get async { .unauthenticated } }
-    func signInWithApple(idToken: String, nonce: String) async throws -> String { "" }
-    func signInWithGoogle(idToken: String, accessToken: String) async throws -> String { "" }
-    func signInWithGoogleOAuth() async throws -> String { "" }
-    func signInWithGitHub() async throws -> String { "" }
-    func signUp(email: String, password: String) async throws -> String { "" }
-    func signIn(email: String, password: String) async throws -> String { "" }
-    func signOut() async throws {}
-    func deleteAccount() async throws {}
+    var currentUserInfo: CurrentUserInfo? { get async { nil } }
+    func signInWithApple(idToken: String, nonce: String) async throws -> String { throw runtimeUsageError() }
+    func signInWithGoogle(idToken: String, accessToken: String) async throws -> String { throw runtimeUsageError() }
+    func signInWithGoogleOAuth() async throws -> String { throw runtimeUsageError() }
+    func signInWithGitHub() async throws -> String { throw runtimeUsageError() }
+    func signUp(email: String, password: String) async throws -> String { throw runtimeUsageError() }
+    func signIn(email: String, password: String) async throws -> String { throw runtimeUsageError() }
+    func sendPasswordResetEmail(to email: String) async throws { throw runtimeUsageError() }
+    func signOut() async throws { throw runtimeUsageError() }
+    func deleteAccount() async throws { throw runtimeUsageError() }
     func observeAuthChanges() -> AsyncStream<AuthState> { AsyncStream { $0.finish() } }
 }

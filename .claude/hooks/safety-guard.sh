@@ -101,4 +101,10 @@ if echo "$CMD" | grep -qE '(^|[[:space:]])(git|npm|yarn|pnpm)[[:space:]].*--no-v
     block "--no-verify (bypasses pre-commit hooks)"
 fi
 
+# === curl|wget piped to shell (remote code execution risk) ===
+# 注: echo 内の文字列でも当たる限界はあるが、安全側に倒す。誤検出時は手動で実行すればよい。
+if echo "$CMD" | grep -qE '(^|[[:space:];|&])(curl|wget)[[:space:]].*\|[[:space:]]*(bash|sh|zsh|python|python3|node|perl|ruby)([[:space:]]|$)'; then
+    block "curl/wget piped to shell (remote code execution)"
+fi
+
 exit 0

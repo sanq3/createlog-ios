@@ -26,6 +26,14 @@ final class ProfileEditViewModel {
     /// 保存成功フラグ。View はこれを監視して dismiss する。
     var didSaveSuccessfully: Bool = false
 
+    /// PhotosPicker で選択されたアバター画像の生バイナリ。
+    /// save() 時に Supabase Storage にアップロードされ、profile.avatarUrl に反映される。
+    /// nil のままなら avatar 変更なし。
+    var pendingAvatarData: Data?
+
+    /// 既存の avatar URL (init 時の User.avatarUrl)。PhotosPicker で新規選択前のフォールバック表示用。
+    let currentAvatarUrl: String?
+
     // MARK: - Originals (for change detection)
 
     @ObservationIgnored private let originalName: String
@@ -48,6 +56,7 @@ final class ProfileEditViewModel {
             || links != originalLinks
             || skills != originalSkills
             || interests != originalInterests
+            || pendingAvatarData != nil
     }
 
     var isHandleValid: Bool {
@@ -81,6 +90,7 @@ final class ProfileEditViewModel {
         links = user.links.map { EditableLink(url: $0.url) }
         skills = user.skills
         interests = Set(user.interests)
+        currentAvatarUrl = user.avatarUrl
 
         originalName = user.name
         originalHandle = user.handle
@@ -118,10 +128,22 @@ final class ProfileEditViewModel {
             }
         }
 
+        // 先に avatar を Supabase Storage にアップロードして URL を取得する
+        var avatarUrlString: String?
+        if let data = pendingAvatarData {
+            do {
+                let url = try await profileRepository.uploadAvatar(imageData: data, contentType: "image/jpeg")
+                avatarUrlString = url.absoluteString
+            } catch {
+                errorMessage = "アバターのアップロードに失敗しました"
+                return
+            }
+        }
+
         let updates = ProfileUpdateDTO(
             handle: handle,
             displayName: displayName.isEmpty ? nil : displayName,
-            avatarUrl: nil,
+            avatarUrl: avatarUrlString,
             ageGroup: nil,
             gender: nil,
             occupation: occupation.isEmpty ? nil : occupation,

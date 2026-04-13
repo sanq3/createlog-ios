@@ -1,10 +1,11 @@
 import SwiftUI
 import SwiftData
 
-/// オンボーディング root。13 画面フロー (マイプロダクト + プロフィール + ハンドル):
+/// オンボーディング root。20 画面フロー (2026-04-14 再設計、1 画面 1 質問粒度)。
 /// welcome → appShowcase → tutorialIntro → platform → techStack → projectName →
-/// projectDetail → saving → accountPrompt → signInCelebration → profileSetup →
-/// handleSetup → completionCelebration
+/// saving → accountPrompt → signInCelebration → displayName → handleSetup →
+/// avatar → bio → roleTag → projectIcon → projectURL → projectGitHub →
+/// projectDescription → projectStatus → completionCelebration
 struct OnboardingView: View {
     @Binding var isPresented: Bool
     var authViewModel: AuthViewModel
@@ -25,7 +26,9 @@ struct OnboardingView: View {
             if viewModel == nil {
                 viewModel = OnboardingViewModel(
                     modelContext: modelContext,
-                    profileRepository: dependencies.profileRepository
+                    profileRepository: dependencies.profileRepository,
+                    appRepository: dependencies.appRepository,
+                    authService: dependencies.authService
                 )
             }
         }
@@ -39,6 +42,26 @@ struct OnboardingView: View {
                 .transition(.onboardingStep)
         }
         .animation(.spring(duration: 0.55, bounce: 0.1), value: viewModel.currentStep)
+        .overlay(alignment: .topLeading) {
+            // 左上 chevron で戻る。戻れる step は ViewModel.canGoBack が判定。
+            // 薄く控えめに出すことで「気に入っているミニマルな見た目」を損なわない。
+            if viewModel.canGoBack {
+                Button {
+                    HapticManager.light()
+                    viewModel.goBack()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundStyle(Color.clTextPrimary.opacity(0.4))
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .padding(.leading, 4)
+                .padding(.top, 4)
+                .transition(.opacity.combined(with: .scale(scale: 0.9)))
+            }
+        }
         .onChange(of: viewModel.currentStep) { _, newStep in
             if newStep == .saving {
                 viewModel.performSave()
@@ -90,12 +113,6 @@ struct OnboardingView: View {
                 onAdvance: { viewModel.advance() }
             )
 
-        case .projectDetail:
-            OnboardingProjectDetailStep(
-                viewModel: viewModel,
-                onAdvance: { viewModel.advance() }
-            )
-
         case .saving:
             OnboardingSavingStep(
                 projectName: viewModel.savedProjectName.isEmpty ? viewModel.projectName : viewModel.savedProjectName,
@@ -119,8 +136,8 @@ struct OnboardingView: View {
         case .signInCelebration:
             OnboardingSignInCelebrationStep(onAdvance: { viewModel.advance() })
 
-        case .profileSetup:
-            OnboardingProfileSetupStep(
+        case .displayName:
+            OnboardingDisplayNameStep(
                 viewModel: viewModel,
                 onAdvance: { viewModel.advance() }
             )
@@ -128,9 +145,38 @@ struct OnboardingView: View {
         case .handleSetup:
             OnboardingHandleStep(
                 viewModel: viewModel,
-                onComplete: { viewModel.advance() },
-                onSkip: { viewModel.advance() }
+                onComplete: { viewModel.advance() }
             )
+
+        case .avatar:
+            OnboardingAvatarStep(viewModel: viewModel, onAdvance: { viewModel.advance() })
+
+        case .bio:
+            OnboardingBioStep(viewModel: viewModel, onAdvance: { viewModel.advance() })
+
+        case .roleTag:
+            OnboardingRoleTagStep(viewModel: viewModel, onAdvance: { viewModel.advance() })
+
+        case .projectIcon:
+            OnboardingProjectIconStep(viewModel: viewModel, onAdvance: { viewModel.advance() })
+
+        case .projectURL:
+            OnboardingProjectURLStep(viewModel: viewModel, onAdvance: { viewModel.advance() })
+
+        case .projectGitHub:
+            OnboardingProjectGitHubStep(viewModel: viewModel, onAdvance: { viewModel.advance() })
+
+        case .projectDescription:
+            OnboardingProjectDescriptionStep(viewModel: viewModel, onAdvance: { viewModel.advance() })
+
+        case .projectStatus:
+            OnboardingProjectStatusStep(viewModel: viewModel, onAdvance: {
+                // projectStatus を抜けた瞬間 = SDProject の全フィールド確定。
+                // completionCelebration の演出 (1.7s) と並走で remote sync を kick。
+                // 失敗してもローカル SDProject は残るので UI ブロックしない。
+                Task { await viewModel.syncProjectToRemote() }
+                viewModel.advance()
+            })
 
         case .completionCelebration:
             OnboardingCompletionCelebrationStep(onComplete: { isPresented = false })

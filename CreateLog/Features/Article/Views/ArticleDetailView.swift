@@ -12,6 +12,18 @@ struct ArticleDetailView: View {
         self._likeCount = State(initialValue: article.likes)
     }
 
+    /// Article の author 情報から User を組み立ててプロフィール画面に渡す。
+    /// Article 側に author UUID が無いため、profile 画面は handle で再 fetch する想定。
+    /// (Article の authorId フィールド追加は v2.1 で対応、T7d と合わせて)
+    private var authorAsUser: User {
+        User(
+            name: article.authorName,
+            handle: article.authorHandle,
+            followerCount: 0,
+            followingCount: 0
+        )
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
@@ -63,16 +75,20 @@ struct ArticleDetailView: View {
 
     private var metaInfo: some View {
         HStack(spacing: 12) {
-            Button {
-                // TODO: プロフィール遷移
+            NavigationLink {
+                UserProfileView(user: authorAsUser)
             } label: {
-                AvatarView(initials: article.authorInitials, size: 40)
+                AvatarView(
+                    initials: article.authorInitials,
+                    size: 40,
+                    imageURL: article.authorAvatarUrl.flatMap(URL.init(string:))
+                )
             }
             .buttonStyle(.plain)
 
             VStack(alignment: .leading, spacing: 2) {
-                Button {
-                    // TODO: プロフィール遷移
+                NavigationLink {
+                    UserProfileView(user: authorAsUser)
                 } label: {
                     Text(article.authorName)
                         .font(.subheadline)
@@ -146,9 +162,7 @@ struct ArticleDetailView: View {
 
             Spacer()
 
-            Button {
-                HapticManager.light()
-            } label: {
+            ShareLink(item: URL(string: "https://createlog.app/articles/\(article.id)")!) {
                 Image(systemName: "square.and.arrow.up")
                     .foregroundStyle(Color.clTextTertiary)
                     .font(.subheadline)

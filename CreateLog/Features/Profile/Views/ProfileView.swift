@@ -4,21 +4,37 @@ import CoreImage.CIFilterBuiltins
 
 struct ProfileView: View {
     @Environment(\.dependencies) private var deps
-    @Query(sort: \SDProject.createdAt, order: .reverse) private var localProjects: [SDProject]
+    /// オンボーディングで作成したローカル SDProject。remote (apps) に同期済 (remoteAppId != nil)
+    /// は ProfileViewModel.apps 経由で出るので除外し、二重表示を防ぐ。
+    @Query(
+        filter: #Predicate<SDProject> { $0.remoteAppId == nil },
+        sort: \SDProject.createdAt,
+        order: .reverse
+    )
+    private var localProjects: [SDProject]
+    @State private var viewModel: ProfileViewModel?
     @State private var showShareSheet = false
     @State private var showEditProfile = false
     @State private var selectedPostTab: PostTab = .posts
-    #if DEBUG
-    @State private var userPosts: [Post] = MockData.posts
-    @State private var userProjects: [Project] = MockData.projects
-    @State private var weeklyHours: [(String, Double)] = MockData.weeklyHours
-    @State private var user: User = MockData.currentUser
-    #else
-    @State private var userPosts: [Post] = []
-    @State private var userProjects: [Project] = []
-    @State private var weeklyHours: [(String, Double)] = []
-    @State private var user: User = User(name: "", handle: "")
-    #endif
+
+    /// ViewModel 未初期化時の空値 (loading state)。
+    private var user: User {
+        if let dto = viewModel?.profile {
+            return User(from: dto)
+        }
+        return User(name: "", handle: "")
+    }
+    private var userPosts: [Post] {
+        (viewModel?.posts ?? []).map { Post(from: $0) }
+    }
+    /// Remote Supabase に保存されたアプリ (apps テーブル)。
+    /// local SDProject (@Query) はオンボーディング登録分。両方並べて表示する。
+    private var userProjects: [Project] {
+        (viewModel?.apps ?? []).map { Project(from: $0) }
+    }
+    private var weeklyHours: [(String, Double)] {
+        viewModel?.weeklyHours ?? []
+    }
 
     private enum PostTab: String, CaseIterable {
         case posts = "投稿"
@@ -33,7 +49,12 @@ struct ProfileView: View {
             VStack(spacing: 0) {
                 // Header row: Avatar + Stats
                 HStack(spacing: 0) {
-                    AvatarView(initials: user.initials, size: 86, status: .offline)
+                    AvatarView(
+                        initials: user.initials,
+                        size: 86,
+                        status: .offline,
+                        imageURL: user.avatarUrl.flatMap(URL.init(string:))
+                    )
 
                     Spacer()
 
@@ -207,31 +228,84 @@ struct ProfileView: View {
             ProfileEditView(user: user, profileRepository: deps.profileRepository)
         }
         .sheet(isPresented: $showShareSheet) {
-            ProfileShareSheet(name: user.name, handle: handle, profileURL: profileURL, initials: user.initials)
-                .presentationDetents([.large])
-                .presentationDragIndicator(.hidden)
+            ProfileShareSheet(
+                name: user.name,
+                handle: handle,
+                profileURL: profileURL,
+                initials: user.initials,
+                avatarUrl: user.avatarUrl
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.hidden)
+        }
+        .refreshable {
+            await viewModel?.loadProfile()
+        }
+        .task {
+            if viewModel == nil {
+                viewModel = ProfileViewModel(
+                    profileRepository: deps.profileRepository,
+                    postRepository: deps.postRepository,
+                    appRepository: deps.appRepository,
+                    followRepository: deps.followRepository,
+                    statsRepository: deps.statsRepository
+                )
+            }
+            await viewModel?.loadProfile()
         }
     }
 
-    // タブごとの投稿データ
+    // タブごとの投稿データ。
+    // - .posts: fetchUserPosts から取得した自分の投稿
+    // - .likes / .bookmarks: 対応する Repository が未実装 (LikeRepository に fetchLiked なし、
+    //   BookmarkRepository 自体なし) のため空配列 + 準備中プレースホルダ。
+    //   v1.1 以降で Like/Bookmark の fetch API を実装した時点で配線する。
     private func postsFor(_ tab: PostTab) -> [Post] {
         switch tab {
         case .posts:
-            Array(userPosts.prefix(3))
-        case .likes:
-            Array(userPosts.dropFirst(min(3, userPosts.count)).prefix(3))
-        case .bookmarks:
-            Array(userPosts.dropFirst(min(6, userPosts.count)).prefix(3))
+            userPosts
+        case .likes, .bookmarks:
+            []
         }
     }
 
+    @ViewBuilder
     private func postList(for tab: PostTab) -> some View {
-        LazyVStack(spacing: 12) {
-            ForEach(postsFor(tab)) { post in
-                PostCardView(post: post)
+        let items = postsFor(tab)
+        if items.isEmpty {
+            tabEmptyState(for: tab)
+                .padding(.top, 12)
+        } else {
+            LazyVStack(spacing: 12) {
+                ForEach(items) { post in
+                    PostCardView(post: post)
+                }
             }
+            .padding(.top, 12)
         }
-        .padding(.top, 12)
+    }
+
+    @ViewBuilder
+    private func tabEmptyState(for tab: PostTab) -> some View {
+        switch tab {
+        case .posts:
+            Text("まだ投稿がありません")
+                .font(.clCaption)
+                .foregroundStyle(Color.clTextTertiary)
+                .padding(.horizontal, 16)
+        case .likes:
+            ContentUnavailableView(
+                "準備中",
+                systemImage: "heart.slash",
+                description: Text("いいねした投稿の一覧は近日対応予定です")
+            )
+        case .bookmarks:
+            ContentUnavailableView(
+                "準備中",
+                systemImage: "bookmark.slash",
+                description: Text("ブックマークの一覧は近日対応予定です")
+            )
+        }
     }
 
     private func profileStat(value: String, label: String) -> some View {
@@ -247,50 +321,151 @@ struct ProfileView: View {
     }
 
     private func localProjectCard(project: SDProject) -> some View {
-        HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 10)
-                .fill(
-                    LinearGradient(
-                        colors: [project.iconColor, project.iconColor.opacity(0.7)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 44, height: 44)
-                .overlay(
-                    Text(String(project.name.prefix(1)))
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.9))
-                )
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 12) {
+                projectIcon(project: project)
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(project.name)
-                    .font(.clHeadline)
-                    .foregroundStyle(Color.clTextPrimary)
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 8) {
+                        Text(project.name)
+                            .font(.clHeadline)
+                            .foregroundStyle(Color.clTextPrimary)
+                            .lineLimit(1)
 
-                if !project.platforms.isEmpty {
-                    Text(project.platforms.joined(separator: " / "))
-                        .font(.clCaption)
-                        .foregroundStyle(Color.clTextTertiary)
+                        statusBadge(for: project.status)
+                    }
+
+                    if !project.platforms.isEmpty {
+                        Text(project.platforms.joined(separator: " / "))
+                            .font(.clCaption)
+                            .foregroundStyle(Color.clTextTertiary)
+                    }
+
+                    if !project.techStack.isEmpty {
+                        Text(project.techStack.prefix(4).joined(separator: ", "))
+                            .font(.system(size: 10))
+                            .foregroundStyle(Color.clTextTertiary.opacity(0.7))
+                            .lineLimit(1)
+                    }
                 }
 
-                if !project.techStack.isEmpty {
-                    Text(project.techStack.prefix(4).joined(separator: ", "))
-                        .font(.system(size: 10))
-                        .foregroundStyle(Color.clTextTertiary.opacity(0.7))
-                        .lineLimit(1)
-                }
+                Spacer()
             }
 
-            Spacer()
+            if !project.appDescription.isEmpty {
+                Text(project.appDescription)
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color.clTextSecondary)
+                    .lineLimit(3)
+            }
+
+            if project.storeURL?.isEmpty == false || project.githubURL?.isEmpty == false {
+                HStack(spacing: 12) {
+                    if let store = project.storeURL, !store.isEmpty {
+                        projectLinkChip(icon: "arrow.up.forward.app", label: storeChipLabel(for: project))
+                    }
+                    if let github = project.githubURL, !github.isEmpty {
+                        projectLinkChip(icon: "chevron.left.forwardslash.chevron.right", label: "GitHub")
+                    }
+                }
+            }
         }
-        .padding(12)
+        .padding(14)
         .background(Color.clSurfaceLow, in: RoundedRectangle(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(Color.clBorder, lineWidth: 1)
         )
         .padding(.horizontal, 16)
+    }
+
+    /// アイコン表示。優先順:
+    /// 1. iconImageData (PhotosPicker でローカル選択した生画像)
+    /// 2. remoteIconUrl (同期成功後に保存される Storage URL — sync 後 instant 反映)
+    /// 3. iconColor + 頭文字 gradient fallback
+    @ViewBuilder
+    private func projectIcon(project: SDProject) -> some View {
+        if let data = project.iconImageData, let uiImage = UIImage(data: data) {
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 44, height: 44)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        } else if let urlString = project.remoteIconUrl, let url = URL(string: urlString) {
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .success(let image):
+                    image.resizable().scaledToFill()
+                default:
+                    iconGradientFallback(project: project)
+                }
+            }
+            .frame(width: 44, height: 44)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        } else {
+            iconGradientFallback(project: project)
+        }
+    }
+
+    private func iconGradientFallback(project: SDProject) -> some View {
+        RoundedRectangle(cornerRadius: 10, style: .continuous)
+            .fill(
+                LinearGradient(
+                    colors: [project.iconColor, project.iconColor.opacity(0.7)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .frame(width: 44, height: 44)
+            .overlay(
+                Text(String(project.name.prefix(1)))
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.9))
+            )
+    }
+
+    private func statusBadge(for status: ProjectStatus) -> some View {
+        Text(status.displayName)
+            .font(.system(size: 10, weight: .semibold))
+            .foregroundStyle(statusBadgeForeground(status))
+            .padding(.horizontal, 7)
+            .padding(.vertical, 2)
+            .background(statusBadgeBackground(status), in: Capsule())
+    }
+
+    private func statusBadgeForeground(_ status: ProjectStatus) -> Color {
+        switch status {
+        case .draft: Color.clTextSecondary
+        case .published: Color.clAccent
+        case .archived: Color.clTextTertiary
+        }
+    }
+
+    private func statusBadgeBackground(_ status: ProjectStatus) -> Color {
+        switch status {
+        case .draft: Color.clSurfaceHigh
+        case .published: Color.clAccent.opacity(0.12)
+        case .archived: Color.clSurfaceHigh.opacity(0.6)
+        }
+    }
+
+    private func projectLinkChip(icon: String, label: String) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 11, weight: .medium))
+            Text(label)
+                .font(.system(size: 12, weight: .medium))
+        }
+        .foregroundStyle(Color.clAccent)
+    }
+
+    /// store URL の host から App Store / Play Store / Web を判別してラベル化。
+    /// 詳細解析が要らない最小ヒューリスティック。
+    private func storeChipLabel(for project: SDProject) -> String {
+        guard let url = project.storeURL?.lowercased() else { return "Web" }
+        if url.contains("apps.apple.com") { return "App Store" }
+        if url.contains("play.google.com") { return "Google Play" }
+        return "Web"
     }
 
     private func serviceCard(project: Project) -> some View {
@@ -362,6 +537,7 @@ struct ProfileShareSheet: View {
     let handle: String
     let profileURL: String
     let initials: String
+    var avatarUrl: String? = nil
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
@@ -482,13 +658,18 @@ struct ProfileShareSheet: View {
                     .padding(.horizontal, 28)
                     .padding(.top, avatarSize / 2)
 
-                    AvatarView(initials: initials, size: avatarSize, status: .offline)
-                        .overlay(
-                            Circle()
-                                .strokeBorder(cardBackground, lineWidth: 4)
-                                .frame(width: avatarSize, height: avatarSize)
-                        )
-                        .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
+                    AvatarView(
+                        initials: initials,
+                        size: avatarSize,
+                        status: .offline,
+                        imageURL: avatarUrl.flatMap(URL.init(string:))
+                    )
+                    .overlay(
+                        Circle()
+                            .strokeBorder(cardBackground, lineWidth: 4)
+                            .frame(width: avatarSize, height: avatarSize)
+                    )
+                    .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
                 }
                 .scaleEffect(cardAppeared ? 1 : 0.85)
                 .opacity(cardAppeared ? 1 : 0)

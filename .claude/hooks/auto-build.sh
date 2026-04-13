@@ -1,26 +1,32 @@
 #!/bin/bash
-# PostToolUse hook: *.swift 変更時に自動ビルド → シミュレータ起動
+# PostToolUse hook: *.swift / project.yml 変更時にファイルパスを蓄積するだけ。
+# 実際のビルドは stop-build.sh (Stop hook) で一括実行する。
+# accumulator パターン: 連続 Edit 中のビルド衝突を防止。
 set -euo pipefail
 
 INPUT=$(cat)
-FILE_PATH=$(echo "$INPUT" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path',''))" 2>/dev/null || true)
 
-# .swift ファイル以外は無視
-[[ "$FILE_PATH" == *.swift ]] || exit 0
-
-cd "${CLAUDE_PROJECT_DIR:-.}" || exit 0
-
-# project.yml が変わっていたら xcodegen を先に実行
-if git diff --name-only HEAD 2>/dev/null | grep -q 'project.yml'; then
-  xcodegen generate 2>/dev/null || true
+# ファイルパス抽出: jq → python3 → sed の順で fallback
+FILE_PATH=""
+if command -v jq >/dev/null 2>&1; then
+  FILE_PATH=$(echo "$INPUT" | jq -r '.tool_response.filePath // .tool_input.file_path // empty' 2>/dev/null || true)
+elif command -v python3 >/dev/null 2>&1; then
+  FILE_PATH=$(echo "$INPUT" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('tool_response',{}).get('filePath','') or d.get('tool_input',{}).get('file_path',''))" 2>/dev/null || true)
 fi
 
-# インクリメンタルビルド
-xcodebuild -project CreateLog.xcodeproj -scheme CreateLog \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
-  build 2>&1 | tail -3
+[ -z "$FILE_PATH" ] && exit 0
 
-# シミュレータにインストール&起動
-xcrun simctl terminate booted com.sanq3.createlog 2>/dev/null || true
-xcrun simctl install booted build/Build/Products/Debug-iphonesimulator/CreateLog.app 2>/dev/null || true
-xcrun simctl launch booted com.sanq3.createlog 2>/dev/null || true
+# .swift / project.yml 以外は無視
+case "$FILE_PATH" in
+  *.swift|*/project.yml) ;;
+  *) exit 0 ;;
+esac
+
+# プロジェクト別 accumulator (並行セッション衝突を防止)
+PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+PROJECT_HASH=$(echo "$PROJECT_DIR" | shasum -a 256 | cut -c1-12)
+ACCUM_FILE="/tmp/claude-build-accumulator-${PROJECT_HASH}.txt"
+
+echo "$FILE_PATH" >> "$ACCUM_FILE"
+
+exit 0

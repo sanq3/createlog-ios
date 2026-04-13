@@ -1,8 +1,12 @@
 import SwiftUI
 import SwiftData
+import OSLog
+
+private let appLogger = Logger(subsystem: "com.sanq3.createlog", category: "App")
 
 @main
 struct CreateLogApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegateAdapter.self) private var appDelegate
     @AppStorage("appearanceMode") private var appearanceMode: String = AppearanceMode.system.rawValue
     @AppStorage("onboardingCompleted") private var onboardingCompleted = false
 
@@ -11,6 +15,7 @@ struct CreateLogApp: App {
     @State private var authViewModel: AuthViewModel
     @State private var deepLinkHandler = DeepLinkHandler()
     @State private var storeKitManager = StoreKitManager()
+    @State private var pushService: PushNotificationService
     @State private var splashFinished = false
 
     init() {
@@ -31,7 +36,7 @@ struct CreateLogApp: App {
             let config = ModelConfiguration(isStoredInMemoryOnly: false)
             modelContainer = try ModelContainer(for: schema, configurations: [config])
         } catch {
-            print("ModelContainer failed: \(error). Falling back to inMemory.")
+            appLogger.error("ModelContainer failed: \(String(describing: error), privacy: .public). Falling back to inMemory.")
             do {
                 let fallback = ModelConfiguration(isStoredInMemoryOnly: true)
                 modelContainer = try ModelContainer(for: schema, configurations: [fallback])
@@ -42,6 +47,9 @@ struct CreateLogApp: App {
         let deps = DependencyContainer(modelContainer: modelContainer)
         dependencies = deps
         _authViewModel = State(initialValue: AuthViewModel(authService: deps.authService))
+        // PushNotificationService は init 内で NotificationCenter を observe するので
+        // AppDelegateAdapter への明示的な参照設定は不要 (疎結合)。
+        _pushService = State(initialValue: PushNotificationService(client: deps.supabaseClient))
     }
 
     var body: some Scene {
@@ -52,6 +60,8 @@ struct CreateLogApp: App {
                     MainTabView()
                         .modelContainer(modelContainer)
                         .environment(\.dependencies, dependencies)
+                        .environment(deepLinkHandler)
+                        .environment(pushService)
                         .onAppear {
                             applyTheme(animated: false)
                             seedDefaultCategories()
@@ -60,6 +70,13 @@ struct CreateLogApp: App {
                             applyTheme(animated: true)
                         }
                         .task { await authViewModel.observeAuthState() }
+                        .task {
+                            // onboarding 完了後の初回起動時に通知許可を要求する
+                            await pushService.refreshAuthorizationStatus()
+                            if pushService.authorizationStatus == .notDetermined {
+                                await pushService.requestAuthorization()
+                            }
+                        }
                         .onOpenURL { url in deepLinkHandler.handle(url) }
                         .opacity(splashFinished ? 1.0 : 0.0)
                         .animation(.easeIn(duration: 0.15), value: splashFinished)

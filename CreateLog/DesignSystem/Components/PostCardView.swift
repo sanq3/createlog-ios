@@ -9,7 +9,12 @@ struct PostCardView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top, spacing: 14) {
-                AvatarView(initials: post.initials, size: 46, status: post.status)
+                AvatarView(
+                    initials: post.initials,
+                    size: 46,
+                    status: post.status,
+                    imageURL: post.authorAvatarUrl.flatMap(URL.init(string:))
+                )
 
                 VStack(alignment: .leading, spacing: 5) {
                     HStack(alignment: .firstTextBaseline) {

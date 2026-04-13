@@ -3,8 +3,12 @@ import Charts
 
 struct ShareReportView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dependencies) private var dependencies
     @State private var selectedPeriod: SharePeriod = .week
     @State private var renderedImage: Image?
+    @State private var currentHandle: String = ""
+    /// 現在表示中の期間のカード内容。`loadCardContent` で期間別に埋める。
+    @State private var cardContent: ShareCardContent = .empty(period: .week)
 
     var body: some View {
         NavigationStack {
@@ -56,6 +60,12 @@ struct ShareReportView: View {
             .background(Color.clBackground)
             .navigationTitle("レポートをシェア")
             .navigationBarTitleDisplayMode(.inline)
+            .task {
+                if let dto = try? await dependencies.profileRepository.fetchMyProfile() {
+                    currentHandle = dto.handle ?? ""
+                }
+                await loadCardContent(period: selectedPeriod)
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
@@ -68,7 +78,12 @@ struct ShareReportView: View {
                 }
             }
             .onAppear { renderImage() }
-            .onChange(of: selectedPeriod) { _, _ in renderImage() }
+            .onChange(of: selectedPeriod) { _, newValue in
+                Task {
+                    await loadCardContent(period: newValue)
+                    renderImage()
+                }
+            }
         }
     }
 
@@ -76,8 +91,6 @@ struct ShareReportView: View {
 
     @ViewBuilder
     private var shareCard: some View {
-        let cardContent = ShareCardContent(period: selectedPeriod)
-
         VStack(spacing: 0) {
             // Header
             HStack {
@@ -157,7 +170,7 @@ struct ShareReportView: View {
 
             // Footer
             HStack {
-                Text("@\("username" /* TODO: from auth */)")
+                Text("@\(currentHandle.isEmpty ? "createlog" : currentHandle)")
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(Color(.tertiaryLabel))
                 Spacer()
@@ -200,6 +213,137 @@ struct ShareReportView: View {
             renderedImage = Image(uiImage: uiImage)
         }
     }
+
+    // MARK: - Data Loading
+
+    /// 指定期間のシェアカード内容を実 stats repository から構築する。
+    /// - week: `fetchWeeklyStats(containing:)` → 7 日集計 + 今週のカテゴリ
+    /// - month: `fetchMonthlyStats(year:month:)` → 月の日別集計 → 合算
+    /// - total: `fetchCumulativeMinutes()` + 直近月のカテゴリ内訳 (全期間 API がないため代替)
+    private func loadCardContent(period: SharePeriod) async {
+        let now = Date()
+        let calendar = Calendar.current
+        switch period {
+        case .week:
+            guard let weekly = try? await dependencies.statsRepository.fetchWeeklyStats(containing: now) else {
+                cardContent = .empty(period: period)
+                return
+            }
+            cardContent = Self.makeWeekly(weekly: weekly, now: now, calendar: calendar)
+
+        case .month:
+            let year = calendar.component(.year, from: now)
+            let month = calendar.component(.month, from: now)
+            guard let monthly = try? await dependencies.statsRepository.fetchMonthlyStats(year: year, month: month) else {
+                cardContent = .empty(period: period)
+                return
+            }
+            cardContent = Self.makeMonthly(monthly: monthly, year: year, month: month)
+
+        case .total:
+            async let cumulativeFetch = (try? await dependencies.statsRepository.fetchCumulativeMinutes()) ?? 0
+            // 累計集計 API は無いため、直近月の stats を基にカテゴリ内訳を出す。
+            let year = calendar.component(.year, from: now)
+            let month = calendar.component(.month, from: now)
+            async let monthlyFetch = (try? await dependencies.statsRepository.fetchMonthlyStats(year: year, month: month)) ?? []
+            let (cumulative, monthly) = await (cumulativeFetch, monthlyFetch)
+            cardContent = Self.makeTotal(cumulativeMinutes: cumulative, recentMonthly: monthly)
+        }
+    }
+
+    // MARK: - Share Card Builders
+
+    private static func makeWeekly(weekly: WeeklyStats, now: Date, calendar: Calendar) -> ShareCardContent {
+        let sorted = weekly.dailyTotals.sorted { $0.date < $1.date }
+        let activeDays = sorted.filter { $0.totalMinutes > 0 }.count
+        let totalHours = Double(weekly.totalMinutes) / 60.0
+        let avg = activeDays > 0 ? totalHours / Double(activeDays) : 0
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ja_JP")
+        formatter.dateFormat = "yyyy年M月d日"
+        let startDate = sorted.first?.date ?? weekly.weekStart
+        let endDate = sorted.last?.date ?? calendar.date(byAdding: .day, value: 6, to: startDate) ?? startDate
+        let range = "\(formatter.string(from: startDate)) - \(formatter.string(from: endDate))"
+
+        let categories = aggregateCategories(from: sorted)
+
+        return ShareCardContent(
+            title: "週間レポート",
+            dateRange: range,
+            totalTime: DurationFormatter.formatHM(hours: totalHours),
+            dailyAvg: DurationFormatter.formatHM(hours: avg),
+            activeDays: activeDays,
+            categories: categories
+        )
+    }
+
+    private static func makeMonthly(monthly: [DailyStats], year: Int, month: Int) -> ShareCardContent {
+        let totalMinutes = monthly.reduce(0) { $0 + $1.totalMinutes }
+        let totalHours = Double(totalMinutes) / 60.0
+        let activeDays = monthly.filter { $0.totalMinutes > 0 }.count
+        let avg = activeDays > 0 ? totalHours / Double(activeDays) : 0
+
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ja_JP")
+        formatter.dateFormat = "yyyy年M月"
+        var comps = DateComponents()
+        comps.year = year
+        comps.month = month
+        let range = formatter.string(from: Calendar.current.date(from: comps) ?? Date())
+
+        let categories = aggregateCategories(from: monthly)
+
+        return ShareCardContent(
+            title: "月間レポート",
+            dateRange: range,
+            totalTime: DurationFormatter.formatHM(hours: totalHours),
+            dailyAvg: DurationFormatter.formatHM(hours: avg),
+            activeDays: activeDays,
+            categories: categories
+        )
+    }
+
+    private static func makeTotal(cumulativeMinutes: Int, recentMonthly: [DailyStats]) -> ShareCardContent {
+        let totalHours = Double(cumulativeMinutes) / 60.0
+        let activeDays = recentMonthly.filter { $0.totalMinutes > 0 }.count
+        // cumulative の「全期間の稼働日」は取れないので 0 は非表示的に扱う。
+        // カテゴリ内訳は直近月ベース (全期間集計 API なし)。
+        let categories = aggregateCategories(from: recentMonthly)
+        let avg: Double = activeDays > 0 ? (Double(recentMonthly.reduce(0) { $0 + $1.totalMinutes }) / 60.0 / Double(activeDays)) : 0
+
+        return ShareCardContent(
+            title: "累計レポート",
+            dateRange: "全期間",
+            totalTime: DurationFormatter.formatHM(hours: totalHours),
+            dailyAvg: DurationFormatter.formatHM(hours: avg),
+            activeDays: activeDays,
+            categories: categories
+        )
+    }
+
+    /// DailyStats 配列から上位カテゴリを集計し `CategoryStat` に変換 (最大 5 件)。
+    private static func aggregateCategories(from stats: [DailyStats]) -> [ShareCardContent.CategoryStat] {
+        var minutesByCategory: [String: Int] = [:]
+        for day in stats {
+            for breakdown in day.categoryBreakdown {
+                minutesByCategory[breakdown.name, default: 0] += breakdown.minutes
+            }
+        }
+        let sorted = minutesByCategory
+            .sorted { $0.value > $1.value }
+            .prefix(5)
+        guard let maxMinutes = sorted.first?.value, maxMinutes > 0 else { return [] }
+        return sorted.map { name, minutes in
+            let hours = Double(minutes) / 60.0
+            let ratio = CGFloat(minutes) / CGFloat(maxMinutes)
+            return ShareCardContent.CategoryStat(
+                name: name,
+                hours: hours,
+                ratio: ratio,
+                color: LogEntry.color(for: name)
+            )
+        }
+    }
 }
 
 // MARK: - Models
@@ -235,35 +379,21 @@ private struct ShareCardContent {
         let color: Color
     }
 
-    init(period: SharePeriod) {
+    /// データ未取得時のプレースホルダ (0 値)。カードのレイアウトを崩さず表示する。
+    static func empty(period: SharePeriod) -> ShareCardContent {
+        let title: String
         switch period {
-        case .week:
-            title = "週間レポート"
-            dateRange = "2026年3月20日 - 3月26日"
-            totalTime = DurationFormatter.formatHM(hours: 28.5)
-            dailyAvg = DurationFormatter.formatHM(hours: 4.1)
-            activeDays = 6
-        case .month:
-            title = "月間レポート"
-            dateRange = "2026年3月"
-            totalTime = DurationFormatter.formatHM(hours: 58.3)
-            dailyAvg = DurationFormatter.formatHM(hours: 3.2)
-            activeDays = 18
-        case .total:
-            title = "累計レポート"
-            dateRange = "2026年1月 - 3月"
-            totalTime = DurationFormatter.formatHM(hours: 186.0)
-            dailyAvg = DurationFormatter.formatHM(hours: 3.5)
-            activeDays = 52
+        case .week: title = "週間レポート"
+        case .month: title = "月間レポート"
+        case .total: title = "累計レポート"
         }
-
-        let maxHours = 24.5
-        categories = [
-            .init(name: "iOS開発", hours: 24.5, ratio: 24.5 / maxHours, color: LogEntry.color(for: "iOS開発")),
-            .init(name: "学習", hours: 12.0, ratio: 12.0 / maxHours, color: LogEntry.color(for: "学習")),
-            .init(name: "バグ修正", hours: 8.5, ratio: 8.5 / maxHours, color: LogEntry.color(for: "バグ修正")),
-            .init(name: "Web開発", hours: 7.8, ratio: 7.8 / maxHours, color: LogEntry.color(for: "Web開発")),
-            .init(name: "デザイン", hours: 5.5, ratio: 5.5 / maxHours, color: LogEntry.color(for: "デザイン")),
-        ]
+        return ShareCardContent(
+            title: title,
+            dateRange: "",
+            totalTime: DurationFormatter.formatHM(hours: 0),
+            dailyAvg: DurationFormatter.formatHM(hours: 0),
+            activeDays: 0,
+            categories: []
+        )
     }
 }

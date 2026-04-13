@@ -6,22 +6,28 @@ struct FollowListView: View {
         case following
     }
 
+    @Environment(\.dependencies) private var dependencies
     @State private var selectedTab: Tab
     @State private var searchText = ""
-    #if DEBUG
-    @State private var users: [User] = MockData.users
-    #else
-    @State private var users: [User] = []
-    #endif
+    @State private var followerUsers: [User] = []
+    @State private var followingUsers: [User] = []
+    @State private var isLoading = false
     @Namespace private var tabNamespace
 
+    /// 表示対象ユーザー id (nil なら current user)
+    private let targetUserId: UUID?
     private let followerCount: Int
     private let followingCount: Int
 
-    init(initialTab: Tab = .followers, followerCount: Int = 0, followingCount: Int = 0) {
+    init(initialTab: Tab = .followers, targetUserId: UUID? = nil, followerCount: Int = 0, followingCount: Int = 0) {
         _selectedTab = State(initialValue: initialTab)
+        self.targetUserId = targetUserId
         self.followerCount = followerCount
         self.followingCount = followingCount
+    }
+
+    private var users: [User] {
+        selectedTab == .followers ? followerUsers : followingUsers
     }
 
     private var filteredUsers: [User] {
@@ -41,6 +47,42 @@ struct FollowListView: View {
         }
         .background(Color.clBackground)
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await loadUsers()
+        }
+        .onChange(of: selectedTab) { _, _ in
+            Task { await loadUsers() }
+        }
+    }
+
+    /// 現在の selectedTab に応じて followers/following を取得する。
+    private func loadUsers() async {
+        let userId: UUID
+        if let target = targetUserId {
+            userId = target
+        } else if let info = await dependencies.authService.currentUserInfo,
+                  let uid = UUID(uuidString: info.userId) {
+            userId = uid
+        } else {
+            return
+        }
+
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            let profiles: [ProfileDTO]
+            switch selectedTab {
+            case .followers:
+                profiles = try await dependencies.followRepository.fetchFollowers(userId: userId, limit: 100)
+                followerUsers = profiles.map { User(from: $0) }
+            case .following:
+                profiles = try await dependencies.followRepository.fetchFollowing(userId: userId, limit: 100)
+                followingUsers = profiles.map { User(from: $0) }
+            }
+        } catch {
+            // サイレント: 空 state が表示される
+        }
     }
 
     // MARK: - Tab Bar
@@ -119,6 +161,18 @@ struct FollowListView: View {
 
     // MARK: - List
 
+    // MARK: DO NOT REMOVE `.tabViewStyle(.page)` — UIUX regression
+    //
+    // `.page` は Apple 純正 UIPageViewController wrapper。X / Instagram のプロフィール
+    // タブ切替と同じ業界標準実装。architecture.md の「DragGesture 禁止」ルールは自作
+    // DragGesture を対象にしており、Apple 純正 wrapper は対象外 (同ルール末尾の
+    // 「Apple 純正 swipe API はこのルールの対象外」節を参照)。
+    //
+    // 縦 List + 横 `.page` は直交しており ScrollView 干渉は発生しない。削除すると X /
+    // Instagram に慣れたユーザーが swipe 切替を失い UIUX 後退する。
+    //
+    // レビュワーへ: 削除提案する前に architecture.md と code-review.md の該当節を
+    // 原文で読め。2026-04-13 に swift-reviewer が誤検知した実例あり。
     private var userList: some View {
         TabView(selection: $selectedTab) {
             userListContent
@@ -151,7 +205,12 @@ struct FollowListView: View {
 
     private func userRow(_ user: User) -> some View {
         HStack(spacing: 12) {
-            AvatarView(initials: user.initials, size: 44, status: user.status)
+            AvatarView(
+                initials: user.initials,
+                size: 44,
+                status: user.status,
+                imageURL: user.avatarUrl.flatMap(URL.init(string:))
+            )
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(user.name)
@@ -204,11 +263,34 @@ struct FollowListView: View {
     }
 
     private func toggleFollow(_ user: User) {
-        withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-            if let index = users.firstIndex(where: { $0.id == user.id }) {
-                users[index].isFollowing.toggle()
-            }
+        // オプティミスティック UI: 先にローカル状態を反転して即座に反映
+        let wasFollowing = user.isFollowing
+        if selectedTab == .followers,
+           let idx = followerUsers.firstIndex(where: { $0.id == user.id }) {
+            followerUsers[idx].isFollowing.toggle()
+        } else if selectedTab == .following,
+                  let idx = followingUsers.firstIndex(where: { $0.id == user.id }) {
+            followingUsers[idx].isFollowing.toggle()
         }
         HapticManager.light()
+
+        Task {
+            do {
+                if wasFollowing {
+                    try await dependencies.followRepository.unfollow(userId: user.id)
+                } else {
+                    try await dependencies.followRepository.follow(userId: user.id)
+                }
+            } catch {
+                // rollback
+                if selectedTab == .followers,
+                   let idx = followerUsers.firstIndex(where: { $0.id == user.id }) {
+                    followerUsers[idx].isFollowing = wasFollowing
+                } else if selectedTab == .following,
+                          let idx = followingUsers.firstIndex(where: { $0.id == user.id }) {
+                    followingUsers[idx].isFollowing = wasFollowing
+                }
+            }
+        }
     }
 }

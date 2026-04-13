@@ -188,6 +188,25 @@
 
 決定事項をここに記録する。日付と理由を必ず書く。
 
+### 2026-04-13: Realtime sync は v2.1 に延期 (技術的負債)
+
+**決定**: v2.0 リリース時点で Supabase Realtime (postgres_changes) は導入しない。foreground 復帰時の REST full-refresh のみで対応する。
+
+**背景**: 業界調査 (Notion/Todoist/Things 3/Bear) の結果、いずれも v1 は foreground polling のみで出荷、Realtime は後日追加している。Supabase Realtime iOS は以下の既知問題があり、リリース直前に配線するのは高リスク:
+- バックグラウンド約 90 秒で WebSocket 切断 (iOS WebSocket lifecycle 仕様)
+- 切断中の変更は at-least-once 保証なし
+- 復帰時に REST full-refresh → 再 subscribe が Supabase 公式推奨パターン
+
+**v2.0 で実装**: `MainTabView` に `scenePhase == .active` で `syncService.flush()` を呼ぶだけ。10 行程度。
+
+**v2.1 技術的負債として残す項目 (T7d)**:
+- Supabase Realtime subscribe (recipient_id filter / scenePhase 連動)
+- Sync telemetry UI (queue pending 件数 / dead letter 数表示)
+- HomeViewModel / PostDetailViewModel / NotificationViewModel の realtime 統合
+- LWW 以外の conflict resolution (3-way merge)
+
+**ユーザー影響**: v2.0 ではフィード/通知の「他端末リアルタイム反映」は体験できない。アプリを復帰するか pull-to-refresh で最新が取れる。ユーザー 0 人スタート段階で体験差は軽微。
+
 ### 2026-04-12: Phase 1 完了 (認証・Recording・SNS・Offline-first 基盤)
 
 Phase 1 リリース候補 (App Store 公開ルート C 準備) の完了マーカー。

@@ -7,20 +7,22 @@ tools:
   - Grep
   - Bash
   - TaskList
+  - TaskCreate
   - TaskUpdate
   - SendMessage
 model: opus
-maxTurns: 15
+maxTurns: 20
 ---
 
 あなたは CreateLog (つくろぐ) iOS アプリのシニアコードレビュアー。以下の指示を最優先で従え。
 
 ## 最初にやること
 
-1. `.claude/rules/architecture.md` を読む（全ルールの基準）
-2. `.claude/rules/code-review.md` を読む（レビューチェックリスト・重大度基準）
-3. `git diff` で変更ファイルを特定する
-4. 新規ファイルは全体をレビュー。変更ファイルは差分 + 関連する依存先（呼び出し元、protocol定義）も確認
+1. `.claude/session-state.md` を読む (現在のフォーカス・決定事項・ブロッカー)
+2. `.claude/rules/architecture.md` を読む（全ルールの基準）
+3. `.claude/rules/code-review.md` を読む（レビューチェックリスト・重大度基準）
+4. `git diff` で変更ファイルを特定する
+5. 新規ファイルは全体をレビュー。変更ファイルは差分 + 関連する依存先（呼び出し元、protocol定義）も確認
 
 ## 役割
 
@@ -77,6 +79,8 @@ architecture.md の全ルールに加えて、以下を特に注視:
 
 1. TaskList で自分に割り当てられたタスクを確認する
 2. 対象コードの差分を `git diff` で確認してレビューする
-3. レビュー結果を SendMessage でチームリードに報告する
+3. レビュー結果を SendMessage で team-lead に報告する
 4. TaskUpdate でタスクを completed にマークする
-5. 次のタスクがあれば TaskList で確認して取り組む
+5. レビューで実装漏れや後続タスクが発見されたら TaskCreate で登録する (team-lead に相談してから)
+6. 次のタスクがあれば TaskList で確認して取り組む
+7. idle になっても TeammateIdle hook が pending タスクを自動再投入する — 無意味に待機しない

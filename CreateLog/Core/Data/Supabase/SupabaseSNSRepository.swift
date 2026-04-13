@@ -50,6 +50,24 @@ final class SupabasePostRepository: PostRepositoryProtocol, Sendable {
         return result
     }
 
+    func fetchUserPosts(userId: UUID, cursor: Date?, limit: Int) async throws -> [PostDTO] {
+        let formatter = ISO8601DateFormatter()
+        var query = client
+            .from("posts")
+            .select()
+            .eq("user_id", value: userId.uuidString)
+            .eq("visibility", value: "public")
+        if let cursor {
+            query = query.lt("created_at", value: formatter.string(from: cursor))
+        }
+        let result: [PostDTO] = try await query
+            .order("created_at", ascending: false)
+            .limit(limit)
+            .execute()
+            .value
+        return result
+    }
+
     func insertPost(_ post: PostInsertDTO) async throws -> PostDTO {
         let result: PostDTO = try await client
             .from("posts")
@@ -124,6 +142,43 @@ final class SupabaseFollowRepository: FollowRepositoryProtocol, Sendable {
             .execute()
 
         return (followersResponse.count ?? 0, followingResponse.count ?? 0)
+    }
+
+    /// userId をフォローしているユーザー (= userId の follower) の profile 一覧。
+    /// `follows.following_id == userId` を埋め込み profile で返す。
+    func fetchFollowers(userId: UUID, limit: Int) async throws -> [ProfileDTO] {
+        struct FollowerRow: Decodable {
+            let follower: ProfileDTO
+            enum CodingKeys: String, CodingKey {
+                case follower
+            }
+        }
+        let rows: [FollowerRow] = try await client
+            .from("follows")
+            .select("follower:profiles!follows_follower_id_fkey(*)")
+            .eq("following_id", value: userId.uuidString)
+            .limit(limit)
+            .execute()
+            .value
+        return rows.map(\.follower)
+    }
+
+    /// userId がフォローしているユーザーの profile 一覧。
+    func fetchFollowing(userId: UUID, limit: Int) async throws -> [ProfileDTO] {
+        struct FollowingRow: Decodable {
+            let following: ProfileDTO
+            enum CodingKeys: String, CodingKey {
+                case following
+            }
+        }
+        let rows: [FollowingRow] = try await client
+            .from("follows")
+            .select("following:profiles!follows_following_id_fkey(*)")
+            .eq("follower_id", value: userId.uuidString)
+            .limit(limit)
+            .execute()
+            .value
+        return rows.map(\.following)
     }
 }
 

@@ -17,6 +17,11 @@ final class MockAuthService: AuthServiceProtocol, @unchecked Sendable {
         get async { stubbedState }
     }
 
+    var stubbedUserInfo: CurrentUserInfo?
+    var currentUserInfo: CurrentUserInfo? {
+        get async { stubbedUserInfo }
+    }
+
     func signInWithApple(idToken: String, nonce: String) async throws -> String {
         if let error = stubbedError { throw error }
         stubbedState = .authenticated(userId: stubbedUserId)
@@ -51,6 +56,14 @@ final class MockAuthService: AuthServiceProtocol, @unchecked Sendable {
         if let error = stubbedError { throw error }
         stubbedState = .authenticated(userId: stubbedUserId)
         return stubbedUserId
+    }
+
+    var sendPasswordResetEmailCalled = false
+    var sendPasswordResetEmailTarget: String?
+    func sendPasswordResetEmail(to email: String) async throws {
+        if let error = stubbedError { throw error }
+        sendPasswordResetEmailCalled = true
+        sendPasswordResetEmailTarget = email
     }
 
     func signOut() async throws {

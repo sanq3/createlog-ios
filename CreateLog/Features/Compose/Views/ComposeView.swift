@@ -29,14 +29,11 @@ enum ComposeContentType: String {
 
 struct ComposeView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dependencies) private var dependencies
     @State private var viewModel = ComposeViewModel()
     @State private var selectedPhotos: [PhotosPickerItem] = []
-
-    #if DEBUG
-    private let user: User = MockData.currentUser
-    #else
-    private let user: User = User(name: "", handle: "")
-    #endif
+    /// ログイン中ユーザーのプロフィール (アバター表示用)。.task で取得。
+    @State private var user: User = User(name: "", handle: "")
 
     var body: some View {
         NavigationStack {
@@ -46,7 +43,8 @@ struct ComposeView: View {
                         AvatarView(
                             initials: user.initials,
                             size: 40,
-                            status: .offline
+                            status: .offline,
+                            imageURL: user.avatarUrl.flatMap(URL.init(string:))
                         )
 
                         AutoFocusTextView(text: $viewModel.text)
@@ -74,6 +72,12 @@ struct ComposeView: View {
             }
             .background(Color.clBackground)
             .navigationBarTitleDisplayMode(.inline)
+            .task {
+                // 現在ユーザーのプロフィール取得 (アバター表示用)
+                if let dto = try? await dependencies.profileRepository.fetchMyProfile() {
+                    user = User(from: dto)
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {

@@ -2,6 +2,8 @@ import Foundation
 
 struct Post: Identifiable, Sendable {
     let id: UUID
+    /// 投稿者の user_id (profiles.id)。ブロック操作などで使う。MockData 経由では nil。
+    let userId: UUID?
     let name: String
     let handle: String
     let status: OnlineStatus
@@ -16,9 +18,12 @@ struct Post: Identifiable, Sendable {
     var isLiked: Bool = false
     var isBookmarked: Bool = false
     let media: PostMedia?
+    /// 投稿者のアバター画像 URL。PostDTO.authorAvatarUrl 経由で渡される。
+    let authorAvatarUrl: String?
 
     init(
         id: UUID = UUID(),
+        userId: UUID? = nil,
         name: String,
         handle: String,
         status: OnlineStatus,
@@ -30,9 +35,11 @@ struct Post: Identifiable, Sendable {
         comments: Int = 0,
         isLiked: Bool = false,
         isBookmarked: Bool = false,
-        media: PostMedia? = nil
+        media: PostMedia? = nil,
+        authorAvatarUrl: String? = nil
     ) {
         self.id = id
+        self.userId = userId
         self.name = name
         self.handle = handle
         self.status = status
@@ -45,6 +52,7 @@ struct Post: Identifiable, Sendable {
         self.isLiked = isLiked
         self.isBookmarked = isBookmarked
         self.media = media
+        self.authorAvatarUrl = authorAvatarUrl
     }
 
     // MARK: - UI Derived Properties

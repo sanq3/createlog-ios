@@ -8,6 +8,8 @@ protocol PostRepositoryProtocol: Sendable {
     func fetchFeed(cursor: Date?, limit: Int) async throws -> [PostDTO]
     /// フォロー中ユーザーの投稿取得
     func fetchFollowingFeed(cursor: Date?, limit: Int) async throws -> [PostDTO]
+    /// 特定ユーザーの投稿一覧 (プロフィール画面用)
+    func fetchUserPosts(userId: UUID, cursor: Date?, limit: Int) async throws -> [PostDTO]
     /// 投稿作成
     func insertPost(_ post: PostInsertDTO) async throws -> PostDTO
     /// 投稿削除
@@ -26,6 +28,10 @@ protocol FollowRepositoryProtocol: Sendable {
     func isFollowing(userId: UUID) async throws -> Bool
     /// フォロワー数/フォロー中数
     func fetchCounts(userId: UUID) async throws -> (followers: Int, following: Int)
+    /// 指定ユーザーをフォローしているユーザー一覧 (フォロワー)
+    func fetchFollowers(userId: UUID, limit: Int) async throws -> [ProfileDTO]
+    /// 指定ユーザーがフォローしているユーザー一覧
+    func fetchFollowing(userId: UUID, limit: Int) async throws -> [ProfileDTO]
 }
 
 // MARK: - Like Repository
@@ -63,6 +69,7 @@ struct CommentDTO: Codable, Sendable, Identifiable {
 
     var authorDisplayName: String?
     var authorHandle: String?
+    var authorAvatarUrl: String?
 
     enum CodingKeys: String, CodingKey {
         case id, content
@@ -72,6 +79,7 @@ struct CommentDTO: Codable, Sendable, Identifiable {
         case createdAt = "created_at"
         case authorDisplayName = "author_display_name"
         case authorHandle = "author_handle"
+        case authorAvatarUrl = "author_avatar_url"
     }
 
     init(from decoder: Decoder) throws {
@@ -84,5 +92,6 @@ struct CommentDTO: Codable, Sendable, Identifiable {
         createdAt = try container.decode(Date.self, forKey: .createdAt)
         authorDisplayName = try container.decodeIfPresent(String.self, forKey: .authorDisplayName)
         authorHandle = try container.decodeIfPresent(String.self, forKey: .authorHandle)
+        authorAvatarUrl = try container.decodeIfPresent(String.self, forKey: .authorAvatarUrl)
     }
 }

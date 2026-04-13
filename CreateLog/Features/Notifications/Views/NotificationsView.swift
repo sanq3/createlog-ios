@@ -8,14 +8,7 @@ struct NotificationsView: View {
     private let filterLabels = ["すべて", "いいね", "フォロー", "メンション", "システム"]
 
     private var allNotifications: [NotificationItem] {
-        if let vmItems = viewModel?.notifications, !vmItems.isEmpty {
-            return vmItems
-        }
-        #if DEBUG
-        return MockData.notifications
-        #else
-        return []
-        #endif
+        viewModel?.notifications ?? []
     }
 
     private var filteredNotifications: [NotificationItem] {
@@ -63,6 +56,9 @@ struct NotificationsView: View {
         .scrollIndicators(.hidden)
         .background(Color.clBackground)
         .navigationTitle("通知")
+        .refreshable {
+            await viewModel?.loadNotifications()
+        }
         .task {
             if viewModel == nil {
                 viewModel = NotificationViewModel(repository: deps.notificationRepository)
@@ -105,42 +101,47 @@ struct NotificationsView: View {
     // MARK: - Notification Row
 
     private func notificationRow(_ notif: NotificationItem) -> some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .top, spacing: 12) {
-                notificationIcon(notif)
+        Button {
+            Task { await viewModel?.markAsRead(notif) }
+        } label: {
+            VStack(spacing: 0) {
+                HStack(alignment: .top, spacing: 12) {
+                    notificationIcon(notif)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    actorAndMessage(notif)
+                    VStack(alignment: .leading, spacing: 4) {
+                        actorAndMessage(notif)
 
-                    if let preview = notif.contentPreview {
-                        Text(preview)
+                        if let preview = notif.contentPreview {
+                            Text(preview)
+                                .font(.clCaption)
+                                .foregroundStyle(Color.clTextTertiary)
+                                .lineLimit(1)
+                        }
+
+                        Text(notif.relativeTimeText)
                             .font(.clCaption)
                             .foregroundStyle(Color.clTextTertiary)
-                            .lineLimit(1)
                     }
 
-                    Text(notif.relativeTimeText)
-                        .font(.clCaption)
-                        .foregroundStyle(Color.clTextTertiary)
-                }
+                    Spacer(minLength: 0)
 
-                Spacer(minLength: 0)
-
-                if !notif.isRead {
-                    Circle()
-                        .fill(Color.clAccent)
-                        .frame(width: 8, height: 8)
-                        .padding(.top, 6)
+                    if !notif.isRead {
+                        Circle()
+                            .fill(Color.clAccent)
+                            .frame(width: 8, height: 8)
+                            .padding(.top, 6)
+                    }
                 }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(notif.isRead ? Color.clear : Color.clAccent.opacity(0.05))
+
+                Divider()
+                    .overlay(Color.clBorder)
+                    .padding(.leading, 76)
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
-            .background(notif.isRead ? Color.clear : Color.clAccent.opacity(0.05))
-
-            Divider()
-                .overlay(Color.clBorder)
-                .padding(.leading, 76)
         }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Avatar + Badge

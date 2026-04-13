@@ -1,14 +1,13 @@
 import SwiftUI
 
-/// Step 09: ハンドル選択。auth 成功後に `@username` を確定する。
+/// Step 11 (2026-04-14): ハンドル選択 (必須、スキップ不可)。
 /// - 3-15 文字、先頭英字、英数字 + `_` のみ
 /// - 500ms debounce で一意性チェック
 /// - 確定 → profiles.handle を update → onComplete
-/// - あとで設定 → onSkip (handle 未設定のまま、profile 編集画面で後から設定可能)
+/// - 下部 ProfilePreviewCard で入力に連動して "@handle" が即時更新される
 struct OnboardingHandleStep: View {
     @Bindable var viewModel: OnboardingViewModel
     let onComplete: () -> Void
-    let onSkip: () -> Void
 
     @State private var appeared = false
     @State private var cardVisible = false
@@ -94,6 +93,19 @@ struct OnboardingHandleStep: View {
 
                 Spacer()
 
+                // Profile preview (2026-04-14, 入力中の @handle が反映される)
+                OnboardingProfilePreviewCard(
+                    displayName: viewModel.displayName,
+                    handle: viewModel.handleInput,
+                    avatarData: viewModel.avatarImageData,
+                    bio: viewModel.bio,
+                    roleTags: Array(viewModel.roleTags).sorted()
+                )
+                .padding(.horizontal, 24)
+                .opacity(ctaVisible ? 1 : 0)
+
+                Spacer().frame(height: 20)
+
                 // Confirm error
                 if let error = viewModel.handleConfirmError {
                     Text(error)
@@ -136,17 +148,6 @@ struct OnboardingHandleStep: View {
                     .buttonStyle(.plain)
                     .disabled(!viewModel.canConfirmHandle)
                     .padding(.horizontal, 32)
-
-                    // Skip
-                    Button {
-                        HapticManager.light()
-                        onSkip()
-                    } label: {
-                        Text("あとで設定する")
-                            .font(.system(size: 15, weight: .medium))
-                            .foregroundStyle(Color.clTextPrimary.opacity(0.4))
-                    }
-                    .padding(.top, 4)
                 }
                 .opacity(ctaVisible ? 1 : 0)
                 .offset(y: ctaVisible ? 0 : 20)

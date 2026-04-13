@@ -1,23 +1,21 @@
 import SwiftUI
 
 struct UserProfileView: View {
+    @Environment(\.dependencies) private var dependencies
+    @Environment(\.dismiss) private var dismiss
     @State private var user: User
     @State private var showUnfollowConfirmation = false
+    @State private var showReportSheet = false
+    @State private var showBlockConfirmation = false
+    @State private var isBlocked = false
+    @State private var blockErrorMessage: String?
+    @State private var remotePosts: [Post] = []
+    @State private var remoteProjects: [Project] = []
+    @State private var weeklyHours: [(day: String, hours: Double)] = []
+
     init(user: User) {
         _user = State(initialValue: user)
     }
-
-    /// 空状態フォールバック (実データ取得前)
-    static let demoWeeklyHours: [(day: String, hours: Double)] = [
-        ("月", 0), ("火", 0), ("水", 0), ("木", 0), ("金", 0), ("土", 0), ("日", 0)
-    ]
-    #if DEBUG
-    static let demoProjects: [Project] = Array(MockData.projects.prefix(2))
-    static let demoPosts: [Post] = Array(MockData.posts.prefix(3))
-    #else
-    static let demoProjects: [Project] = []
-    static let demoPosts: [Post] = []
-    #endif
 
     var body: some View {
         ScrollView {
@@ -26,7 +24,7 @@ struct UserProfileView: View {
                 actionButtons
 
                 // 週間チャート
-                WeeklyChart(data: Self.demoWeeklyHours)
+                WeeklyChart(data: weeklyHours)
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
 
@@ -47,14 +45,22 @@ struct UserProfileView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
                     Button(role: .destructive) {
-                        // TODO: 通報機能
+                        showReportSheet = true
                     } label: {
                         Label("報告する", systemImage: "exclamationmark.triangle")
                     }
-                    Button(role: .destructive) {
-                        // TODO: ブロック機能
-                    } label: {
-                        Label("ブロックする", systemImage: "slash.circle")
+                    if isBlocked {
+                        Button {
+                            Task { await unblock() }
+                        } label: {
+                            Label("ブロックを解除", systemImage: "slash.circle")
+                        }
+                    } else {
+                        Button(role: .destructive) {
+                            showBlockConfirmation = true
+                        } label: {
+                            Label("ブロックする", systemImage: "slash.circle")
+                        }
                     }
                 } label: {
                     Image(systemName: "ellipsis")
@@ -70,12 +76,121 @@ struct UserProfileView: View {
             titleVisibility: .visible
         ) {
             Button("フォロー解除", role: .destructive) {
-                withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                    user.isFollowing = false
-                }
-                HapticManager.light()
+                toggleFollow()
             }
             Button("キャンセル", role: .cancel) {}
+        }
+        .sheet(isPresented: $showBlockConfirmation) {
+            BlockConfirmSheet(userName: user.name, userHandle: user.handle) {
+                Task { await block() }
+            }
+        }
+        .sheet(isPresented: $showReportSheet) {
+            ReportSheet(targetName: user.name) { reason, detail in
+                Task { await submitReport(reason: reason, detail: detail) }
+            }
+        }
+        .alert("エラー", isPresented: Binding(
+            get: { blockErrorMessage != nil },
+            set: { if !$0 { blockErrorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(blockErrorMessage ?? "")
+        }
+        .task {
+            // 初回表示時に: ブロック状態 + 投稿 + マイプロダクト + 週間統計 + フォロー状態を並列取得
+            async let blockedCheck = (try? await dependencies.ugcRepository.isBlocked(userId: user.id)) ?? false
+            async let postsDTO = (try? await dependencies.postRepository.fetchUserPosts(userId: user.id, cursor: nil, limit: 20)) ?? []
+            async let appsDTO = (try? await dependencies.appRepository.fetchApps(userId: user.id)) ?? []
+            async let weeklyStats = try? await dependencies.statsRepository.fetchWeeklyStats(containing: Date())
+            async let followingState = (try? await dependencies.followRepository.isFollowing(userId: user.id)) ?? false
+            let (blocked, posts, apps, weekly, following) = await (blockedCheck, postsDTO, appsDTO, weeklyStats, followingState)
+            isBlocked = blocked
+            remotePosts = posts.map { Post(from: $0) }
+            remoteProjects = apps.map { Project(from: $0) }
+            weeklyHours = Self.buildWeeklyHours(from: weekly)
+            user.isFollowing = following
+        }
+    }
+
+    /// WeeklyStats を WeeklyChart 用に曜日ラベル付き配列に変換。
+    /// ProfileViewModel.buildWeeklyHours と同ロジック。
+    private static func buildWeeklyHours(from weekly: WeeklyStats?) -> [(day: String, hours: Double)] {
+        let labels = ["月", "火", "水", "木", "金", "土", "日"]
+        guard let weekly else {
+            return labels.map { ($0, 0) }
+        }
+        let sorted = weekly.dailyTotals.sorted { $0.date < $1.date }
+        return sorted.enumerated().map { idx, stats in
+            let label = idx < labels.count ? labels[idx] : ""
+            return (label, Double(stats.totalMinutes) / 60.0)
+        }
+    }
+
+    // MARK: - Follow
+
+    /// optimistic UI でフォロー/解除し、失敗時は rollback。
+    /// FollowListView.toggleFollow と同じ pattern。
+    private func toggleFollow() {
+        let wasFollowing = user.isFollowing
+        withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+            user.isFollowing.toggle()
+        }
+        HapticManager.light()
+
+        Task {
+            do {
+                if wasFollowing {
+                    try await dependencies.followRepository.unfollow(userId: user.id)
+                } else {
+                    try await dependencies.followRepository.follow(userId: user.id)
+                }
+            } catch {
+                await MainActor.run {
+                    withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                        user.isFollowing = wasFollowing
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Block / Unblock / Report
+
+    private func block() async {
+        do {
+            try await dependencies.ugcRepository.blockUser(userId: user.id)
+            isBlocked = true
+            HapticManager.success()
+            // ブロック後は画面を閉じる (フィードからこのユーザーを見えなくする前提)
+            dismiss()
+        } catch {
+            blockErrorMessage = "ブロックに失敗しました。しばらくしてから再試行してください。"
+        }
+    }
+
+    private func unblock() async {
+        do {
+            try await dependencies.ugcRepository.unblockUser(userId: user.id)
+            isBlocked = false
+            HapticManager.success()
+        } catch {
+            blockErrorMessage = "ブロック解除に失敗しました。"
+        }
+    }
+
+    private func submitReport(reason: ReportReason, detail: String) async {
+        do {
+            try await dependencies.ugcRepository.reportContent(
+                targetId: user.id,
+                targetType: "user",
+                reason: reason.rawValue,
+                detail: detail.isEmpty ? nil : detail
+            )
+        } catch {
+            // ReportSheet は submit 直後に success 画面を出す (UX 先行)。
+            // 失敗時のリトライ導線は将来検討。今はログのみで swallow。
         }
     }
 
@@ -84,12 +199,17 @@ struct UserProfileView: View {
     private var headerSection: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
-                AvatarView(initials: user.initials, size: 86, status: user.status)
+                AvatarView(
+                    initials: user.initials,
+                    size: 86,
+                    status: user.status,
+                    imageURL: user.avatarUrl.flatMap(URL.init(string:))
+                )
 
                 Spacer()
 
                 HStack(spacing: 0) {
-                    profileStat(value: "\(user.projectCount)", label: "投稿")
+                    profileStat(value: "\(remotePosts.count)", label: "投稿")
                     Spacer()
                     profileStat(value: "\(user.followerCount)", label: "フォロワー")
                     Spacer()
@@ -139,10 +259,7 @@ struct UserProfileView: View {
                 if user.isFollowing {
                     showUnfollowConfirmation = true
                 } else {
-                    withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                        user.isFollowing = true
-                    }
-                    HapticManager.light()
+                    toggleFollow()
                 }
             } label: {
                 Text(user.isFollowing ? "フォロー中" : "フォローする")
@@ -178,8 +295,15 @@ struct UserProfileView: View {
                 .foregroundStyle(Color.clTextSecondary)
                 .padding(.horizontal, 16)
 
-            ForEach(Self.demoProjects) { project in
-                serviceCard(project: project)
+            if remoteProjects.isEmpty {
+                Text("マイプロダクトはまだ登録されていません")
+                    .font(.clCaption)
+                    .foregroundStyle(Color.clTextTertiary)
+                    .padding(.horizontal, 16)
+            } else {
+                ForEach(remoteProjects) { project in
+                    serviceCard(project: project)
+                }
             }
         }
         .padding(.top, 20)
@@ -195,8 +319,15 @@ struct UserProfileView: View {
                 .padding(.horizontal, 16)
 
             LazyVStack(spacing: 12) {
-                ForEach(Self.demoPosts) { post in
-                    PostCardView(post: post)
+                if remotePosts.isEmpty {
+                    Text("まだ投稿がありません")
+                        .font(.clCaption)
+                        .foregroundStyle(Color.clTextTertiary)
+                        .padding(.horizontal, 16)
+                } else {
+                    ForEach(remotePosts) { post in
+                        PostCardView(post: post)
+                    }
                 }
             }
         }

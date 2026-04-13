@@ -18,6 +18,8 @@ struct User: Identifiable, Sendable {
     let experienceLevel: ExperienceLevel
     let skills: [String]
     let interests: [String]
+    /// Supabase Storage `avatars` bucket の public URL。nil なら initials gradient fallback。
+    let avatarUrl: String?
 
     init(
         id: UUID = UUID(),
@@ -36,7 +38,8 @@ struct User: Identifiable, Sendable {
         occupation: String = "",
         experienceLevel: ExperienceLevel = .lessThanOne,
         skills: [String] = [],
-        interests: [String] = []
+        interests: [String] = [],
+        avatarUrl: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -55,6 +58,7 @@ struct User: Identifiable, Sendable {
         self.experienceLevel = experienceLevel
         self.skills = skills
         self.interests = interests
+        self.avatarUrl = avatarUrl
     }
 
     // MARK: - UI Derived Properties

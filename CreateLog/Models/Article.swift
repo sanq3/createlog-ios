@@ -7,6 +7,7 @@ struct Article: Identifiable, Sendable {
     let authorName: String
     let authorHandle: String
     let authorInitials: String
+    let authorAvatarUrl: String?
     let coverColor: ColorRGB
     let publishedAt: Date
     let readingTime: Int
@@ -23,6 +24,7 @@ struct Article: Identifiable, Sendable {
         authorName: String,
         authorHandle: String,
         authorInitials: String,
+        authorAvatarUrl: String? = nil,
         coverColor: ColorRGB = ColorRGB(red: 0.15, green: 0.2, blue: 0.3),
         publishedAt: Date = Date(),
         readingTime: Int = 5,
@@ -38,6 +40,7 @@ struct Article: Identifiable, Sendable {
         self.authorName = authorName
         self.authorHandle = authorHandle
         self.authorInitials = authorInitials
+        self.authorAvatarUrl = authorAvatarUrl
         self.coverColor = coverColor
         self.publishedAt = publishedAt
         self.readingTime = readingTime

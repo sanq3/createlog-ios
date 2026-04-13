@@ -3,31 +3,52 @@ import Charts
 
 struct ReportDashboardView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dependencies) private var dependencies
     @State private var animateIn = false
     @State private var showShare = false
-    #if DEBUG
-    @State private var weeklyStackedData: [WeeklyStackedEntry] = MockData.weeklyStackedHours
-    @State private var weeklyHoursData: [(day: String, hours: Double)] = MockData.weeklyHours
-    #else
     @State private var weeklyStackedData: [WeeklyStackedEntry] = []
     @State private var weeklyHoursData: [(day: String, hours: Double)] = []
-    #endif
 
-    // Mock data
-    private let todayHours: Double = 4.25
-    private let weekHours: Double = 28.5
-    private let monthHours: Double = 58.3
+    /// 今日 / 今週 / 今月の合計時間 (時間単位)。statsRepository から取得。
+    @State private var todayHours: Double = 0
+    @State private var weekHours: Double = 0
+    @State private var monthHours: Double = 0
 
-    private let mockCategories: [(name: String, hours: Double)] = [
-        ("iOS開発", 24.5),
-        ("学習", 12.0),
-        ("バグ修正", 8.5),
-        ("Web開発", 7.8),
-        ("デザイン", 5.5),
-    ]
+    /// 今月のカテゴリ別集計。donut chart 用。
+    @State private var monthCategories: [(name: String, hours: Double)] = []
+
+    /// 週送りオフセット。0 = 今週、-1 = 先週、+1 = 来週。
+    @State private var weekOffset: Int = 0
 
     private var totalCategoryHours: Double {
-        mockCategories.reduce(0) { $0 + $1.hours }
+        monthCategories.reduce(0) { $0 + $1.hours }
+    }
+
+    /// 現在表示中の週の開始日 (月曜)
+    private var currentWeekStart: Date {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.firstWeekday = 2
+        guard let weekStart = calendar.dateInterval(of: .weekOfYear, for: Date())?.start else {
+            return Date()
+        }
+        return calendar.date(byAdding: .day, value: weekOffset * 7, to: weekStart) ?? weekStart
+    }
+
+    private var weekRangeText: String {
+        let calendar = Calendar.current
+        let start = currentWeekStart
+        guard let end = calendar.date(byAdding: .day, value: 6, to: start) else { return "" }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M/d"
+        return "\(formatter.string(from: start)) - \(formatter.string(from: end))"
+    }
+
+    private var weekAverageText: String {
+        let total = weeklyHoursData.reduce(0) { $0 + $1.hours }
+        let avgHours = total / 7
+        let hours = Int(avgHours)
+        let minutes = Int((avgHours - Double(hours)) * 60)
+        return "avg \(hours)h \(minutes)m"
     }
 
     private let donutRadius: CGFloat = 60
@@ -96,6 +117,91 @@ struct ReportDashboardView: View {
                 animateIn = true
             }
         }
+        .task {
+            await loadAllData()
+        }
+        .refreshable {
+            await loadAllData()
+        }
+        .onChange(of: weekOffset) { _, _ in
+            Task { await loadWeeklyData() }
+        }
+    }
+
+    /// 画面表示用の全データを並列取得する。
+    /// - KPI 3 値 (today/week/month)
+    /// - 月カテゴリ内訳 (donut)
+    /// - 週別カテゴリ (stacked bar + daily hours)
+    private func loadAllData() async {
+        async let today = loadDailyMinutes(for: Date())
+        async let month = loadMonthlyData(for: Date())
+        async let week = loadWeeklyDataAsync()
+
+        todayHours = await today
+        let (monthTotal, categories) = await month
+        monthHours = monthTotal
+        monthCategories = categories
+        let (weekTotal, hoursData, stacked) = await week
+        weekHours = weekTotal
+        weeklyHoursData = hoursData
+        weeklyStackedData = stacked
+    }
+
+    private func loadWeeklyData() async {
+        let (weekTotal, hoursData, stacked) = await loadWeeklyDataAsync()
+        weekHours = weekTotal
+        weeklyHoursData = hoursData
+        weeklyStackedData = stacked
+    }
+
+    private func loadDailyMinutes(for date: Date) async -> Double {
+        guard let daily = try? await dependencies.statsRepository.fetchDailyStats(for: date) else { return 0 }
+        return Double(daily.totalMinutes) / 60.0
+    }
+
+    /// 今月の合計時間 + カテゴリ別内訳を集計する
+    private func loadMonthlyData(for date: Date) async -> (total: Double, categories: [(name: String, hours: Double)]) {
+        let calendar = Calendar.current
+        let year = calendar.component(.year, from: date)
+        let month = calendar.component(.month, from: date)
+        guard let stats = try? await dependencies.statsRepository.fetchMonthlyStats(year: year, month: month) else {
+            return (0, [])
+        }
+        let totalMinutes = stats.reduce(0) { $0 + $1.totalMinutes }
+        var categoryMinutes: [String: Int] = [:]
+        for day in stats {
+            for breakdown in day.categoryBreakdown {
+                categoryMinutes[breakdown.name, default: 0] += breakdown.minutes
+            }
+        }
+        let sorted = categoryMinutes
+            .sorted { $0.value > $1.value }
+            .map { (name: $0.key, hours: Double($0.value) / 60.0) }
+        return (Double(totalMinutes) / 60.0, sorted)
+    }
+
+    /// 表示中の週 (weekOffset 適用) の合計 / 曜日別 / stacked を取得する
+    private func loadWeeklyDataAsync() async -> (total: Double, hours: [(day: String, hours: Double)], stacked: [WeeklyStackedEntry]) {
+        guard let weekly = try? await dependencies.statsRepository.fetchWeeklyStats(containing: currentWeekStart) else {
+            return (0, [], [])
+        }
+        let labels = ["月", "火", "水", "木", "金", "土", "日"]
+        let sorted = weekly.dailyTotals.sorted { $0.date < $1.date }
+
+        var hoursData: [(day: String, hours: Double)] = []
+        var stacked: [WeeklyStackedEntry] = []
+        for (idx, stats) in sorted.enumerated() {
+            let label = idx < labels.count ? labels[idx] : ""
+            hoursData.append((day: label, hours: Double(stats.totalMinutes) / 60.0))
+            for breakdown in stats.categoryBreakdown {
+                stacked.append(WeeklyStackedEntry(
+                    day: label,
+                    category: breakdown.name,
+                    hours: Double(breakdown.minutes) / 60.0
+                ))
+            }
+        }
+        return (Double(weekly.totalMinutes) / 60.0, hoursData, stacked)
     }
 
     // MARK: - KPI Row
@@ -150,7 +256,7 @@ struct ReportDashboardView: View {
                         .frame(width: donutRadius * 2, height: donutRadius * 2)
                         .position(center)
 
-                    ForEach(0..<min(3, mockCategories.count), id: \.self) { index in
+                    ForEach(0..<min(3, monthCategories.count), id: \.self) { index in
                         calloutView(index: index, center: center)
                     }
                     .opacity(animateIn ? 1 : 0)
@@ -159,7 +265,7 @@ struct ReportDashboardView: View {
             .frame(height: 220)
 
             HStack(spacing: 16) {
-                ForEach(Array(mockCategories.dropFirst(3).enumerated()), id: \.element.name) { _, cat in
+                ForEach(Array(monthCategories.dropFirst(3).enumerated()), id: \.element.name) { _, cat in
                     HStack(spacing: 5) {
                         Circle()
                             .fill(LogEntry.color(for: cat.name))
@@ -167,7 +273,7 @@ struct ReportDashboardView: View {
                         Text(cat.name)
                             .font(.system(size: 10, weight: .medium))
                             .foregroundStyle(Color.clTextSecondary)
-                        Text("\(Int(cat.hours / totalCategoryHours * 100))%")
+                        Text("\(percentageOfTotal(cat.hours))%")
                             .font(.system(size: 9, weight: .bold, design: .monospaced))
                             .foregroundStyle(Color.clTextTertiary)
                     }
@@ -183,7 +289,7 @@ struct ReportDashboardView: View {
             Circle()
                 .stroke(Color.clBorder, lineWidth: donutStroke)
 
-            ForEach(Array(mockCategories.enumerated()), id: \.offset) { index, cat in
+            ForEach(Array(monthCategories.enumerated()), id: \.offset) { index, cat in
                 Circle()
                     .trim(
                         from: animateIn ? segmentStart(at: index) : 0,
@@ -208,9 +314,9 @@ struct ReportDashboardView: View {
 
     @ViewBuilder
     private func calloutView(index: Int, center: CGPoint) -> some View {
-        let cat = mockCategories[index]
+        let cat = monthCategories[index]
         let color = LogEntry.color(for: cat.name)
-        let percentage = Int(cat.hours / totalCategoryHours * 100)
+        let percentage = percentageOfTotal(cat.hours)
 
         let midFrac = (segmentStart(at: index) + segmentEnd(at: index)) / 2
         let angle = midFrac * 2 * .pi - .pi / 2
@@ -267,12 +373,20 @@ struct ReportDashboardView: View {
 
     // MARK: - Segment Helpers
 
+    /// 0 除算を避けるためのパーセンテージ計算。total が 0 のときは 0% を返す。
+    private func percentageOfTotal(_ hours: Double) -> Int {
+        guard totalCategoryHours > 0 else { return 0 }
+        return Int(hours / totalCategoryHours * 100)
+    }
+
     private func segmentStart(at index: Int) -> Double {
-        mockCategories.prefix(index).reduce(0) { $0 + $1.hours } / totalCategoryHours
+        guard totalCategoryHours > 0 else { return 0 }
+        return monthCategories.prefix(index).reduce(0) { $0 + $1.hours } / totalCategoryHours
     }
 
     private func segmentEnd(at index: Int) -> Double {
-        let end = mockCategories.prefix(index + 1).reduce(0) { $0 + $1.hours } / totalCategoryHours
+        guard totalCategoryHours > 0 else { return 0 }
+        let end = monthCategories.prefix(index + 1).reduce(0) { $0 + $1.hours } / totalCategoryHours
         return max(end - 0.005, segmentStart(at: index))
     }
 
@@ -284,6 +398,7 @@ struct ReportDashboardView: View {
                 HStack(spacing: 10) {
                     Button {
                         HapticManager.selection()
+                        weekOffset -= 1
                     } label: {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 11, weight: .medium))
@@ -291,23 +406,25 @@ struct ReportDashboardView: View {
                     }
                     .buttonStyle(.plain)
 
-                    Text("3/20 - 3/26")
+                    Text(weekRangeText)
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(Color.clTextPrimary)
 
                     Button {
                         HapticManager.selection()
+                        if weekOffset < 0 { weekOffset += 1 }
                     } label: {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(Color.clTextTertiary)
+                            .foregroundStyle(weekOffset < 0 ? Color.clTextTertiary : Color.clTextTertiary.opacity(0.3))
                     }
                     .buttonStyle(.plain)
+                    .disabled(weekOffset >= 0)
                 }
 
                 Spacer()
 
-                Text("avg 4h 18m")
+                Text(weekAverageText)
                     .font(.system(size: 11, weight: .medium, design: .monospaced))
                     .foregroundStyle(Color.clTextTertiary)
             }

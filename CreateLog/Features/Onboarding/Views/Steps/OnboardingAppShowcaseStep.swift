@@ -89,18 +89,11 @@ struct OnboardingAppShowcaseStep: View {
 
                 Spacer()
 
-                Button {
-                    HapticManager.light()
-                    onAdvance()
-                } label: {
-                    Text("続ける")
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundStyle(Color.clBackground)
-                        .padding(.horizontal, 48)
-                        .padding(.vertical, 16)
-                        .background(Capsule().fill(Color.clTextPrimary))
-                }
-                .buttonStyle(.plain)
+                OnboardingPrimaryCTA(
+                    title: "続ける",
+                    disabledStyle: .dimmed,
+                    action: onAdvance
+                )
                 .opacity(phoneAppeared ? 1 : 0)
                 .offset(y: phoneAppeared ? 0 : 20)
                 .padding(.bottom, 36)

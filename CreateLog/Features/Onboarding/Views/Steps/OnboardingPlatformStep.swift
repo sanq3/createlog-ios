@@ -43,25 +43,14 @@ struct OnboardingPlatformStep: View {
 
                 Spacer()
 
-                Button {
-                    guard canAdvance else { return }
-                    HapticManager.light()
-                    onAdvance()
-                } label: {
-                    Text("続ける")
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundStyle(Color.clBackground)
-                        .padding(.horizontal, 48)
-                        .padding(.vertical, 16)
-                        .background(
-                            Capsule().fill(Color.clTextPrimary.opacity(canAdvance ? 1 : 0.3))
-                        )
-                }
-                .buttonStyle(.plain)
-                .allowsHitTesting(canAdvance)
+                OnboardingPrimaryCTA(
+                    title: "続ける",
+                    isEnabled: canAdvance,
+                    disabledStyle: .dimmed,
+                    action: onAdvance
+                )
                 .opacity(appeared ? 1 : 0)
                 .offset(y: appeared ? 0 : 20)
-                .animation(.spring(duration: 0.35), value: canAdvance)
                 .padding(.bottom, 48)
             }
         }

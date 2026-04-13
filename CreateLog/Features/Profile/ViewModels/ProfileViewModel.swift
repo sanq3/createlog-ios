@@ -7,6 +7,7 @@ final class ProfileViewModel {
     // MARK: - Dependencies
 
     @ObservationIgnored private let profileRepository: any ProfileRepositoryProtocol
+    @ObservationIgnored private let postRepository: any PostRepositoryProtocol
     @ObservationIgnored private let appRepository: any AppRepositoryProtocol
     @ObservationIgnored private let followRepository: any FollowRepositoryProtocol
     @ObservationIgnored private let statsRepository: any StatsRepositoryProtocol
@@ -14,11 +15,14 @@ final class ProfileViewModel {
     // MARK: - State
 
     var profile: ProfileDTO?
+    var posts: [PostDTO] = []
     var apps: [AppDTO] = []
     var followerCount = 0
     var followingCount = 0
     var isFollowing = false
     var totalMinutes = 0
+    /// 曜日 (月〜日) ラベル + 時間 (時間単位) ペア。ProfileView の週間チャート用。
+    var weeklyHours: [(day: String, hours: Double)] = []
     var isLoading = false
     var errorMessage: String?
 
@@ -30,12 +34,14 @@ final class ProfileViewModel {
 
     init(
         profileRepository: any ProfileRepositoryProtocol,
+        postRepository: any PostRepositoryProtocol,
         appRepository: any AppRepositoryProtocol,
         followRepository: any FollowRepositoryProtocol,
         statsRepository: any StatsRepositoryProtocol,
         userId: UUID? = nil
     ) {
         self.profileRepository = profileRepository
+        self.postRepository = postRepository
         self.appRepository = appRepository
         self.followRepository = followRepository
         self.statsRepository = statsRepository
@@ -50,25 +56,48 @@ final class ProfileViewModel {
         defer { isLoading = false }
 
         do {
-            if let userId = targetUserId {
-                profile = try await profileRepository.fetchProfile(userId: userId)
-                apps = try await appRepository.fetchApps(userId: userId)
-                let counts = try await followRepository.fetchCounts(userId: userId)
-                followerCount = counts.followers
-                followingCount = counts.following
-                isFollowing = try await followRepository.isFollowing(userId: userId)
+            let userId: UUID
+            if let targetId = targetUserId {
+                profile = try await profileRepository.fetchProfile(userId: targetId)
+                apps = try await appRepository.fetchApps(userId: targetId)
+                isFollowing = try await followRepository.isFollowing(userId: targetId)
+                userId = targetId
             } else {
                 profile = try await profileRepository.fetchMyProfile()
                 apps = try await appRepository.fetchMyApps()
-                if let myId = profile?.id {
-                    let counts = try await followRepository.fetchCounts(userId: myId)
-                    followerCount = counts.followers
-                    followingCount = counts.following
-                }
                 totalMinutes = try await statsRepository.fetchCumulativeMinutes()
+                guard let myId = profile?.id else {
+                    errorMessage = "プロフィールの読み込みに失敗しました"
+                    return
+                }
+                userId = myId
             }
+
+            // Follower counts + 投稿 + 週間チャートを並列で取得
+            async let counts = followRepository.fetchCounts(userId: userId)
+            async let userPosts = postRepository.fetchUserPosts(userId: userId, cursor: nil, limit: AppConfig.feedPageSize)
+            async let weekly = statsRepository.fetchWeeklyStats(containing: Date())
+
+            let (c, p, w) = try await (counts, userPosts, weekly)
+            followerCount = c.followers
+            followingCount = c.following
+            posts = p
+            weeklyHours = Self.buildWeeklyHours(from: w)
         } catch {
             errorMessage = "プロフィールの読み込みに失敗しました"
+        }
+    }
+
+    /// `WeeklyStats.dailyTotals` を曜日ラベル付き時間に変換。
+    /// locale 依存せず固定ラベル (月〜日) を返す。チャートの縦軸は時間単位。
+    private static func buildWeeklyHours(from weekly: WeeklyStats) -> [(day: String, hours: Double)] {
+        let labels = ["月", "火", "水", "木", "金", "土", "日"]
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.firstWeekday = 2  // Monday
+        let sorted = weekly.dailyTotals.sorted { $0.date < $1.date }
+        return sorted.enumerated().map { idx, stats in
+            let label = idx < labels.count ? labels[idx] : ""
+            return (label, Double(stats.totalMinutes) / 60.0)
         }
     }
 

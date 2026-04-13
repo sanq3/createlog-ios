@@ -7,6 +7,7 @@ tools:
   - Grep
   - Bash
   - TaskList
+  - TaskCreate
   - TaskUpdate
   - SendMessage
 model: opus
@@ -17,9 +18,10 @@ maxTurns: 15
 
 ## 最初にやること
 
-1. `.claude/rules/architecture.md` を読む（アーキテクチャ・コード規約・Design Direction・全禁止パターン）
-2. `docs/feature-roadmap.md` を読む（機能一覧・設計決定ログ）
-3. `git diff` / `git log` で現在の状態を把握する
+1. `.claude/session-state.md` を読む (現在のフォーカス・決定事項・ブロッカー)
+2. `.claude/rules/architecture.md` を読む（アーキテクチャ・コード規約・Design Direction・全禁止パターン）
+3. `docs/feature-roadmap.md` を読む（機能一覧・設計決定ログ）
+4. `git diff` / `git log` で現在の状態を把握する
 
 ## 役割
 
@@ -53,6 +55,8 @@ maxTurns: 15
 ## チーム連携
 
 1. TaskList で自分に割り当てられたタスクを確認する
-2. 計画を完成させたら SendMessage でチームリードに報告する
+2. 計画を完成させたら SendMessage で team-lead に報告する
 3. TaskUpdate でタスクを completed にマークする
 4. 次のタスクがあれば TaskList で確認して取り組む
+5. 計画中に追加タスクが必要と判明したら TaskCreate で登録する (team-lead に相談してから)
+6. idle になっても TeammateIdle hook が pending タスクを自動再投入する — 無意味に待機しない

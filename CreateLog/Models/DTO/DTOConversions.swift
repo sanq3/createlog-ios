@@ -6,6 +6,7 @@ extension Post {
     init(from dto: PostDTO) {
         self.init(
             id: dto.id,
+            userId: dto.userId,
             name: dto.authorDisplayName ?? "",
             handle: dto.authorHandle ?? "",
             status: .offline,
@@ -15,7 +16,8 @@ extension Post {
             likes: dto.likesCount,
             reposts: dto.repostsCount,
             comments: dto.commentsCount,
-            media: nil
+            media: nil,
+            authorAvatarUrl: dto.authorAvatarUrl
         )
     }
 }
@@ -69,7 +71,8 @@ extension User {
             followingCount: dto.followingCount,
             links: links,
             occupation: dto.occupation ?? "",
-            experienceLevel: ExperienceLevel(serverValue: dto.experienceYears)
+            experienceLevel: ExperienceLevel(serverValue: dto.experienceYears),
+            avatarUrl: dto.avatarUrl
         )
     }
 }
@@ -112,6 +115,7 @@ extension Project {
             name: dto.name,
             description: dto.description ?? "",
             iconInitials: String(dto.name.prefix(2)),
+            iconUrl: dto.iconUrl,
             platform: ProjectPlatform(serverValue: dto.platform),
             status: ProjectStatus(serverValue: dto.status),
             storeURL: dto.storeUrl,
@@ -137,6 +141,25 @@ extension ProjectPlatform {
 }
 
 extension ProjectStatus {
+    /// UI 表示用ラベル (onboarding / detail 画面用)。
+    /// rawValue は日本語だが `下書き` は UX 文脈に合わない場面があるため分離。
+    var displayName: String {
+        switch self {
+        case .draft: "開発中"
+        case .published: "公開中"
+        case .archived: "停止"
+        }
+    }
+
+    /// ドメイン → サーバー値の逆変換。SDProject.statusRaw の保存値としても使用。
+    var serverValue: String {
+        switch self {
+        case .draft: "draft"
+        case .published: "published"
+        case .archived: "archived"
+        }
+    }
+
     init(serverValue: String) {
         switch serverValue {
         case "draft": self = .draft

@@ -11,6 +11,41 @@ final class SupabaseAuthService: AuthServiceProtocol, Sendable {
         self.client = client
     }
 
+    /// `signInWithIdToken` / `signInWithOAuth` が Session を返しても、
+    /// まれに SDK storage 反映が読めないことがあるため最後に明示的に検証する。
+    /// 初回失敗時は返却された token から `setSession` を再実行して復旧を試みる。
+    private func ensureSessionEstablished(
+        from session: Session,
+        provider: String
+    ) async {
+        for attempt in 0..<4 {
+            do {
+                let verified = try await client.auth.session
+                print("[SupabaseAuthService] ✅ persisted session verified (provider=\(provider), attempt=\(attempt), user.id=\(verified.user.id.uuidString))")
+                return
+            } catch {
+                print("[SupabaseAuthService] ⚠️ persisted session verify failed (provider=\(provider), attempt=\(attempt + 1)): \(error)")
+                if attempt == 0 {
+                    do {
+                        let restored = try await client.auth.setSession(
+                            accessToken: session.accessToken,
+                            refreshToken: session.refreshToken
+                        )
+                        print("[SupabaseAuthService] 🔁 setSession recovery succeeded (provider=\(provider), user.id=\(restored.user.id.uuidString))")
+                    } catch {
+                        print("[SupabaseAuthService] 🚨 setSession recovery failed (provider=\(provider)): \(error)")
+                    }
+                }
+
+                if attempt < 3 {
+                    try? await Task.sleep(nanoseconds: 250_000_000)
+                }
+            }
+        }
+
+        print("[SupabaseAuthService] 🚨 persisted session unavailable after recovery attempts (provider=\(provider))")
+    }
+
     var currentState: AuthState {
         get async {
             do {
@@ -22,13 +57,40 @@ final class SupabaseAuthService: AuthServiceProtocol, Sendable {
         }
     }
 
+    var currentUserInfo: CurrentUserInfo? {
+        get async {
+            guard let session = try? await client.auth.session else { return nil }
+            let providers: [String] = session.user.identities?.map { $0.provider.lowercased() } ?? []
+            return CurrentUserInfo(
+                userId: session.user.id.uuidString,
+                email: session.user.email,
+                linkedProviders: Array(Set(providers)).sorted()
+            )
+        }
+    }
+
     func signInWithApple(idToken: String, nonce: String) async throws -> String {
+        print("[SupabaseAuthService] ▶️ signInWithApple called (idToken.len=\(idToken.count), nonce.len=\(nonce.count))")
         do {
             let session = try await client.auth.signInWithIdToken(
                 credentials: .init(provider: .apple, idToken: idToken, nonce: nonce)
             )
-            return session.user.id.uuidString
+            let userIdStr = session.user.id.uuidString
+            print("[SupabaseAuthService] ◀️ signInWithIdToken returned: accessToken.len=\(session.accessToken.count), refreshToken.len=\(session.refreshToken.count), user.id=\(userIdStr)(len=\(userIdStr.count)), user.email=\(session.user.email ?? "<nil>"), expiresAt=\(session.expiresAt)")
+
+            // 明示的に session を storage に書き込めているか即時検証
+            do {
+                let verify = try await client.auth.session
+                print("[SupabaseAuthService] ✅ post-signIn session verify: user.id=\(verify.user.id.uuidString) accessToken matches=\(verify.accessToken == session.accessToken)")
+            } catch {
+                print("[SupabaseAuthService] 🚨 post-signIn session verify FAILED: \(error)")
+            }
+
+            await ensureSessionEstablished(from: session, provider: "apple")
+
+            return userIdStr
         } catch {
+            print("[SupabaseAuthService] ❌ signInWithIdToken threw: \(type(of: error)) — \(error.localizedDescription) — \(String(describing: error))")
             throw mapError(error)
         }
     }
@@ -59,6 +121,7 @@ final class SupabaseAuthService: AuthServiceProtocol, Sendable {
             ) { webSession in
                 webSession.prefersEphemeralWebBrowserSession = true
             }
+            await ensureSessionEstablished(from: session, provider: "google")
             return session.user.id.uuidString
         } catch {
             throw mapError(error)
@@ -77,6 +140,7 @@ final class SupabaseAuthService: AuthServiceProtocol, Sendable {
             ) { webSession in
                 webSession.prefersEphemeralWebBrowserSession = true
             }
+            await ensureSessionEstablished(from: session, provider: "github")
             return session.user.id.uuidString
         } catch {
             throw mapError(error)
@@ -106,6 +170,14 @@ final class SupabaseAuthService: AuthServiceProtocol, Sendable {
         }
     }
 
+    func sendPasswordResetEmail(to email: String) async throws {
+        do {
+            try await client.auth.resetPasswordForEmail(email)
+        } catch {
+            throw mapError(error)
+        }
+    }
+
     func signOut() async throws {
         do {
             try await client.auth.signOut()
@@ -115,14 +187,20 @@ final class SupabaseAuthService: AuthServiceProtocol, Sendable {
     }
 
     func deleteAccount() async throws {
-        // アカウント削除はEdge Function経由で実行（service_roleが必要なため）
+        // アカウント削除はEdge Function経由で実行（service_roleが必要なため）。
+        // delete 成功後の signOut は `try?` で swallow する。
+        // Reference: https://github.com/supabase/auth/issues/1801 — delete 後の signOut は
+        // サーバー側で「User from sub claim in JWT does not exist」エラーを返す既知バグ。
+        // このエラーを throw すると UI には「削除失敗」と見えるが実際は削除成功しており UX が壊れる。
+        // Supabase Swift SDK は signOut 失敗時もローカル Keychain を確実にクリアするので
+        // session は確実に消える。delete 自体が失敗した場合は catch で throw する (session 維持でリトライ可能)。
         do {
             let session = try await client.auth.session
             try await client.functions.invoke(
                 "delete-account",
                 options: .init(body: ["user_id": session.user.id.uuidString])
             )
-            try await client.auth.signOut()
+            try? await client.auth.signOut()
         } catch {
             throw mapError(error)
         }

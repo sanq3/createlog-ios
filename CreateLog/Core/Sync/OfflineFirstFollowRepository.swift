@@ -69,6 +69,15 @@ final class OfflineFirstFollowRepository: FollowRepositoryProtocol, @unchecked S
         try await underlying.fetchCounts(userId: userId)
     }
 
+    func fetchFollowers(userId: UUID, limit: Int) async throws -> [ProfileDTO] {
+        // 他人のフォロワー情報は cache しない (混乱の元)。remote 直接。
+        try await underlying.fetchFollowers(userId: userId, limit: limit)
+    }
+
+    func fetchFollowing(userId: UUID, limit: Int) async throws -> [ProfileDTO] {
+        try await underlying.fetchFollowing(userId: userId, limit: limit)
+    }
+
     // MARK: - Local helpers
 
     private func insertOptimisticLocal(followerId: UUID?, followeeId: UUID) async {

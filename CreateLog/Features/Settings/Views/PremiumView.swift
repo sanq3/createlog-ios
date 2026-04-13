@@ -2,7 +2,17 @@ import SwiftUI
 
 struct PremiumView: View {
     @State private var selectedPlan: PremiumPlan = .monthly
+    @State private var storeKitManager = StoreKitManager()
+    @State private var showTermsSheet = false
     @Environment(\.dismiss) private var dismiss
+
+    /// App Store 連携前の mock 表示価格。loadProducts() 後は実価格 (localizedPrice) で上書きされる。
+    private var subscribeTitle: String {
+        if storeKitManager.isPremium {
+            return "プレミアム登録済み"
+        }
+        return "プレミアムに登録"
+    }
 
     var body: some View {
         ScrollView {
@@ -22,6 +32,17 @@ struct PremiumView: View {
                     .padding(.horizontal, 20)
                     .padding(.bottom, 12)
 
+                Button {
+                    Task { await storeKitManager.restorePurchases() }
+                    HapticManager.light()
+                } label: {
+                    Text("購入履歴を復元")
+                        .font(.clCaption)
+                        .foregroundStyle(Color.clTextTertiary)
+                }
+                .buttonStyle(.plain)
+                .padding(.bottom, 8)
+
                 Text("いつでもキャンセル可能 - Apple IDで管理")
                     .font(.clCaption)
                     .foregroundStyle(Color.clTextTertiary)
@@ -29,6 +50,7 @@ struct PremiumView: View {
 
                 Button {
                     HapticManager.light()
+                    showTermsSheet = true
                 } label: {
                     Text("利用規約とプライバシーポリシー")
                         .font(.clCaption)
@@ -36,12 +58,37 @@ struct PremiumView: View {
                 }
                 .buttonStyle(.plain)
                 .padding(.bottom, 40)
+
+                if let errorMessage = storeKitManager.errorMessage {
+                    Text(errorMessage)
+                        .font(.clCaption)
+                        .foregroundStyle(Color.clError)
+                        .padding(.bottom, 20)
+                }
             }
         }
         .scrollIndicators(.hidden)
         .background(Color.clBackground)
         .navigationTitle("プレミアム")
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await storeKitManager.loadProducts()
+        }
+        .sheet(isPresented: $showTermsSheet) {
+            NavigationStack {
+                List {
+                    Link("利用規約", destination: URL(string: "https://createlog.app/terms")!)
+                    Link("プライバシーポリシー", destination: URL(string: "https://createlog.app/privacy")!)
+                }
+                .navigationTitle("利用規約とプライバシー")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("閉じる") { showTermsSheet = false }
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Header
@@ -208,15 +255,31 @@ struct PremiumView: View {
     private var subscribeButton: some View {
         Button {
             HapticManager.medium()
+            Task {
+                // 選択されたプランに対応する product を取得 (現時点では monthly のみ存在)
+                guard let product = storeKitManager.products.first else {
+                    storeKitManager.errorMessage = "商品情報が読み込めません"
+                    return
+                }
+                await storeKitManager.purchase(product)
+            }
         } label: {
-            Text("プレミアムに登録")
-                .font(.system(size: 16, weight: .bold))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(Color.clAccent, in: .capsule)
+            HStack {
+                if storeKitManager.isLoading {
+                    ProgressView()
+                        .tint(.white)
+                } else {
+                    Text(subscribeTitle)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(.white)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(storeKitManager.isPremium ? Color.clTextTertiary : Color.clAccent, in: .capsule)
         }
         .buttonStyle(.bounce)
+        .disabled(storeKitManager.isPremium || storeKitManager.isLoading || storeKitManager.products.isEmpty)
     }
 }
 

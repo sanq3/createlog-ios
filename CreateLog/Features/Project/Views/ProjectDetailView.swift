@@ -3,12 +3,10 @@ import SwiftUI
 struct ProjectDetailView: View {
     let project: Project
 
+    /// レビュー機能は v2.1 (App Store 審査後) 実装。現状は空配列を返す。
+    /// UI 側は reviews.isEmpty チェックで「まだレビューなし」を表示している。
     private var reviews: [Review] {
-        #if DEBUG
-        return MockData.reviews
-        #else
-        return []
-        #endif
+        []
     }
 
     var body: some View {
@@ -93,7 +91,11 @@ struct ProjectDetailView: View {
                     .frame(height: 20)
 
                 HStack(spacing: 4) {
-                    AvatarView(initials: project.authorInitials, size: 22)
+                    AvatarView(
+                        initials: project.authorInitials,
+                        size: 22,
+                        imageURL: project.authorAvatarUrl.flatMap(URL.init(string:))
+                    )
                     Text(project.authorName)
                         .font(.caption)
                         .foregroundStyle(Color.clTextSecondary)
@@ -219,39 +221,49 @@ struct ProjectDetailView: View {
         }
     }
 
+    @ViewBuilder
     private func linkRow(icon: String, title: String, url: String, color: Color) -> some View {
-        Button {
-            HapticManager.light()
-        } label: {
-            HStack(spacing: 12) {
-                Image(systemName: icon)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(color)
-                    .frame(width: 32, height: 32)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(color.opacity(0.1))
-                    )
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundStyle(Color.clTextPrimary)
-                    Text(url)
-                        .font(.caption)
-                        .foregroundStyle(Color.clTextTertiary)
-                        .lineLimit(1)
+        let destination = URL(string: url)
+        Group {
+            if let destination {
+                Link(destination: destination) {
+                    linkRowContent(icon: icon, title: title, url: url, color: color)
                 }
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundStyle(Color.clTextTertiary)
+            } else {
+                linkRowContent(icon: icon, title: title, url: url, color: color)
             }
         }
         .buttonStyle(.plain)
+    }
+
+    private func linkRowContent(icon: String, title: String, url: String, color: Color) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(color)
+                .frame(width: 32, height: 32)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(color.opacity(0.1))
+                )
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundStyle(Color.clTextPrimary)
+                Text(url)
+                    .font(.caption)
+                    .foregroundStyle(Color.clTextTertiary)
+                    .lineLimit(1)
+            }
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundStyle(Color.clTextTertiary)
+        }
     }
 
     // MARK: - Reviews
@@ -327,7 +339,11 @@ struct ProjectDetailView: View {
         detailCard {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 10) {
-                    AvatarView(initials: review.authorInitials, size: 32)
+                    AvatarView(
+                        initials: review.authorInitials,
+                        size: 32,
+                        imageURL: review.authorAvatarUrl.flatMap(URL.init(string:))
+                    )
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text(review.authorName)
@@ -464,7 +480,21 @@ struct ProjectDetailView: View {
 #if DEBUG
 #Preview {
     NavigationStack {
-        ProjectDetailView(project: MockData.projects[0])
+        ProjectDetailView(project: Project(
+            id: UUID(),
+            name: "CreateLog",
+            description: "エンジニア向け作業記録プラットフォーム",
+            iconInitials: "CL",
+            platform: .ios,
+            status: .published,
+            storeURL: nil,
+            githubURL: nil,
+            authorName: "",
+            authorHandle: "",
+            authorInitials: "",
+            averageRating: 0,
+            reviewCount: 0
+        ))
     }
     .preferredColorScheme(.dark)
 }

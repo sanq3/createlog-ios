@@ -13,13 +13,19 @@
 
 ```bash
 xcodegen generate
-xcodebuild -project CreateLog.xcodeproj -scheme CreateLog -destination 'generic/platform=iOS Simulator' build
+xcodebuild -project CreateLog.xcodeproj -scheme CreateLog \
+  -destination 'platform=iOS Simulator,id=8BBEFBCE-2E2E-469B-98E5-6C16EC90BB22' \
+  -derivedDataPath ./build build
 ```
 
 テスト:
 ```bash
-xcodebuild -project CreateLog.xcodeproj -scheme CreateLogTests -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test
+xcodebuild -project CreateLog.xcodeproj -scheme CreateLog \
+  -destination 'platform=iOS Simulator,id=8BBEFBCE-2E2E-469B-98E5-6C16EC90BB22' \
+  -derivedDataPath ./build test
 ```
+
+**注意:** `-derivedDataPath ./build` を必ず指定。省略すると default DerivedData が使われ hook のインストールパスと不一致になる。
 
 ## 構成
 
@@ -79,3 +85,7 @@ CreateLogTests/              # Swift Testing (XCTest互換)
 - UIや機能に関する質問・作業の前に docs/feature-roadmap.md を必ず読め。読まずに回答するな
 - プロダクトに関する決定が下されたら docs/feature-roadmap.md の設計決定ログに即追記しろ
 - コード・設計・機能に変更があったら、関連するドキュメント全てを即更新しろ。対象: このCLAUDE.md、docs/配下の全ファイル、.claude/rules/配下。古い情報を残すな
+- **設計で決めたことは即座にコードに反映しろ。** 「決まった」と「作った」は同時でなければならない。モックでもいいから設計を反映した状態にする。「後で実装」にするな
+- **新フィールドやUI追加前に、既存データフローを自分で Read して追え。** そのデータが既存のどの画面でどう表示されるかを確認してから実装しろ。Explore agent 任せにするな
+- **ヒアリング時は必ず AskUserQuestion ツールを使え。** プレーンテキストで `(a) / (b) / (c)` と並べるな。ボタンで選択できる UI を使え
+- **オンボーディングで入力させるデータは全て実アプリデータとして保存・反映しろ。** 見せかけだけの体験を作るな。仮UI・装飾的ステップ禁止

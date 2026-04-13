@@ -35,15 +35,6 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/confirm-before-edit.sh"
-          }
-        ]
-      },
-      {
         "matcher": "Bash",
         "hooks": [
           {
@@ -92,13 +83,12 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Edit|Write",
+        "matcher": "Edit|Write|MultiEdit",
         "hooks": [
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/auto-build.sh",
-            "timeout": 120,
-            "async": true
+            "timeout": 5
           }
         ]
       },
@@ -145,7 +135,41 @@
         ]
       }
     ],
+    "TeammateIdle": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/teammate-idle.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/task-completed.sh",
+            "timeout": 180,
+            "statusMessage": "ビルド検証中..."
+          }
+        ]
+      }
+    ],
     "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/stop-build.sh",
+            "timeout": 180,
+            "async": true,
+            "statusMessage": "ビルド + シミュレータ起動中..."
+          }
+        ]
+      },
       {
         "matcher": "*",
         "hooks": [

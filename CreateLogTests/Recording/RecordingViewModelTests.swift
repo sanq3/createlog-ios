@@ -94,11 +94,12 @@ struct RecordingViewModelTests {
 
     @Test("computeTodayTotal: 今日のエントリのみ合計")
     func todayTotal() {
-        let today1 = makeEntry(minutesAgo: 60, duration: 30, project: "A", category: "開発")
-        let today2 = makeEntry(minutesAgo: 120, duration: 45, project: "B", category: "学習")
-        let yesterday = makeEntry(daysAgo: 1, duration: 90, project: "C", category: "開発")
+        let now = Self.fixedNoon
+        let today1 = makeEntry(minutesAgo: 60, duration: 30, project: "A", category: "開発", now: now)
+        let today2 = makeEntry(minutesAgo: 120, duration: 45, project: "B", category: "学習", now: now)
+        let yesterday = makeEntry(daysAgo: 1, duration: 90, project: "C", category: "開発", now: now)
 
-        let total = RecordingViewModel.computeTodayTotal(from: [today1, today2, yesterday])
+        let total = RecordingViewModel.computeTodayTotal(from: [today1, today2, yesterday], now: now)
         #expect(total == 75) // 30 + 45
     }
 
@@ -111,13 +112,14 @@ struct RecordingViewModelTests {
 
     @Test("computeCategoryBreakdown: カテゴリ別集計")
     func categoryBreakdown() {
+        let now = Self.fixedNoon
         let entries = [
-            makeEntry(minutesAgo: 60, duration: 60, project: "A", category: "開発"),
-            makeEntry(minutesAgo: 180, duration: 30, project: "B", category: "開発"),
-            makeEntry(minutesAgo: 300, duration: 45, project: "C", category: "学習"),
+            makeEntry(minutesAgo: 60, duration: 60, project: "A", category: "開発", now: now),
+            makeEntry(minutesAgo: 180, duration: 30, project: "B", category: "開発", now: now),
+            makeEntry(minutesAgo: 300, duration: 45, project: "C", category: "学習", now: now),
         ]
 
-        let breakdown = RecordingViewModel.computeCategoryBreakdown(from: entries)
+        let breakdown = RecordingViewModel.computeCategoryBreakdown(from: entries, now: now)
 
         #expect(breakdown.count == 2)
         #expect(breakdown[0].name == "開発") // 90分が最大
@@ -134,8 +136,18 @@ struct RecordingViewModelTests {
 
     // MARK: - Helpers
 
-    private func makeEntry(minutesAgo: Int = 60, duration: Int, project: String, category: String) -> SDTimeEntry {
-        let end = Date()
+    /// 日付境界からの距離を十分に確保した固定時刻 (今日の 12:00)。
+    /// 時間依存テストが深夜帯の実行で偽陽性 crash を起こさないように使う。
+    private static let fixedNoon: Date = {
+        var comps = Calendar.current.dateComponents([.year, .month, .day], from: Date())
+        comps.hour = 12
+        comps.minute = 0
+        comps.second = 0
+        return Calendar.current.date(from: comps) ?? Date()
+    }()
+
+    private func makeEntry(minutesAgo: Int = 60, duration: Int, project: String, category: String, now: Date = Date()) -> SDTimeEntry {
+        let end = now
         let start = end.addingTimeInterval(-Double(minutesAgo * 60))
         return SDTimeEntry(
             startDate: start,
@@ -146,8 +158,8 @@ struct RecordingViewModelTests {
         )
     }
 
-    private func makeEntry(daysAgo: Int, duration: Int, project: String, category: String) -> SDTimeEntry {
-        let date = Calendar.current.date(byAdding: .day, value: -daysAgo, to: Date())!
+    private func makeEntry(daysAgo: Int, duration: Int, project: String, category: String, now: Date = Date()) -> SDTimeEntry {
+        let date = Calendar.current.date(byAdding: .day, value: -daysAgo, to: now)!
         return SDTimeEntry(
             startDate: date,
             endDate: date.addingTimeInterval(Double(duration * 60)),

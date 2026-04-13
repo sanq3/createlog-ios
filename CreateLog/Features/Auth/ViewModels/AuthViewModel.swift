@@ -23,6 +23,7 @@ final class AuthViewModel {
 
     init(authService: any AuthServiceProtocol) {
         self.authService = authService
+        print("[AuthViewModel] 🔧 init: authService type = \(type(of: authService))")
     }
 
     // MARK: - Auth State Observation
@@ -45,7 +46,10 @@ final class AuthViewModel {
         return request
     }
 
-    func handleAppleSignIn(result: Result<ASAuthorization, Error>) async {
+    /// Apple Sign In を実行。session 確立まで確認できた時だけ true を返す。
+    /// 呼出側はこの戻り値で遷移判定する (`authState` の AsyncStream 反映を待たない)。
+    @discardableResult
+    func handleAppleSignIn(result: Result<ASAuthorization, Error>) async -> Bool {
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
@@ -57,19 +61,48 @@ final class AuthViewModel {
                   let idToken = String(data: tokenData, encoding: .utf8),
                   let nonce = currentNonce else {
                 errorMessage = "Apple認証情報の取得に失敗しました"
-                return
+                return false
             }
             do {
-                _ = try await authService.signInWithApple(idToken: idToken, nonce: nonce)
+                let userId = try await authService.signInWithApple(idToken: idToken, nonce: nonce)
+                authState = .authenticated(userId: userId)
+                print("[AuthViewModel] ✅ Apple sign in success: userId=\(userId)")
+                guard await verifySessionEstablished(provider: "apple") else {
+                    try? await authService.signOut()
+                    authState = .unauthenticated
+                    errorMessage = "ログインセッションの確立に失敗しました。もう一度お試しください"
+                    return false
+                }
+                return true
             } catch {
+                print("[AuthViewModel] ❌ Apple sign in failed: \(error)")
                 errorMessage = mapErrorMessage(error)
+                return false
             }
         case .failure(let error):
             if (error as NSError).code == ASAuthorizationError.canceled.rawValue {
-                return
+                return false
             }
+            print("[AuthViewModel] ❌ Apple authorization failed: \(error)")
             errorMessage = "Apple認証に失敗しました"
+            return false
         }
+    }
+
+    /// サインイン成功後に実 session が SDK storage に書き込まれたか確認する。
+    /// 書込み完了前に displayName step に進むと `Auth session missing` になるため、
+    /// ここで最大 3 秒待って session 確立できなければ失敗扱いにする。
+    private func verifySessionEstablished(provider: String) async -> Bool {
+        for attempt in 0..<12 {
+            let state = await authService.currentState
+            if case .authenticated = state {
+                print("[AuthViewModel] ✅ Session verified after \(attempt) retries (provider=\(provider))")
+                return true
+            }
+            try? await Task.sleep(nanoseconds: 250_000_000)
+        }
+        print("[AuthViewModel] ⚠️ Session NOT established after 3s (provider=\(provider)). 次 step で Auth session missing の可能性あり")
+        return false
     }
 
     // MARK: - Sign in with Google (OAuth web flow)
@@ -77,16 +110,28 @@ final class AuthViewModel {
     /// T5 (2026-04-12): Google OAuth web flow ハンドラ。
     /// SDK 内部で ASWebAuthenticationSession 起動 → callback → session 確立。
     /// user cancel は silent return (errorMessage を触らない、X/Instagram UX 踏襲)。
-    func handleGoogleSignIn() async {
+    @discardableResult
+    func handleGoogleSignIn() async -> Bool {
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
 
         do {
-            _ = try await authService.signInWithGoogleOAuth()
+            let userId = try await authService.signInWithGoogleOAuth()
+            authState = .authenticated(userId: userId)
+            print("[AuthViewModel] ✅ Google sign in success: userId=\(userId)")
+            guard await verifySessionEstablished(provider: "google") else {
+                try? await authService.signOut()
+                authState = .unauthenticated
+                errorMessage = "ログインセッションの確立に失敗しました。もう一度お試しください"
+                return false
+            }
+            return true
         } catch {
-            if Self.isUserCancel(error) { return }
+            if Self.isUserCancel(error) { return false }
+            print("[AuthViewModel] ❌ Google sign in failed: \(error)")
             errorMessage = mapErrorMessage(error)
+            return false
         }
     }
 
@@ -94,16 +139,28 @@ final class AuthViewModel {
 
     /// T5 (2026-04-12): GitHub OAuth web flow ハンドラ。
     /// scopes: user:email + read:user。user cancel は silent return。
-    func handleGitHubSignIn() async {
+    @discardableResult
+    func handleGitHubSignIn() async -> Bool {
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
 
         do {
-            _ = try await authService.signInWithGitHub()
+            let userId = try await authService.signInWithGitHub()
+            authState = .authenticated(userId: userId)
+            print("[AuthViewModel] ✅ GitHub sign in success: userId=\(userId)")
+            guard await verifySessionEstablished(provider: "github") else {
+                try? await authService.signOut()
+                authState = .unauthenticated
+                errorMessage = "ログインセッションの確立に失敗しました。もう一度お試しください"
+                return false
+            }
+            return true
         } catch {
-            if Self.isUserCancel(error) { return }
+            if Self.isUserCancel(error) { return false }
+            print("[AuthViewModel] ❌ GitHub sign in failed: \(error)")
             errorMessage = mapErrorMessage(error)
+            return false
         }
     }
 
@@ -144,6 +201,30 @@ final class AuthViewModel {
         } catch {
             errorMessage = mapErrorMessage(error)
         }
+    }
+
+    // MARK: - Delete Account
+
+    /// Edge Function 経由で auth.user + profile を cascade 削除し、最後に signOut する。
+    /// 失敗時は errorMessage を立てて state は変えない (リトライ可能)。
+    func deleteAccount() async {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+
+        do {
+            try await authService.deleteAccount()
+        } catch {
+            errorMessage = mapErrorMessage(error)
+        }
+    }
+
+    // MARK: - Current user info
+
+    /// AccountSettingsView 用の email + 連携プロバイダ取得。
+    /// observeAuthState() が走ってなくても単発で取れる。
+    func loadCurrentUserInfo() async -> CurrentUserInfo? {
+        await authService.currentUserInfo
     }
 
     // MARK: - Validation

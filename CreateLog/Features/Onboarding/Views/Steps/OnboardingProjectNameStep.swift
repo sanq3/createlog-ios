@@ -58,28 +58,12 @@ struct OnboardingProjectNameStep: View {
                 Spacer()
 
                 // 続けるボタン (入力があれば spring-up)
-                HStack {
-                    Spacer()
-                    Button {
-                        advance()
-                    } label: {
-                        Text("続ける")
-                            .font(.system(size: 17, weight: .bold))
-                            .foregroundStyle(Color.clBackground)
-                            .padding(.horizontal, 28)
-                            .padding(.vertical, 16)
-                            .background(
-                                Capsule()
-                                    .fill(Color.clTextPrimary)
-                            )
-                    }
-                    .buttonStyle(.plain)
-                    .opacity(canAdvance ? 1 : 0)
-                    .offset(y: canAdvance ? 0 : 24)
-                    .blur(radius: canAdvance ? 0 : 4)
-                    .animation(.spring(duration: 0.5, bounce: 0.25), value: canAdvance)
-                    Spacer()
-                }
+                OnboardingPrimaryCTA(
+                    title: "続ける",
+                    isEnabled: canAdvance,
+                    disabledStyle: .hidden,
+                    action: { advance() }
+                )
                 .padding(.bottom, 48)
             }
         }

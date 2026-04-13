@@ -23,6 +23,29 @@ View → ViewModel(@Observable) → Repository/Service → Supabase
 - 重複ロジックは共通Modifier/Extension/関数に抽出する
 - 新Featureは `Features/{Name}/Views/` に作る。ViewModelが必要になったら `ViewModels/` を追加
 
+### 同役割 UI の直書きコピペ禁止 — 3 箇所目で必ず共通化しろ
+
+同じ役割の UI (CTA ボタン / 入力フィールド / カード / 空状態 / 一覧 row など) を View に**直書きでコピペ**するな。**3 箇所目が出た瞬間に共通コンポーネントに抽出**しろ。直書きを許すと以下が必ず起きる:
+
+1. 色・フォント・余白の仕様ズレが発生する (例: 5 箇所は `clTextPrimary` なのに 1 箇所だけ `clAccent`)
+2. ダーク/ライトのどちらかで視認性が破綻しても検知できない
+3. 新 Step/画面を追加する開発者が「最近書かれた間違った方」をコピペして汚染が広がる
+
+**新 View に頻出 UI パーツを書く前に、必ず以下を実行しろ:**
+
+```bash
+# 例: CTA ボタンを書こうとしている時
+grep -rn "続ける" CreateLog/Features/{同Feature}/  # 既存を探す
+grep -rn "Capsule().fill" CreateLog/Features/      # 似た形状を探す
+```
+
+- 既存があれば**その共通コンポーネントを使え**。見た目が揃っていないなら先に共通化してから使え
+- 既存がなくコピペ 1 箇所目なら View に直書きして OK。**2 箇所目も様子見で OK**
+- **3 箇所目で必ず抽出**。Features/{Feature}/Views/Components/ または DesignSystem/Components/ に移す
+- トークン (色・フォント) は必ず `cl` プレフィックスのデザイントークンを使う。RGB / フォントサイズの手打ち禁止
+
+**由来**: 2026-04-14 オンボーディング後半 (OnboardingQuestionShell) の「続ける」CTA を、前半 5 ステップの直書き実装を参照せず独自実装し、`Color.clAccent` (ダーク時 RGB(0.82,0.82,0.88) 薄紫) + `.white` 文字の組み合わせでダークモード視認不能バグを埋め込んだ。原因は共通コンポーネント (`OnboardingPrimaryCTA`) が存在せず 5 箇所で直書きコピペしていたこと。事後に共通化して全 Step を置換。**再発防止のため「3 箇所目で抽出」ルールを明文化**。
+
 ## コーディングルール
 
 - iPhone縦固定。XcodeGen (`project.yml`) でプロジェクト管理
@@ -152,6 +175,24 @@ SF Symbols は「安っぽく見えない」用途に限定しろ。アイコン
 - `AnyView` によるtype erasure → `some View` / `@ViewBuilder` で解決しろ
 - iOS 26未満でしか動かないサードパーティライブラリ
 - SwiftUI の `DragGesture` / `simultaneousGesture` でエッジスワイプ(サイドメニュー等)を実装するな。ScrollView の縦スクロール・水平ページングと干渉してバグの温床になる。必要なら UIKit の `UIScreenEdgePanGestureRecognizer` を `UIViewRepresentable` でブリッジしろ。ユーザーの既存操作(タブスワイプ等)を絶対に削除するな
+
+### Apple 純正 swipe API (`.tabViewStyle(.page)` 等) はこのルールの対象外 — 削除禁止
+
+上の「DragGesture 禁止」ルールは **自作の DragGesture / simultaneousGesture** についての話。以下の Apple 純正 API は **禁止対象外**であり、むしろ推奨される。勝手に削除するな。
+
+**許容 (Apple 純正、積極採用):**
+- `.tabViewStyle(.page)` / `.tabViewStyle(.page(indexDisplayMode:))` — `UIPageViewController` の SwiftUI wrapper。iOS 14+ 公式 API
+- `List` の swipe-to-delete / `.swipeActions` — HIG 準拠
+- `NavigationStack` の edge swipe back (自動有効)
+- `ScrollView(.horizontal)` の paging — iOS 17+ の `.scrollTargetBehavior(.paging)`
+
+**これらを削除すると UIUX 後退。** X / Instagram / Apple Music のプロフィール・タブ切替は全て `UIPageViewController` ベースで swipe 切替必須。業界標準 (大手 SNS 踏襲) の原則に反する削除は禁止。
+
+**干渉リスクの正しい判定基準:**
+- 同方向重なり (横 + 横): 干渉しうる — `.page` TabView 内に horizontal ScrollView / map / carousel を置くな
+- 直交 (縦 List + 横 `.page`): 干渉しない — FollowListView 等の標準パターン。削除不要
+
+**由来**: 2026-04-13 code review で swift-reviewer が FollowListView の `.tabViewStyle(.page)` を「DragGesture 禁止ルール違反」として HIGH 指摘したが、これは**誤検知**。`.page` は Apple 純正 wrapper であり、自作 DragGesture とは別物。X 公式アプリも同等の UIPageViewController 実装を使用。**再発防止のためこの節を追加**。レビューで `.tabViewStyle(.page)` や `.swipeActions` や `NavigationStack` の edge swipe を削除提案する場合、このルールに違反していないかを先に確認しろ。
 
 **サードパーティライブラリ導入基準:**
 - 導入前にメンテナンス状況を確認（最終更新日、issue対応頻度）。1年以上更新なしは原則禁止

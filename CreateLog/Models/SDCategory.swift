@@ -40,12 +40,52 @@ final class SDProject {
     var category: SDCategory?
     var createdAt: Date = Date()
 
-    init(name: String, platforms: [String] = [], techStack: [String] = [], category: SDCategory? = nil) {
+    // Onboarding projectDetail (2026-04-14)
+    var appDescription: String = ""
+    var storeURL: String?
+    var githubURL: String?
+    var iconImageData: Data?
+    var statusRaw: String = ProjectStatus.draft.serverValue
+
+    /// Supabase `apps` テーブルへの同期成功時に保存される remote ID。
+    /// nil = まだ同期していない (オフライン or 同期失敗)。
+    /// 値あり = remote と紐付き済み。ProfileView の local 一覧から除外して remote 表示に切り替える。
+    var remoteAppId: UUID?
+
+    /// `apps.icon_url` (Supabase Storage public URL)。同期成功後に値が入る。
+    /// ProfileView の local card がアイコン表示するときの fallback (ローカル iconImageData 優先)。
+    var remoteIconUrl: String?
+
+    init(
+        name: String,
+        platforms: [String] = [],
+        techStack: [String] = [],
+        category: SDCategory? = nil,
+        appDescription: String = "",
+        storeURL: String? = nil,
+        githubURL: String? = nil,
+        iconImageData: Data? = nil,
+        status: ProjectStatus = .draft,
+        remoteAppId: UUID? = nil,
+        remoteIconUrl: String? = nil
+    ) {
         self.name = name
         self.platforms = platforms
         self.techStack = techStack
         self.category = category
         self.createdAt = Date()
+        self.appDescription = appDescription
+        self.storeURL = storeURL
+        self.githubURL = githubURL
+        self.iconImageData = iconImageData
+        self.statusRaw = status.serverValue
+        self.remoteAppId = remoteAppId
+        self.remoteIconUrl = remoteIconUrl
+    }
+
+    var status: ProjectStatus {
+        get { ProjectStatus(serverValue: statusRaw) }
+        set { statusRaw = newValue.serverValue }
     }
 }
 

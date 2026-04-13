@@ -66,6 +66,14 @@ final class OfflineFirstPostRepository: PostRepositoryProtocol, @unchecked Senda
         }
     }
 
+    func fetchUserPosts(userId: UUID, cursor: Date?, limit: Int) async throws -> [PostDTO] {
+        // プロフィール画面用。remote 直接 fetch + 成功時 upsert。
+        // cache fallback はしない (他人プロフィールを cache しても混乱の元)。
+        let remote = try await underlying.fetchUserPosts(userId: userId, cursor: cursor, limit: limit)
+        await upsertCache(remote)
+        return remote
+    }
+
     // MARK: - Write
 
     func insertPost(_ post: PostInsertDTO) async throws -> PostDTO {

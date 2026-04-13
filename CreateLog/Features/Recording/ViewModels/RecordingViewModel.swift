@@ -384,14 +384,14 @@ final class RecordingViewModel {
         }
     }
 
-    nonisolated static func computeTodayTotal(from entries: [SDTimeEntry]) -> Int {
+    nonisolated static func computeTodayTotal(from entries: [SDTimeEntry], now: Date = Date()) -> Int {
         entries
-            .filter { isToday($0.startDate) }
+            .filter { isToday($0.startDate, now: now) }
             .reduce(0) { $0 + $1.durationMinutes }
     }
 
-    nonisolated static func computeCategoryBreakdown(from entries: [SDTimeEntry]) -> [CategoryBreakdownItem] {
-        let todayEntries = entries.filter { isToday($0.startDate) }
+    nonisolated static func computeCategoryBreakdown(from entries: [SDTimeEntry], now: Date = Date()) -> [CategoryBreakdownItem] {
+        let todayEntries = entries.filter { isToday($0.startDate, now: now) }
         let grouped = Dictionary(grouping: todayEntries, by: \.categoryName)
         return grouped
             .map { CategoryBreakdownItem(name: $0.key, minutes: $0.value.reduce(0) { $0 + $1.durationMinutes }) }
@@ -405,9 +405,8 @@ final class RecordingViewModel {
         return Color("clCat07")
     }
 
-    nonisolated static func computeWeekOverWeekChange(from entries: [SDTimeEntry]) -> Double? {
+    nonisolated static func computeWeekOverWeekChange(from entries: [SDTimeEntry], now: Date = Date()) -> Double? {
         let cal = Calendar.current
-        let now = Date()
 
         guard let thisWeekStart = cal.dateInterval(of: .weekOfYear, for: now)?.start else { return nil }
         guard let lastWeekStart = cal.date(byAdding: .weekOfYear, value: -1, to: thisWeekStart) else { return nil }
@@ -424,7 +423,7 @@ final class RecordingViewModel {
         return Double(thisWeek - lastWeek) / Double(lastWeek)
     }
 
-    nonisolated private static func isToday(_ date: Date) -> Bool {
-        Calendar.current.isDateInToday(date)
+    nonisolated static func isToday(_ date: Date, now: Date = Date()) -> Bool {
+        Calendar.current.isDate(date, inSameDayAs: now)
     }
 }

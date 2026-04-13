@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct PostDetailView: View {
+    @Environment(\.dependencies) private var dependencies
     @State var post: Post
     @State private var comments: [Comment] = []
     @State private var commentText = ""
@@ -8,6 +9,10 @@ struct PostDetailView: View {
     @FocusState private var isCommentFocused: Bool
     @State private var showReport = false
     @State private var showBlock = false
+    @State private var myInitials: String = "?"
+    @State private var myAvatarUrl: String?
+    /// 投稿者の userId (ブロック操作用)。PostDTO から引いて保持。
+    @State private var authorUserId: UUID?
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -57,14 +62,130 @@ struct PostDetailView: View {
             }
         }
         .sheet(isPresented: $showReport) {
-            ReportSheet(targetName: post.name) { _, _ in }
+            ReportSheet(targetName: post.name) { reason, detail in
+                Task {
+                    try? await dependencies.ugcRepository.reportContent(
+                        targetId: post.id,
+                        targetType: "post",
+                        reason: reason.rawValue,
+                        detail: detail.isEmpty ? nil : detail
+                    )
+                }
+            }
         }
         .sheet(isPresented: $showBlock) {
             BlockConfirmSheet(
                 userName: post.name,
                 userHandle: post.handle,
-                onBlock: {}
+                onBlock: {
+                    guard let uid = authorUserId ?? post.userId else { return }
+                    Task {
+                        try? await dependencies.ugcRepository.blockUser(userId: uid)
+                    }
+                }
             )
+        }
+        .task {
+            await loadInitial()
+        }
+    }
+
+    // MARK: - Loading
+
+    /// 自分のプロフィール (コメント入力欄のアバター用) と投稿のコメント一覧を並列ロード。
+    private func loadInitial() async {
+        async let profile: ProfileDTO? = (try? await dependencies.profileRepository.fetchMyProfile())
+        async let commentDTOs: [CommentDTO] = (try? await dependencies.commentRepository.fetchComments(
+            postId: post.id,
+            cursor: nil,
+            limit: 50
+        )) ?? []
+        async let likedState: Bool = (try? await dependencies.likeRepository.isLiked(postId: post.id)) ?? post.isLiked
+
+        let (myProfile, dtos, liked) = await (profile, commentDTOs, likedState)
+
+        if let myProfile {
+            let name = myProfile.displayName ?? myProfile.handle ?? ""
+            myInitials = name.isEmpty ? "?" : String(name.prefix(1))
+            myAvatarUrl = myProfile.avatarUrl
+        }
+
+        authorUserId = post.userId
+        post.isLiked = liked
+        comments = dtos.map(commentFromDTO)
+    }
+
+    private func commentFromDTO(_ dto: CommentDTO) -> Comment {
+        let displayName = dto.authorDisplayName ?? dto.authorHandle ?? ""
+        let initials = displayName.isEmpty ? "?" : String(displayName.prefix(1))
+        return Comment(
+            id: dto.id,
+            authorName: displayName,
+            authorHandle: dto.authorHandle ?? "",
+            authorInitials: initials,
+            authorAvatarUrl: dto.authorAvatarUrl,
+            text: dto.content,
+            timestamp: dto.createdAt
+        )
+    }
+
+    private func toggleLike() {
+        let wasLiked = post.isLiked
+        withAnimation(.spring(duration: 0.4, bounce: 0.5)) {
+            post.isLiked.toggle()
+            post.likes += post.isLiked ? 1 : -1
+            heartScale = 1.4
+        }
+        HapticManager.light()
+        Task {
+            try? await Task.sleep(for: .milliseconds(200))
+            withAnimation(.spring(duration: 0.3)) {
+                heartScale = 1.0
+            }
+        }
+        Task {
+            do {
+                if wasLiked {
+                    try await dependencies.likeRepository.unlike(postId: post.id)
+                } else {
+                    try await dependencies.likeRepository.like(postId: post.id)
+                }
+            } catch {
+                // rollback
+                await MainActor.run {
+                    withAnimation(.spring(duration: 0.3, bounce: 0.2)) {
+                        post.isLiked = wasLiked
+                        post.likes += wasLiked ? 1 : -1
+                    }
+                }
+            }
+        }
+    }
+
+    private func submitComment() {
+        let text = commentText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
+        HapticManager.light()
+        let draftText = text
+        commentText = ""
+        isCommentFocused = false
+        Task {
+            do {
+                let dto = try await dependencies.commentRepository.insertComment(
+                    postId: post.id,
+                    content: draftText,
+                    parentId: nil
+                )
+                await MainActor.run {
+                    comments.append(commentFromDTO(dto))
+                    post.comments += 1
+                }
+            } catch {
+                // 失敗時は入力を復元
+                await MainActor.run {
+                    commentText = draftText
+                }
+            }
         }
     }
 
@@ -72,7 +193,12 @@ struct PostDetailView: View {
 
     private var postHeader: some View {
         HStack(spacing: 12) {
-            AvatarView(initials: post.initials, size: 48, status: post.status)
+            AvatarView(
+                initials: post.initials,
+                size: 48,
+                status: post.status,
+                imageURL: post.authorAvatarUrl.flatMap(URL.init(string:))
+            )
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(post.name)
@@ -172,27 +298,22 @@ struct PostDetailView: View {
         HStack {
             Spacer()
 
-            actionButton(icon: "bubble.right", count: post.comments)
-
-            Spacer()
-
-            actionButton(icon: "arrow.2.squarepath", count: post.reposts)
+            // コメントボタン: 入力欄にフォーカスする
+            Button {
+                HapticManager.light()
+                isCommentFocused = true
+            } label: {
+                Image(systemName: "bubble.right")
+                    .font(.system(size: 18))
+                    .foregroundStyle(Color.clTextTertiary)
+                    .frame(width: 44, height: 44)
+            }
+            .buttonStyle(.plain)
 
             Spacer()
 
             Button {
-                withAnimation(.spring(duration: 0.4, bounce: 0.5)) {
-                    post.isLiked.toggle()
-                    post.likes += post.isLiked ? 1 : -1
-                    heartScale = 1.4
-                }
-                HapticManager.light()
-                Task {
-                    try? await Task.sleep(for: .milliseconds(200))
-                    withAnimation(.spring(duration: 0.3)) {
-                        heartScale = 1.0
-                    }
-                }
+                toggleLike()
             } label: {
                 Image(systemName: post.isLiked ? "heart.fill" : "heart")
                     .font(.system(size: 18))
@@ -204,9 +325,7 @@ struct PostDetailView: View {
 
             Spacer()
 
-            Button {
-                HapticManager.light()
-            } label: {
+            ShareLink(item: URL(string: "https://createlog.app/post/\(post.id)")!) {
                 Image(systemName: "square.and.arrow.up")
                     .font(.system(size: 17))
                     .foregroundStyle(Color.clTextTertiary)
@@ -219,6 +338,7 @@ struct PostDetailView: View {
         .padding(.vertical, 6)
     }
 
+    /// 現状未使用 (repost は MVP 対象外)。v2.1 の repost 実装時に復活予定。
     private func actionButton(icon: String, count: Int) -> some View {
         Button {
             HapticManager.light()
@@ -247,7 +367,11 @@ struct PostDetailView: View {
     private func commentRow(_ comment: Comment) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top, spacing: 10) {
-                AvatarView(initials: comment.authorInitials, size: 36)
+                AvatarView(
+                    initials: comment.authorInitials,
+                    size: 36,
+                    imageURL: comment.authorAvatarUrl.flatMap(URL.init(string:))
+                )
 
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 6) {
@@ -277,7 +401,11 @@ struct PostDetailView: View {
     private func replyRow(_ reply: Comment) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top, spacing: 10) {
-                AvatarView(initials: reply.authorInitials, size: 36)
+                AvatarView(
+                    initials: reply.authorInitials,
+                    size: 36,
+                    imageURL: reply.authorAvatarUrl.flatMap(URL.init(string:))
+                )
 
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 6) {
@@ -339,9 +467,10 @@ struct PostDetailView: View {
 
             HStack(spacing: 10) {
                 AvatarView(
-                    initials: "?",
+                    initials: myInitials,
                     size: 32,
-                    status: .offline
+                    status: .offline,
+                    imageURL: myAvatarUrl.flatMap(URL.init(string:))
                 )
 
                 TextField("コメントを追加...", text: $commentText)
@@ -357,9 +486,7 @@ struct PostDetailView: View {
 
                 if !commentText.isEmpty {
                     Button {
-                        HapticManager.light()
-                        commentText = ""
-                        isCommentFocused = false
+                        submitComment()
                     } label: {
                         Image(systemName: "paperplane.fill")
                             .font(.system(size: 16))

@@ -62,8 +62,18 @@ final class SupabaseSearchRepository: SearchRepositoryProtocol, Sendable {
     }
 
     func fetchTrendingTags() async throws -> [String] {
-        // TODO: hashtags集計テーブルまたはRPC関数で取得
-        return []
+        // `trending_hashtags` view を参照 (T4 で導入済み)。
+        // HashtagRepository と重複するが、Discover 画面は文字列配列のみ欲しいので直接 view を叩く。
+        struct TagRow: Decodable {
+            let tag: String
+        }
+        let rows: [TagRow] = try await client
+            .from("trending_hashtags")
+            .select("tag")
+            .limit(20)
+            .execute()
+            .value
+        return rows.map(\.tag)
     }
 
     func fetchSuggestedUsers(limit: Int) async throws -> [ProfileDTO] {

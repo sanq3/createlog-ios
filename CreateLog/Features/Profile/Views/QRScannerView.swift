@@ -106,10 +106,8 @@ struct QRScannerView: View {
                     .font(.system(size: 18, weight: .bold))
                     .foregroundStyle(.white)
 
-                // TODO: Replace with actual profile navigation when backend is connected
-                Button {
-                    HapticManager.light()
-                    dismiss()
+                NavigationLink {
+                    UserProfileView(user: User(name: username, handle: username))
                 } label: {
                     Text("プロフィールを見る")
                         .font(.system(size: 15, weight: .semibold))
@@ -246,7 +244,9 @@ struct CameraPreview: UIViewRepresentable {
 }
 
 final class CameraPreviewUIView: UIView {
-    var delegate: AVCaptureMetadataOutputObjectsDelegate? {
+    /// Coordinator を weak で保持して UIView→Coordinator→UIView の retain cycle を断つ。
+    /// UIViewRepresentable の Coordinator は SwiftUI 側で寿命管理されるので weak で十分。
+    weak var delegate: AVCaptureMetadataOutputObjectsDelegate? {
         didSet { setupSession() }
     }
 
@@ -296,6 +296,12 @@ final class CameraPreviewUIView: UIView {
     }
 
     deinit {
-        captureSession.stopRunning()
+        // AVCaptureSession.stopRunning() は synchronous & blocking。
+        // deinit は main thread で呼ばれる場合があり、そこで blocking すると UI が hang する。
+        // session を capture して background queue で停止する (Apple docs 推奨パターン)。
+        let session = captureSession
+        DispatchQueue.global(qos: .userInitiated).async {
+            session.stopRunning()
+        }
     }
 }

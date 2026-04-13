@@ -37,6 +37,9 @@ struct NoOpProfileRepository: ProfileRepositoryProtocol {
         throw NetworkError.notAuthenticated
     }
     func checkHandleAvailability(_ handle: String) async throws -> Bool { true }
+    func uploadAvatar(imageData: Data, contentType: String) async throws -> URL {
+        throw NetworkError.notAuthenticated
+    }
 }
 
 /// T4 (2026-04-12): NoOp SubscriptionRepository (Preview 用)

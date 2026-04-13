@@ -5,6 +5,7 @@ struct Comment: Identifiable, Sendable {
     let authorName: String
     let authorHandle: String
     let authorInitials: String
+    let authorAvatarUrl: String?
     let text: String
     let timestamp: Date
     var likes: Int
@@ -16,6 +17,7 @@ struct Comment: Identifiable, Sendable {
         authorName: String,
         authorHandle: String,
         authorInitials: String,
+        authorAvatarUrl: String? = nil,
         text: String,
         timestamp: Date = Date(),
         likes: Int = 0,
@@ -26,6 +28,7 @@ struct Comment: Identifiable, Sendable {
         self.authorName = authorName
         self.authorHandle = authorHandle
         self.authorInitials = authorInitials
+        self.authorAvatarUrl = authorAvatarUrl
         self.text = text
         self.timestamp = timestamp
         self.likes = likes
@@ -39,6 +42,7 @@ struct Review: Identifiable, Sendable {
     let authorName: String
     let authorHandle: String
     let authorInitials: String
+    let authorAvatarUrl: String?
     let rating: Int
     let text: String
     let timestamp: Date
@@ -49,6 +53,7 @@ struct Review: Identifiable, Sendable {
         authorName: String,
         authorHandle: String,
         authorInitials: String,
+        authorAvatarUrl: String? = nil,
         rating: Int,
         text: String = "",
         timestamp: Date = Date(),
@@ -58,6 +63,7 @@ struct Review: Identifiable, Sendable {
         self.authorName = authorName
         self.authorHandle = authorHandle
         self.authorInitials = authorInitials
+        self.authorAvatarUrl = authorAvatarUrl
         self.rating = rating
         self.text = text
         self.timestamp = timestamp

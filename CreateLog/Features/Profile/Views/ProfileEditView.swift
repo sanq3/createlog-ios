@@ -1,8 +1,11 @@
 import SwiftUI
+import PhotosUI
 
 struct ProfileEditView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: ProfileEditViewModel
+    @State private var selectedPhoto: PhotosPickerItem?
+    @State private var avatarImage: Image?
 
     init(user: User, profileRepository: any ProfileRepositoryProtocol) {
         _viewModel = State(initialValue: ProfileEditViewModel(
@@ -52,15 +55,26 @@ struct ProfileEditView: View {
     // MARK: - Avatar
 
     private var avatarSection: some View {
-        Button {
-            // TODO: PhotosPicker表示
-        } label: {
+        PhotosPicker(
+            selection: $selectedPhoto,
+            matching: .images,
+            photoLibrary: .shared()
+        ) {
             ZStack(alignment: .bottomTrailing) {
-                AvatarView(
-                    initials: String(viewModel.displayName.prefix(1)),
-                    size: 80,
-                    status: .offline
-                )
+                if let avatarImage {
+                    avatarImage
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 80, height: 80)
+                        .clipShape(Circle())
+                } else {
+                    AvatarView(
+                        initials: String(viewModel.displayName.prefix(1)),
+                        size: 80,
+                        status: .offline,
+                        imageURL: viewModel.currentAvatarUrl.flatMap(URL.init(string:))
+                    )
+                }
 
                 Image(systemName: "camera.fill")
                     .font(.system(size: 12, weight: .semibold))
@@ -71,6 +85,19 @@ struct ProfileEditView: View {
             }
         }
         .buttonStyle(.plain)
+        .onChange(of: selectedPhoto) { _, newItem in
+            Task { await loadAvatar(newItem) }
+        }
+    }
+
+    /// 選択された画像を読み込んで画面に表示 + ViewModel にバイナリを渡す。
+    /// 実際の Supabase Storage へのアップロードは viewModel.save() 時に行う。
+    private func loadAvatar(_ item: PhotosPickerItem?) async {
+        guard let item else { return }
+        guard let data = try? await item.loadTransferable(type: Data.self) else { return }
+        guard let uiImage = UIImage(data: data) else { return }
+        avatarImage = Image(uiImage: uiImage)
+        viewModel.pendingAvatarData = data
     }
 
     // MARK: - Form

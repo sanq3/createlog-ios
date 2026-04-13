@@ -23,6 +23,7 @@ enum AppearanceMode: String, CaseIterable {
 }
 
 struct SettingsView: View {
+    @Environment(\.dependencies) private var dependencies
     @AppStorage("appearanceMode") private var appearanceMode: String = AppearanceMode.system.rawValue
     @AppStorage("durationFormat") private var durationFormat: String = DurationFormat.system.rawValue
     @AppStorage("appLanguage") private var appLanguage: String = AppLanguage.system.rawValue
@@ -212,7 +213,7 @@ struct SettingsView: View {
         .fullScreenCover(isPresented: $showOnboarding) {
             OnboardingView(
                 isPresented: $showOnboarding,
-                authViewModel: AuthViewModel(authService: NoOpAuthService())
+                authViewModel: AuthViewModel(authService: dependencies.authService)
             )
         }
     }
@@ -275,6 +276,7 @@ struct IntegrationSettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
+    @ViewBuilder
     private func integrationRow(
         name: String,
         icon: String,
@@ -297,10 +299,9 @@ struct IntegrationSettingsView: View {
 
             Spacer()
 
-            Button {
-                HapticManager.light()
-            } label: {
-                Text("設定")
+            // エディタ拡張機能は v2.1 対応。現時点では marketplace へのリンクのみ提供。
+            Link(destination: extensionURL(for: name)) {
+                Text("インストール")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Color.clAccent)
                     .padding(.horizontal, 12)
@@ -309,6 +310,11 @@ struct IntegrationSettingsView: View {
             }
             .buttonStyle(.plain)
         }
+    }
+
+    private func extensionURL(for editor: String) -> URL {
+        // 拡張機能 publish 前は公式サイトのアナウンスページに飛ばす
+        URL(string: "https://createlog.app/integrations/\(editor.lowercased())")!
     }
 }
 
@@ -442,8 +448,13 @@ struct LegalTextView: View {
 // MARK: - Support
 
 struct SupportView: View {
+    @Environment(\.openURL) private var openURL
     @State private var category: SupportCategory = .bug
     @State private var message = ""
+    @State private var sent = false
+
+    /// サポートメール送信先。運用開始後はプロダクトで個別メールへ変更予定。
+    private let supportEmail = "support@createlog.app"
 
     var body: some View {
         List {
@@ -465,9 +476,18 @@ struct SupportView: View {
                 Text("メッセージ")
             }
 
+            if sent {
+                Section {
+                    Text("メールアプリが開きます。そのまま送信してください。")
+                        .font(.clCaption)
+                        .foregroundStyle(Color.clSuccess)
+                }
+            }
+
             Section {
                 Button {
                     HapticManager.success()
+                    sendMail()
                 } label: {
                     Text("送信")
                         .font(.system(size: 15, weight: .bold))
@@ -487,6 +507,21 @@ struct SupportView: View {
         .background(Color.clBackground)
         .navigationTitle("お問い合わせ")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    /// メールアプリを mailto: で起動。body に category + message を prefill する。
+    private func sendMail() {
+        let subject = "[CreateLog] \(category.label)"
+        let body = message
+        var components = URLComponents(string: "mailto:\(supportEmail)")
+        components?.queryItems = [
+            URLQueryItem(name: "subject", value: subject),
+            URLQueryItem(name: "body", value: body)
+        ]
+        if let url = components?.url {
+            openURL(url)
+            sent = true
+        }
     }
 }
 

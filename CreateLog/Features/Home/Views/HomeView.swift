@@ -5,16 +5,9 @@ struct HomeView: View {
     @State private var viewModel: FeedViewModel?
     @State private var segmentIndex = 0
 
-    /// ViewModelにデータが入ればそちらを優先、なければDEBUGビルドでMockDataにフォールバック
+    /// ViewModel から実データを返す。MockData fallback は排除 (2026-04-13 v2.0 接続)。
     private var posts: [Post] {
-        if let vmPosts = viewModel?.posts, !vmPosts.isEmpty {
-            return vmPosts
-        }
-        #if DEBUG
-        return MockData.posts
-        #else
-        return []
-        #endif
+        viewModel?.posts ?? []
     }
     @Binding var tabBarOffset: CGFloat
     let reselectCount: Int
@@ -38,8 +31,10 @@ struct HomeView: View {
     private let hideThreshold: CGFloat = 15
     private let showThreshold: CGFloat = 100
 
-    private var timelinePosts: [Post] { Array(posts.prefix(5)) }
-    private var followingPosts: [Post] { Array(posts.suffix(from: min(5, posts.count))) }
+    // 各ページは現在 segment の posts をそのまま表示する。
+    // horizontal swipe で segmentIndex が変わると ViewModel の segment が切り替わり posts が更新される。
+    private var timelinePosts: [Post] { posts }
+    private var followingPosts: [Post] { posts }
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -139,7 +134,7 @@ struct HomeView: View {
         .fullScreenCover(isPresented: $showOnboarding) {
             OnboardingView(
                 isPresented: $showOnboarding,
-                authViewModel: AuthViewModel(authService: NoOpAuthService())
+                authViewModel: AuthViewModel(authService: deps.authService)
             )
         }
         .errorBanner(Binding(
@@ -156,14 +151,17 @@ struct HomeView: View {
             }
             await viewModel?.loadFeed()
         }
+        .onChange(of: segmentIndex) { _, _ in
+            viewModel?.segment = segmentIndex == 0 ? .timeline : .following
+            Task { await viewModel?.onSegmentChange() }
+        }
         .onChange(of: reselectCount) {
             if isAtTop {
                 // Already at top → refresh
                 isRefreshing = true
                 HapticManager.light()
-                // Simulate refresh (replace with real API call later)
                 Task {
-                    try? await Task.sleep(for: .milliseconds(1500))
+                    await viewModel?.refresh()
                     isRefreshing = false
                 }
             } else {
@@ -194,18 +192,34 @@ struct HomeView: View {
     private func feedPage(for pagePosts: [Post]) -> some View {
         ScrollView {
             LazyVStack(spacing: 12) {
-                if isRefreshing {
+                if isRefreshing || (viewModel?.isLoading == true && pagePosts.isEmpty) {
                     ProgressView()
                         .padding(.top, 8)
                 }
 
-                ForEach(Array(pagePosts.enumerated()), id: \.element.id) { _, post in
+                if pagePosts.isEmpty, viewModel?.isLoading == false {
+                    emptyFeedState
+                        .padding(.top, 80)
+                }
+
+                ForEach(Array(pagePosts.enumerated()), id: \.element.id) { index, post in
                     NavigationLink {
                         PostDetailView(post: post)
                     } label: {
                         PostCardView(post: post)
                     }
                     .buttonStyle(.plain)
+                    .onAppear {
+                        // 末尾の数件に到達したら次ページを読み込む
+                        if index >= pagePosts.count - 3 {
+                            Task { await viewModel?.loadMore() }
+                        }
+                    }
+                }
+
+                if viewModel?.isLoadingMore == true {
+                    ProgressView()
+                        .padding(.vertical, 12)
                 }
             }
             .padding(.top, titleRowHeight + tabBarSectionHeight)
@@ -257,6 +271,27 @@ struct HomeView: View {
                 }
             }
         }
+    }
+
+    // MARK: - Empty state
+
+    private var emptyFeedState: some View {
+        VStack(spacing: 12) {
+            Image(systemName: segmentIndex == 0 ? "tray" : "person.2")
+                .font(.system(size: 44, weight: .light))
+                .foregroundStyle(Color.clTextTertiary)
+            Text(segmentIndex == 0 ? "まだ投稿がありません" : "フォロー中のユーザーの投稿はありません")
+                .font(.clBody)
+                .foregroundStyle(Color.clTextSecondary)
+            if segmentIndex == 1 {
+                Text("他の開発者をフォローすると、ここに投稿が流れます")
+                    .font(.clCaption)
+                    .foregroundStyle(Color.clTextTertiary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+            }
+        }
+        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Tab Bar (hides on scroll down, shows on scroll up / horizontal swipe)

@@ -65,3 +65,32 @@ globs: ["**/*.swift"]
 - **Approve**: CRITICAL/HIGH なし
 - **Warning**: HIGH のみ（注意付きマージ可）
 - **Block**: CRITICAL あり
+
+## 誤検知を避けるためのチェック (レビュー時必読)
+
+**UIUX を損なう削除提案を出す前に、以下を必ず確認しろ:**
+
+### 1. Apple 純正 swipe API を「DragGesture 禁止ルール違反」と誤認するな
+
+`.tabViewStyle(.page)` / `.swipeActions` / `NavigationStack` の edge swipe / `.scrollTargetBehavior(.paging)` は **Apple 純正 wrapper** であり、`architecture.md` の「DragGesture 禁止」ルールの対象外。削除提案を出す前に `architecture.md` の「Apple 純正 swipe API はこのルールの対象外」節を読め。
+
+**判定フロー:**
+1. コードが `DragGesture` / `simultaneousGesture` を直接使っているか? → YES なら違反候補
+2. コードが `.tabViewStyle(.page)` 等の Apple 純正 wrapper か? → **違反ではない。削除提案するな**
+3. 削除すると X / Instagram 踏襲 UX が失われるか? → YES なら業界標準違反。削除提案するな
+
+### 2. UIUX を変える提案は必ずユーザー確認が必要
+
+以下の変更は「削除してもコードは動く」でも UIUX 体験を変える:
+- swipe / drag / 左右切替機能の削除
+- アニメーション削除 / カスタマイズ削除
+- gesture / haptic / transition の改変
+- tab / page の構造変更
+
+これらは**コード品質 HIGH ではなく UIUX 変更**として分類し、「提案」として出す。削除を前提にしてはいけない。
+
+### 3. 「architecture.md 違反」と主張する前に該当節を原文で読め
+
+ルール文言を抽象的に当てはめず、節の**由来**セクション (いつなぜ追加されたか) まで読んで真の対象を理解しろ。
+
+**由来**: 2026-04-13 swift-reviewer が FollowListView の `.tabViewStyle(.page)` を HIGH 指摘した (誤検知)。`.page` は UIPageViewController wrapper であり X / Instagram と同じ業界標準実装。削除すれば UIUX 後退。レビュー精度を上げるため本節を追加。

@@ -10,4 +10,6 @@ protocol ProfileRepositoryProtocol: Sendable {
     func updateProfile(_ updates: ProfileUpdateDTO) async throws -> ProfileDTO
     /// ハンドルの利用可否チェック
     func checkHandleAvailability(_ handle: String) async throws -> Bool
+    /// アバター画像を Supabase Storage にアップロードして公開 URL を返す
+    func uploadAvatar(imageData: Data, contentType: String) async throws -> URL
 }
