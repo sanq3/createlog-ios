@@ -1,19 +1,28 @@
 import SwiftUI
 import AuthenticationServices
 
-/// Step 08: アカウント作成促進。Apple / Google Sign In を実接続。
-/// 認証成功 → onAdvance。スキップ → onSkip (オンボーディング完了)。
+/// Step 08: アカウント作成 / ログイン。Apple / Google / GitHub Sign In を実接続。
+/// isLoginMode で新規作成モード (デフォルト) とログインモード (Welcome のログインリンク経由) を切替。
 struct OnboardingAccountPromptStep: View {
     let projectName: String
     let platform: String
+    let isLoginMode: Bool
     @Bindable var authViewModel: AuthViewModel
     let onAdvance: () -> Void
+    let onBackToWelcome: () -> Void
     @Environment(\.colorScheme) private var colorScheme
-    let onSkip: () -> Void
 
     @State private var appeared = false
     @State private var cardVisible = false
     @State private var ctaVisible = false
+
+    private var titleText: String {
+        isLoginMode ? "アカウントにログイン" : "アカウントを作成"
+    }
+
+    private var buttonSuffix: String {
+        isLoginMode ? "でログイン" : "で続ける"
+    }
 
     var body: some View {
         ZStack {
@@ -22,7 +31,7 @@ struct OnboardingAccountPromptStep: View {
             VStack(spacing: 0) {
                 Spacer().frame(height: 100)
 
-                Text("アカウントを作成して\nデータを安全に保存")
+                Text(titleText)
                     .font(.system(size: 26, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary)
                     .tracking(-0.5)
@@ -31,43 +40,45 @@ struct OnboardingAccountPromptStep: View {
                     .opacity(appeared ? 1 : 0)
                     .offset(y: appeared ? 0 : 12)
 
-                Spacer().frame(height: 28)
+                if !isLoginMode {
+                    Spacer().frame(height: 28)
 
-                // Compact service card
-                HStack(spacing: 14) {
-                    Text(String(projectName.prefix(1)))
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 36, height: 36)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(Self.iconColor(for: projectName))
-                        )
+                    // Compact service card (新規モードのみ)
+                    HStack(spacing: 14) {
+                        Text(String(projectName.prefix(1)))
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundStyle(.white)
+                            .frame(width: 36, height: 36)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .fill(Self.iconColor(for: projectName))
+                            )
 
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(projectName)
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(Color.clTextPrimary)
-                            .lineLimit(1)
-                        Text(platform)
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(Color.clTextPrimary.opacity(0.5))
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(projectName)
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundStyle(Color.clTextPrimary)
+                                .lineLimit(1)
+                            Text(platform)
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(Color.clTextPrimary.opacity(0.5))
+                        }
+                        Spacer()
                     }
-                    Spacer()
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(Color.clSurfaceHigh)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .strokeBorder(Color.clTextPrimary.opacity(0.06), lineWidth: 1)
+                    )
+                    .padding(.horizontal, 40)
+                    .opacity(cardVisible ? 1 : 0)
+                    .scaleEffect(cardVisible ? 1 : 0.95)
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(Color.clSurfaceHigh)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .strokeBorder(Color.clTextPrimary.opacity(0.06), lineWidth: 1)
-                )
-                .padding(.horizontal, 40)
-                .opacity(cardVisible ? 1 : 0)
-                .scaleEffect(cardVisible ? 1 : 0.95)
 
                 Spacer()
 
@@ -81,93 +92,96 @@ struct OnboardingAccountPromptStep: View {
                         .padding(.bottom, 12)
                 }
 
-                // Auth buttons
+                // Auth buttons (3ボタン完全同一UI: Capsule + 透過 bg + 黒枠 + SF/Canvas アイコン + 統一 font)
                 VStack(spacing: 12) {
-                    // Sign in with Apple (dark mode = .black で bg に馴染ませる)
-                    SignInWithAppleButton(.signIn) { request in
-                        let prepared = authViewModel.prepareAppleSignIn()
-                        request.requestedScopes = prepared.requestedScopes
-                        request.nonce = prepared.nonce
-                    } onCompletion: { result in
-                        Task { @MainActor in
-                            await authViewModel.handleAppleSignIn(result: result)
-                            if case .authenticated = authViewModel.authState {
-                                onAdvance()
+                    AppleSignInButton(
+                        labelText: "Apple" + buttonSuffix,
+                        onRequest: { request in
+                            let prepared = authViewModel.prepareAppleSignIn()
+                            request.requestedScopes = prepared.requestedScopes
+                            request.nonce = prepared.nonce
+                        },
+                        onCompletion: { result in
+                            Task { @MainActor in
+                                if await authViewModel.handleAppleSignIn(result: result) {
+                                    onAdvance()
+                                }
                             }
                         }
-                    }
-                    .signInWithAppleButtonStyle(colorScheme == .dark ? .black : .black)
-                    .frame(height: 50)
-                    .clipShape(Capsule())
-                    .overlay(
-                        Capsule()
-                            .strokeBorder(Color.clTextPrimary.opacity(colorScheme == .dark ? 0.3 : 0), lineWidth: 1)
                     )
                     .padding(.horizontal, 32)
 
-                    // Google Sign In (T5: OAuth web flow)
                     Button {
                         Task { @MainActor in
-                            await authViewModel.handleGoogleSignIn()
-                            if case .authenticated = authViewModel.authState {
+                            if await authViewModel.handleGoogleSignIn() {
                                 onAdvance()
                             }
                         }
                     } label: {
                         HStack(spacing: 8) {
-                            GoogleLogo()
+                            Image("GoogleLogo")
+                                .resizable()
+                                .scaledToFit()
                                 .frame(width: 18, height: 18)
-                            Text("Googleでログイン")
+                            Text("Google" + buttonSuffix)
                                 .font(.system(size: 16, weight: .medium))
                                 .foregroundStyle(Color.clTextPrimary)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
+                        .frame(height: 50)
                         .background(
                             Capsule()
-                                .strokeBorder(Color.clTextPrimary.opacity(0.35), lineWidth: 1.5)
+                                .strokeBorder(Color.clTextPrimary, lineWidth: 1)
                         )
                     }
                     .buttonStyle(.plain)
                     .padding(.horizontal, 32)
 
-                    // GitHub Sign In (T5: OAuth web flow)
                     Button {
                         Task { @MainActor in
-                            await authViewModel.handleGitHubSignIn()
-                            if case .authenticated = authViewModel.authState {
+                            if await authViewModel.handleGitHubSignIn() {
                                 onAdvance()
                             }
                         }
                     } label: {
                         HStack(spacing: 8) {
-                            Image(systemName: "chevron.left.forwardslash.chevron.right")
-                                .font(.system(size: 16, weight: .semibold))
+                            Image("GitHubLogo")
+                                .resizable()
+                                .renderingMode(.template)
+                                .scaledToFit()
+                                .frame(width: 18, height: 18)
                                 .foregroundStyle(Color.clTextPrimary)
-                            Text("GitHubでログイン")
+                            Text("GitHub" + buttonSuffix)
                                 .font(.system(size: 16, weight: .medium))
                                 .foregroundStyle(Color.clTextPrimary)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
+                        .frame(height: 50)
                         .background(
                             Capsule()
-                                .strokeBorder(Color.clTextPrimary.opacity(0.35), lineWidth: 1.5)
+                                .strokeBorder(Color.clTextPrimary, lineWidth: 1)
                         )
                     }
                     .buttonStyle(.plain)
                     .padding(.horizontal, 32)
 
-                    // Skip
-                    Button {
-                        HapticManager.light()
-                        onSkip()
-                    } label: {
-                        Text("あとで")
-                            .font(.system(size: 15, weight: .medium))
-                            .foregroundStyle(Color.clTextPrimary.opacity(0.4))
+                    if isLoginMode {
+                        Button {
+                            HapticManager.light()
+                            onBackToWelcome()
+                        } label: {
+                            HStack(spacing: 4) {
+                                Text("初めての方は")
+                                    .foregroundStyle(Color.clTextPrimary.opacity(0.5))
+                                Text("こちら")
+                                    .foregroundStyle(Color.clTextPrimary.opacity(0.85))
+                                    .underline()
+                            }
+                            .font(.system(size: 13, weight: .medium))
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.top, 8)
                     }
-                    .padding(.top, 4)
                 }
                 .opacity(ctaVisible ? 1 : 0)
                 .offset(y: ctaVisible ? 0 : 20)
@@ -214,47 +228,13 @@ extension OnboardingAccountPromptStep {
     }
 }
 
-// MARK: - Google Logo (4色公式カラー)
-
-private struct GoogleLogo: View {
-    var body: some View {
-        Canvas { context, size in
-            let center = CGPoint(x: size.width / 2, y: size.height / 2)
-            let radius = min(size.width, size.height) / 2 - 1
-            let lineWidth: CGFloat = radius * 0.38
-
-            let colors: [(Color, Angle, Angle)] = [
-                (Color(red: 0.92, green: 0.26, blue: 0.21), .degrees(-45), .degrees(45)),    // red (top-right)
-                (Color(red: 0.98, green: 0.74, blue: 0.02), .degrees(45), .degrees(135)),     // yellow (bottom-right)
-                (Color(red: 0.22, green: 0.65, blue: 0.32), .degrees(135), .degrees(225)),    // green (bottom-left)
-                (Color(red: 0.26, green: 0.52, blue: 0.96), .degrees(225), .degrees(315)),    // blue (top-left)
-            ]
-
-            for (color, start, end) in colors {
-                var path = Path()
-                path.addArc(center: center, radius: radius - lineWidth / 2,
-                            startAngle: start, endAngle: end, clockwise: false)
-                context.stroke(path, with: .color(color), lineWidth: lineWidth)
-            }
-
-            // Right bar of "G"
-            let barRect = CGRect(
-                x: center.x,
-                y: center.y - lineWidth / 2,
-                width: radius,
-                height: lineWidth
-            )
-            context.fill(Path(barRect), with: .color(Color(red: 0.26, green: 0.52, blue: 0.96)))
-        }
-    }
-}
-
 #Preview {
     OnboardingAccountPromptStep(
         projectName: "つくろぐ",
         platform: "iOS",
+        isLoginMode: false,
         authViewModel: AuthViewModel(authService: NoOpAuthService()),
         onAdvance: {},
-        onSkip: {}
+        onBackToWelcome: {}
     )
 }

@@ -21,6 +21,10 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         SUPABASE_URL: $(SUPABASE_URL)
         SUPABASE_ANON_KEY: $(SUPABASE_ANON_KEY)
+        CFBundleDevelopmentRegion: ja
+        CFBundleLocalizations:
+          - ja
+          - en
         LSApplicationQueriesSchemes:
           - line
           - instagram
@@ -32,6 +36,14 @@ targets:
             CFBundleURLName: com.sanq3.createlog.auth
             CFBundleURLSchemes:
               - createlog
+        UIBackgroundModes:
+          - remote-notification
+    entitlements:
+      path: CreateLog/CreateLog.entitlements
+      properties:
+        aps-environment: development
+        com.apple.developer.applesignin:
+          - Default
     configFiles:
       Debug: Config/Debug.xcconfig
       Release: Config/Release.xcconfig
@@ -45,7 +57,9 @@ targets:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
-        INFOPLIST_KEY_NSCameraUsageDescription: "QRコードをスキャンしてユーザーを追加するためにカメラを使用します"
+        INFOPLIST_KEY_NSCameraUsageDescription: "プロフィール画像の撮影とQRコードスキャンに使用します"
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "プロフィール画像や投稿画像の選択に使用します"
+        INFOPLIST_KEY_NSUserNotificationsUsageDescription: "いいね、コメント、フォローなどの通知をお知らせします"
         SWIFT_EMIT_LOC_STRINGS: YES
         GENERATE_INFOPLIST_FILE: YES
         CURRENT_PROJECT_VERSION: 1

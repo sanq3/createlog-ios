@@ -4,6 +4,7 @@ import SwiftUI
 /// letter entrance は速め → 着地後の wave / shimmer / breathing はスローで余韻。
 struct OnboardingWelcomeHeroStep: View {
     let onAdvance: () -> Void
+    let onLogin: () -> Void
 
     private static let logo: [String] = ["C","r","e","a","t","e","L","o","g"]
 
@@ -93,9 +94,30 @@ struct OnboardingWelcomeHeroStep: View {
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(Color.clTextSecondary)
                     .opacity(hintVisible ? (hintPulse ? 0.9 : 0.4) : 0)
-                    .padding(.bottom, 48)
+                    .padding(.bottom, 64)
             }
             .allowsHitTesting(false)
+
+            // ログインリンク (既存ユーザー向け、画面最下部)
+            VStack {
+                Spacer()
+                Button {
+                    HapticManager.light()
+                    onLogin()
+                } label: {
+                    HStack(spacing: 4) {
+                        Text("すでにアカウントをお持ちの方")
+                            .foregroundStyle(Color.clTextPrimary.opacity(0.5))
+                        Text("ログイン")
+                            .foregroundStyle(Color.clTextPrimary.opacity(0.85))
+                            .underline()
+                    }
+                    .font(.system(size: 13, weight: .medium))
+                }
+                .buttonStyle(.plain)
+                .opacity(hintVisible ? 1 : 0)
+                .padding(.bottom, 24)
+            }
         }
         .onAppear {
             lettersVisible = true
@@ -140,5 +162,5 @@ struct OnboardingWelcomeHeroStep: View {
 }
 
 #Preview {
-    OnboardingWelcomeHeroStep(onAdvance: {})
+    OnboardingWelcomeHeroStep(onAdvance: {}, onLogin: {})
 }

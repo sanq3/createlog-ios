@@ -1,8 +1,10 @@
 import Foundation
 import SwiftData
 
-/// オンボーディング 9 画面フロー。マイプロダクト (SDProject) 登録 + ハンドル選択が主目的。
-/// welcome → appShowcase → tutorialIntro → platform → techStack → projectName → saving → accountPrompt → handleSetup
+/// オンボーディング 13 画面フロー。マイプロダクト (SDProject) + プロフィール登録 + ハンドル選択。
+/// welcome → appShowcase → tutorialIntro → platform → techStack → projectName →
+/// projectDetail → saving → accountPrompt → signInCelebration → profileSetup →
+/// handleSetup → completionCelebration
 @MainActor
 @Observable
 final class OnboardingViewModel {
@@ -13,9 +15,13 @@ final class OnboardingViewModel {
         case platform = 3
         case techStack = 4
         case projectName = 5
-        case saving = 6
-        case accountPrompt = 7
-        case handleSetup = 8
+        case projectDetail = 6
+        case saving = 7
+        case accountPrompt = 8
+        case signInCelebration = 9
+        case profileSetup = 10
+        case handleSetup = 11
+        case completionCelebration = 12
     }
 
     // MARK: - Handle validation (T6)
@@ -56,6 +62,10 @@ final class OnboardingViewModel {
 
     var currentStep: Step = .welcome
 
+    /// Welcome 画面のログインリンクから accountPrompt へジャンプしたか。
+    /// true の間は AccountPrompt のタイトル・文言・プロジェクトカードがログイン用に切り替わる。
+    var isLoginMode: Bool = false
+
     // Product registration (マイプロダクト)
     var selectedPlatforms: Set<String> = []
     var selectedTechStack: Set<String> = []
@@ -63,6 +73,21 @@ final class OnboardingViewModel {
     var isSaved: Bool = false
     var savedProjectName: String = ""
     var savedPlatforms: [String] = []
+
+    // Project detail (2026-04-14, projectDetail step)
+    var appDescription: String = ""
+    var storeURL: String = ""
+    var githubURL: String = ""
+    var iconImageData: Data? = nil
+    var releaseStatus: ProjectStatus = .draft
+
+    // Profile setup (2026-04-14, profileSetup step)
+    var displayName: String = ""
+    var bio: String = ""
+    var avatarImageData: Data? = nil
+    var roleTags: Set<String> = []
+    var isSavingProfile: Bool = false
+    var profileSaveError: String? = nil
 
     // Handle setup (T6)
     var handleInput: String = ""
@@ -81,6 +106,21 @@ final class OnboardingViewModel {
     ) {
         self.modelContext = modelContext
         self.profileRepository = profileRepository
+        purgeUnconfirmedProjects()
+    }
+
+    /// onboarding 未完了で残った SDProject を全削除する。
+    /// OnboardingView が出る = `onboardingCompleted == false` (CreateLogApp で分岐済) なので、
+    /// 残存分は「前回 onboarding 途中離脱の仮データ」と判断できる。
+    /// アカウント作成まで到達しなければ毎回リセットし、マイサービスが無限に積み上がるのを防ぐ。
+    private func purgeUnconfirmedProjects() {
+        let descriptor = FetchDescriptor<SDProject>()
+        if let existing = try? modelContext.fetch(descriptor) {
+            for project in existing {
+                modelContext.delete(project)
+            }
+            try? modelContext.save()
+        }
     }
 
     // MARK: - Derived
@@ -104,11 +144,26 @@ final class OnboardingViewModel {
         currentStep = next
     }
 
+    /// 既存ユーザー用: Welcome から直接 accountPrompt へジャンプ。
+    /// isLoginMode = true でタイトル・文言・リンクが切り替わる。
+    func jumpToAccountPrompt() {
+        isLoginMode = true
+        currentStep = .accountPrompt
+    }
+
+    /// ログイン画面から「初めての方はこちら」で Welcome に戻る。
+    /// isLoginMode を false に戻して通常 onboarding を続行可能にする。
+    func backToWelcome() {
+        isLoginMode = false
+        currentStep = .welcome
+    }
+
     // MARK: - Save (SDProject = マイプロダクト)
 
     /// saving step に入った瞬間に呼ばれる。
     /// SDProject をローカル (SwiftData) に保存。
     /// プロフィールのマイプロダクト + 記録タブのプロジェクト選択に反映される。
+    /// projectDetail で入力された URL / 説明 / アイコン / status もこの時点で一緒に保存する。
     func performSave() {
         guard !isSaved else { return }
 
@@ -117,13 +172,68 @@ final class OnboardingViewModel {
         let platforms = Array(selectedPlatforms)
         let techStack = Array(selectedTechStack)
 
-        let project = SDProject(name: finalName, platforms: platforms, techStack: techStack)
+        let trimmedStore = storeURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedGithub = githubURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedDesc = appDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let project = SDProject(
+            name: finalName,
+            platforms: platforms,
+            techStack: techStack,
+            appDescription: trimmedDesc,
+            storeURL: trimmedStore.isEmpty ? nil : trimmedStore,
+            githubURL: trimmedGithub.isEmpty ? nil : trimmedGithub,
+            iconImageData: iconImageData,
+            status: releaseStatus
+        )
         modelContext.insert(project)
         try? modelContext.save()
 
         savedProjectName = finalName
         savedPlatforms = platforms
         isSaved = true
+    }
+
+    // MARK: - Profile save (2026-04-14, profileSetup step)
+
+    /// profileSetup step の保存。
+    /// - avatar があれば Supabase Storage にアップロード → URL を ProfileUpdateDTO に渡す
+    /// - display name / bio / role tag (occupation として先頭 1 個を保存) を update
+    /// - 失敗時は profileSaveError をセットし false を返す
+    func saveProfileDetails() async -> Bool {
+        isSavingProfile = true
+        profileSaveError = nil
+        defer { isSavingProfile = false }
+
+        var avatarUrlString: String? = nil
+        if let imageData = avatarImageData {
+            do {
+                let url = try await profileRepository.uploadAvatar(imageData: imageData, contentType: "image/jpeg")
+                avatarUrlString = url.absoluteString
+            } catch {
+                profileSaveError = "アバターのアップロードに失敗しました: \(error.localizedDescription)"
+                return false
+            }
+        }
+
+        let trimmedDisplayName = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedBio = bio.trimmingCharacters(in: .whitespacesAndNewlines)
+        let occupation = roleTags.sorted().first
+
+        let updates = ProfileUpdateDTO(
+            displayName: trimmedDisplayName.isEmpty ? nil : trimmedDisplayName,
+            avatarUrl: avatarUrlString,
+            occupation: occupation,
+            bio: trimmedBio.isEmpty ? nil : trimmedBio
+        )
+
+        do {
+            _ = try await profileRepository.updateProfile(updates)
+            return true
+        } catch {
+            profileSaveError = error.localizedDescription
+            return false
+        }
     }
 
     // MARK: - Handle input (T6)

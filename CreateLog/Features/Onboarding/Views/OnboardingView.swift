@@ -1,8 +1,10 @@
 import SwiftUI
 import SwiftData
 
-/// オンボーディング root。9 画面フロー (マイプロダクト登録 + ハンドル選択):
-/// welcome → appShowcase → tutorialIntro → platform → techStack → projectName → saving → accountPrompt → handleSetup
+/// オンボーディング root。13 画面フロー (マイプロダクト + プロフィール + ハンドル):
+/// welcome → appShowcase → tutorialIntro → platform → techStack → projectName →
+/// projectDetail → saving → accountPrompt → signInCelebration → profileSetup →
+/// handleSetup → completionCelebration
 struct OnboardingView: View {
     @Binding var isPresented: Bool
     var authViewModel: AuthViewModel
@@ -48,7 +50,10 @@ struct OnboardingView: View {
     private func currentStepView(_ viewModel: OnboardingViewModel) -> some View {
         switch viewModel.currentStep {
         case .welcome:
-            OnboardingWelcomeHeroStep(onAdvance: { viewModel.advance() })
+            OnboardingWelcomeHeroStep(
+                onAdvance: { viewModel.advance() },
+                onLogin: { viewModel.jumpToAccountPrompt() }
+            )
 
         case .appShowcase:
             OnboardingAppShowcaseStep(onAdvance: { viewModel.advance() })
@@ -85,6 +90,12 @@ struct OnboardingView: View {
                 onAdvance: { viewModel.advance() }
             )
 
+        case .projectDetail:
+            OnboardingProjectDetailStep(
+                viewModel: viewModel,
+                onAdvance: { viewModel.advance() }
+            )
+
         case .saving:
             OnboardingSavingStep(
                 projectName: viewModel.savedProjectName.isEmpty ? viewModel.projectName : viewModel.savedProjectName,
@@ -99,17 +110,30 @@ struct OnboardingView: View {
             OnboardingAccountPromptStep(
                 projectName: viewModel.savedProjectName,
                 platform: viewModel.savedPlatforms.joined(separator: " / "),
+                isLoginMode: viewModel.isLoginMode,
                 authViewModel: authViewModel,
                 onAdvance: { viewModel.advance() },
-                onSkip: { isPresented = false }
+                onBackToWelcome: { viewModel.backToWelcome() }
+            )
+
+        case .signInCelebration:
+            OnboardingSignInCelebrationStep(onAdvance: { viewModel.advance() })
+
+        case .profileSetup:
+            OnboardingProfileSetupStep(
+                viewModel: viewModel,
+                onAdvance: { viewModel.advance() }
             )
 
         case .handleSetup:
             OnboardingHandleStep(
                 viewModel: viewModel,
-                onComplete: { isPresented = false },
-                onSkip: { isPresented = false }
+                onComplete: { viewModel.advance() },
+                onSkip: { viewModel.advance() }
             )
+
+        case .completionCelebration:
+            OnboardingCompletionCelebrationStep(onComplete: { isPresented = false })
         }
     }
 }

@@ -5,6 +5,8 @@ import SwiftUI
 struct OnboardingAppShowcaseStep: View {
     let onAdvance: () -> Void
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     @State private var phoneAppeared = false
     @State private var timerCount = 0
     @State private var selectedTag = "開発"
@@ -12,6 +14,8 @@ struct OnboardingAppShowcaseStep: View {
     @State private var newRecordAppeared = false
     @State private var chartBarsGrown = false
     @State private var scrollPosition: Int? = 0
+    @State private var kpiTodayMinutes: Int = 120
+    @State private var phone2Tilting = false
 
     var body: some View {
         ZStack {
@@ -57,6 +61,12 @@ struct OnboardingAppShowcaseStep: View {
 
                         premiumPhone { timelineScreenView }
                             .id(1)
+                            .rotation3DEffect(
+                                .degrees(phone2Tilting ? 1.5 : -1.5),
+                                axis: (x: 0, y: 1, z: 0),
+                                perspective: 0.45
+                            )
+                            .scaleEffect(phone2Tilting ? 1.01 : 0.99)
                             .scrollTransition(.interactive, axis: .horizontal) { content, phase in
                                 content
                                     .scaleEffect(phase.isIdentity ? 1.0 : 0.8)
@@ -106,6 +116,11 @@ struct OnboardingAppShowcaseStep: View {
                 withAnimation(.spring(duration: 1.0, bounce: 0.1)) {
                     chartBarsGrown = true
                 }
+                if !reduceMotion {
+                    withAnimation(.easeInOut(duration: 1.75).repeatForever(autoreverses: true)) {
+                        phone2Tilting = true
+                    }
+                }
             }
         }
         .task {
@@ -113,6 +128,16 @@ struct OnboardingAppShowcaseStep: View {
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(1.0))
                 timerCount += 1
+            }
+        }
+        .task(id: scrollPosition) {
+            guard scrollPosition == 1, !reduceMotion else { return }
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(4.0))
+                if Task.isCancelled || scrollPosition != 1 { break }
+                withAnimation(.spring(duration: 0.4)) {
+                    kpiTodayMinutes += 1
+                }
             }
         }
     }
@@ -302,6 +327,10 @@ struct OnboardingAppShowcaseStep: View {
         String(format: "%d:%02d", timerCount / 60, timerCount % 60)
     }
 
+    private var kpiTodayText: String {
+        String(format: "%dh %02dm", kpiTodayMinutes / 60, kpiTodayMinutes % 60)
+    }
+
     // MARK: - Timeline Screen
 
     private var timelineScreenView: some View {
@@ -314,7 +343,18 @@ struct OnboardingAppShowcaseStep: View {
 
             // KPI 行
             HStack(spacing: 0) {
-                miniKpi("2h", "今日")
+                VStack(spacing: 1) {
+                    Text(kpiTodayText)
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color.clTextPrimary)
+                        .contentTransition(.numericText(countsDown: false))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                    Text("今日")
+                        .font(.system(size: 7, weight: .medium))
+                        .foregroundStyle(Color.clTextPrimary.opacity(0.5))
+                }
+                .frame(maxWidth: .infinity)
                 miniKpi("12h", "今週")
                 miniKpi("48h", "今月")
             }
