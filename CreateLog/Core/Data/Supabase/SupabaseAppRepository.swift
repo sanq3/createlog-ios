@@ -67,10 +67,14 @@ final class SupabaseAppRepository: AppRepositoryProtocol, Sendable {
     /// アイコンを Supabase Storage `avatars` bucket に upload。新しい bucket を作る migration を避けるため、
     /// path を `{userId}/apps/{timestamp}.{ext}` で名前空間を分けて user avatar と共存させる。
     /// (avatars bucket の RLS は `auth.uid() = storage prefix` 想定なので prefix を userId にすれば適用される)
+    ///
+    /// **重要**: `UUID.uuidString` は uppercase を返すが Postgres `auth.uid()::text` は lowercase。
+    /// `.lowercased()` を必ず付ける (RLS の path prefix 比較が大文字小文字 sensitive)。
     func uploadAppIcon(imageData: Data, contentType: String) async throws -> URL {
         let session = try await client.auth.session
         let ext = contentType.contains("png") ? "png" : "jpg"
-        let path = "\(session.user.id.uuidString)/apps/\(Int(Date().timeIntervalSince1970)).\(ext)"
+        let userIdLower = session.user.id.uuidString.lowercased()
+        let path = "\(userIdLower)/apps/\(Int(Date().timeIntervalSince1970)).\(ext)"
 
         _ = try await client.storage
             .from("avatars")

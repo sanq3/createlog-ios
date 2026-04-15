@@ -76,10 +76,14 @@ final class SupabaseProfileRepository: ProfileRepositoryProtocol, Sendable {
     /// Supabase Storage `avatars` bucket にアップロードして公開 URL を返す。
     /// ファイル名は `{userId}/{timestamp}.{ext}` 形式で衝突回避 + user ごとの prefix で RLS 適用しやすく。
     /// bucket 側で `public: true` かつ auth.uid() = storage prefix の RLS policy を想定。
+    ///
+    /// **重要**: `UUID.uuidString` は uppercase を返すが Postgres `auth.uid()::text` は lowercase。
+    /// `.lowercased()` を必ず付ける (RLS の path prefix 比較が大文字小文字 sensitive)。
     func uploadAvatar(imageData: Data, contentType: String) async throws -> URL {
         let session = try await currentSession()
         let ext = contentType.contains("png") ? "png" : "jpg"
-        let path = "\(session.user.id.uuidString)/\(Int(Date().timeIntervalSince1970)).\(ext)"
+        let userIdLower = session.user.id.uuidString.lowercased()
+        let path = "\(userIdLower)/\(Int(Date().timeIntervalSince1970)).\(ext)"
 
         _ = try await client.storage
             .from("avatars")
