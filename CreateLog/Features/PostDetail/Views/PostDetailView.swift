@@ -13,6 +13,17 @@ struct PostDetailView: View {
     @State private var myAvatarUrl: String?
     /// 投稿者の userId (ブロック操作用)。PostDTO から引いて保持。
     @State private var authorUserId: UUID?
+    /// 返信モード: 誰に返信しているかを保持。`nil` の時は通常のコメント投稿。
+    /// 1 階層のみの制約 (X / Instagram 同様): 返信の返信は元の親 comment に紐づけ、
+    /// UI では `@handle に返信` と示すだけで DB 的にはフラット化する。
+    @State private var replyingTo: ReplyTarget?
+
+    private struct ReplyTarget: Equatable {
+        /// DB 挿入時に `parent_comment_id` として使う UUID (常に**最上位の親** comment)。
+        let parentId: UUID
+        let handle: String
+        let authorName: String
+    }
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -112,10 +123,10 @@ struct PostDetailView: View {
 
         authorUserId = post.userId
         post.isLiked = liked
-        comments = dtos.map(commentFromDTO)
+        comments = buildComments(from: dtos)
     }
 
-    private func commentFromDTO(_ dto: CommentDTO) -> Comment {
+    private func commentFromDTO(_ dto: CommentDTO, replies: [Comment] = []) -> Comment {
         let displayName = dto.authorDisplayName ?? dto.authorHandle ?? ""
         let initials = displayName.isEmpty ? "?" : String(displayName.prefix(1))
         return Comment(
@@ -125,8 +136,29 @@ struct PostDetailView: View {
             authorInitials: initials,
             authorAvatarUrl: dto.authorAvatarUrl,
             text: dto.content,
-            timestamp: dto.createdAt
+            timestamp: dto.createdAt,
+            replies: replies
         )
+    }
+
+    /// Flat な [CommentDTO] を parent/reply 2 階層に再構成する。
+    /// - 親 (`parent_comment_id == nil`): 新しい順
+    /// - 返信 (`parent_comment_id != nil`): 古い順 (会話の流れ保持)
+    /// 1 階層制約: 返信の返信も DB 上は同じ parent に紐づくので自動的に 2 階層に収まる。
+    private func buildComments(from dtos: [CommentDTO]) -> [Comment] {
+        let repliesByParent = Dictionary(
+            grouping: dtos.filter { $0.parentCommentId != nil },
+            by: { $0.parentCommentId! }
+        )
+        let parents = dtos
+            .filter { $0.parentCommentId == nil }
+            .sorted { $0.createdAt > $1.createdAt }
+        return parents.map { parentDTO in
+            let childDTOs = (repliesByParent[parentDTO.id] ?? [])
+                .sorted { $0.createdAt < $1.createdAt }
+            let children = childDTOs.map { commentFromDTO($0) }
+            return commentFromDTO(parentDTO, replies: children)
+        }
     }
 
     private func toggleLike() {
@@ -167,25 +199,54 @@ struct PostDetailView: View {
         guard !text.isEmpty else { return }
         HapticManager.light()
         let draftText = text
+        let target = replyingTo
         commentText = ""
+        replyingTo = nil
         isCommentFocused = false
         Task {
             do {
                 let dto = try await dependencies.commentRepository.insertComment(
                     postId: post.id,
                     content: draftText,
-                    parentId: nil
+                    parentId: target?.parentId
                 )
                 await MainActor.run {
-                    comments.append(commentFromDTO(dto))
+                    appendComment(dto)
                     post.comments += 1
                 }
             } catch {
-                // 失敗時は入力を復元
+                // 失敗時は入力と返信モードを復元
                 await MainActor.run {
                     commentText = draftText
+                    replyingTo = target
                 }
             }
+        }
+    }
+
+    /// 新規コメント / 返信を受け取って既存リストに挿入する。
+    /// 親コメント: 新しい順の先頭に追加。
+    /// 返信: 該当親の `replies` 末尾に追加 (古い順のため新しいものは最後)。
+    private func appendComment(_ dto: CommentDTO) {
+        let newComment = commentFromDTO(dto)
+        if let parentId = dto.parentCommentId {
+            comments = comments.map { parent in
+                guard parent.id == parentId else { return parent }
+                return Comment(
+                    id: parent.id,
+                    authorName: parent.authorName,
+                    authorHandle: parent.authorHandle,
+                    authorInitials: parent.authorInitials,
+                    authorAvatarUrl: parent.authorAvatarUrl,
+                    text: parent.text,
+                    timestamp: parent.timestamp,
+                    likes: parent.likes,
+                    isLiked: parent.isLiked,
+                    replies: parent.replies + [newComment]
+                )
+            }
+        } else {
+            comments.insert(newComment, at: 0)
         }
     }
 
@@ -358,7 +419,8 @@ struct PostDetailView: View {
             ForEach(comments) { comment in
                 commentRow(comment)
                 ForEach(comment.replies) { reply in
-                    replyRow(reply)
+                    // 返信の返信も最上位の親 (comment.id) に紐づけ (1 階層制約)
+                    replyRow(reply, parentCommentId: comment.id)
                 }
             }
         }
@@ -388,7 +450,10 @@ struct PostDetailView: View {
                         .foregroundStyle(Color.clTextPrimary)
                         .lineSpacing(4)
 
-                    commentMeta(comment)
+                    commentMeta(comment) {
+                        // 親コメントへ返信: parentId = このコメント自身の id
+                        startReply(to: comment, parentId: comment.id)
+                    }
                 }
             }
             .padding(.horizontal, 16)
@@ -398,7 +463,7 @@ struct PostDetailView: View {
         }
     }
 
-    private func replyRow(_ reply: Comment) -> some View {
+    private func replyRow(_ reply: Comment, parentCommentId: UUID) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top, spacing: 10) {
                 AvatarView(
@@ -422,7 +487,10 @@ struct PostDetailView: View {
                         .foregroundStyle(Color.clTextPrimary)
                         .lineSpacing(4)
 
-                    commentMeta(reply)
+                    commentMeta(reply) {
+                        // 返信への返信も最上位の parent に紐づく (1 階層制約)
+                        startReply(to: reply, parentId: parentCommentId)
+                    }
                 }
             }
             .padding(.leading, 40)
@@ -440,9 +508,7 @@ struct PostDetailView: View {
         }
     }
 
-    private func commentMeta(_ comment: Comment) -> some View {
-        // v2.0.0: 返信機能 (スレッド化) は未実装のため「返信」ラベルは非表示。
-        // タップできない Text を出すと誤解を生むので削除した。v2.1 で replies schema + UI とセットで再導入予定。
+    private func commentMeta(_ comment: Comment, onReply: @escaping () -> Void) -> some View {
         HStack(spacing: 16) {
             Text(relativeTime(from: comment.timestamp))
                 .font(.system(size: 12))
@@ -453,8 +519,26 @@ struct PostDetailView: View {
                     .font(.system(size: 12))
                     .foregroundStyle(Color.clTextTertiary)
             }
+
+            Button(action: onReply) {
+                Text("返信")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(Color.clTextTertiary)
+            }
+            .buttonStyle(.plain)
         }
         .padding(.top, 4)
+    }
+
+    /// 返信モードを開始。入力欄の focus と replyingTo state を同時に更新。
+    private func startReply(to target: Comment, parentId: UUID) {
+        HapticManager.light()
+        replyingTo = ReplyTarget(
+            parentId: parentId,
+            handle: target.authorHandle,
+            authorName: target.authorName
+        )
+        isCommentFocused = true
     }
 
     // MARK: - Comment Input Bar
@@ -462,6 +546,28 @@ struct PostDetailView: View {
     private var commentInputBar: some View {
         VStack(spacing: 0) {
             Divider().foregroundStyle(Color.clBorder)
+
+            if let target = replyingTo {
+                HStack {
+                    Text("@\(target.handle) に返信中")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(Color.clAccent)
+                    Spacer()
+                    Button {
+                        HapticManager.light()
+                        replyingTo = nil
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 14))
+                            .foregroundStyle(Color.clTextTertiary)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 6)
+                .background(Color.clAccent.opacity(0.08))
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
+            }
 
             HStack(spacing: 10) {
                 AvatarView(
@@ -471,7 +577,10 @@ struct PostDetailView: View {
                     imageURL: myAvatarUrl.flatMap(URL.init(string:))
                 )
 
-                TextField("コメントを追加...", text: $commentText)
+                TextField(
+                    replyingTo.map { "@\($0.handle) に返信..." } ?? "コメントを追加...",
+                    text: $commentText
+                )
                     .font(.system(size: 15))
                     .foregroundStyle(Color.clTextPrimary)
                     .focused($isCommentFocused)
@@ -497,6 +606,7 @@ struct PostDetailView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
             .animation(.spring(duration: 0.35, bounce: 0.15), value: commentText.isEmpty)
+            .animation(.spring(duration: 0.35, bounce: 0.15), value: replyingTo)
         }
         .background(.ultraThinMaterial)
     }
