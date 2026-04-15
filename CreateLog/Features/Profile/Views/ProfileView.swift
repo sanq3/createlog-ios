@@ -12,35 +12,47 @@ struct ProfileView: View {
         order: .reverse
     )
     private var localProjects: [SDProject]
-    @State private var viewModel: ProfileViewModel?
+    /// 2026-04-16: 非 optional 化 (SWR + cache-first rendering)。init で dependencies を受け取り、
+    /// `ProfileViewModel.init` 内で `SDProfileCache` から同期的に profile を fetch する。
+    /// これで View 初回描画時に `User(name:"", handle:"")` の空 User が見える flicker を根絶。
+    @State private var viewModel: ProfileViewModel
     @State private var showShareSheet = false
     @State private var showEditProfile = false
-    @State private var selectedPostTab: PostTab = .posts
 
-    /// ViewModel 未初期化時の空値 (loading state)。
+    init(dependencies: DependencyContainer) {
+        _viewModel = State(initialValue: ProfileViewModel(
+            profileRepository: dependencies.profileRepository,
+            postRepository: dependencies.postRepository,
+            appRepository: dependencies.appRepository,
+            followRepository: dependencies.followRepository,
+            statsRepository: dependencies.statsRepository
+        ))
+    }
+
+    /// profile 未 load (cold cache 初回) の場合は空文字 User を返し、body 側で `.redacted(.placeholder)`
+    /// で skeleton として描画する。通常は cache hit で cold cache は初回 login 直後のみ。
     private var user: User {
-        if let dto = viewModel?.profile {
+        if let dto = viewModel.profile {
             return User(from: dto)
         }
         return User(name: "", handle: "")
     }
     private var userPosts: [Post] {
-        (viewModel?.posts ?? []).map { Post(from: $0) }
+        viewModel.posts.map { Post(from: $0) }
     }
     /// Remote Supabase に保存されたアプリ (apps テーブル)。
     /// local SDProject (@Query) はオンボーディング登録分。両方並べて表示する。
     private var userProjects: [Project] {
-        (viewModel?.apps ?? []).map { Project(from: $0) }
+        viewModel.apps.map { Project(from: $0) }
     }
     private var weeklyHours: [(String, Double)] {
-        viewModel?.weeklyHours ?? []
+        viewModel.weeklyHours
+    }
+    /// SWR: profile が未 load の初回のみ skeleton 表示。cache hit 時は即座に実データ。
+    private var isColdCache: Bool {
+        viewModel.profile == nil
     }
 
-    private enum PostTab: String, CaseIterable {
-        case posts = "投稿"
-        case likes = "いいね"
-        case bookmarks = "ブックマーク"
-    }
     private var handle: String { "@\(user.handle)" }
     private var profileURL: String { "https://createlog.app/\(user.handle)" }
 
@@ -170,39 +182,24 @@ struct ProfileView: View {
                 }
                 .padding(.top, 20)
 
-                // 投稿タブ
+                // 投稿セクション
+                // v2.0.0: タブ (投稿 / いいね / ブックマーク) は投稿のみに。
+                // いいね・ブックマークの一覧は対応 Repository 未実装 (LikeRepository.fetchLiked なし、
+                // BookmarkRepository なし) のため v2.1 で再導入する。
                 VStack(spacing: 0) {
-                    // タブバー
-                    HStack(spacing: 0) {
-                        ForEach(PostTab.allCases, id: \.self) { tab in
-                            Button {
-                                withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                                    selectedPostTab = tab
-                                }
-                            } label: {
-                                VStack(spacing: 8) {
-                                    Text(tab.rawValue)
-                                        .font(.system(size: 14, weight: selectedPostTab == tab ? .semibold : .regular))
-                                        .foregroundStyle(
-                                            selectedPostTab == tab ? Color.clTextPrimary : Color.clTextTertiary
-                                        )
-
-                                    Rectangle()
-                                        .fill(selectedPostTab == tab ? Color.clAccent : Color.clear)
-                                        .frame(height: 2)
-                                }
-                            }
-                            .buttonStyle(.plain)
-                            .frame(maxWidth: .infinity)
-                        }
+                    HStack {
+                        Text("投稿")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(Color.clTextPrimary)
+                        Spacer()
                     }
                     .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
 
                     Divider()
                         .foregroundStyle(Color.clBorder)
 
-                    // 投稿リスト
-                    postList(for: selectedPostTab)
+                    postsListSection
                 }
                 .padding(.top, 20)
 
@@ -238,73 +235,33 @@ struct ProfileView: View {
             .presentationDetents([.large])
             .presentationDragIndicator(.hidden)
         }
+        .redacted(reason: isColdCache ? .placeholder : [])
         .refreshable {
-            await viewModel?.loadProfile()
+            await viewModel.loadProfile()
         }
         .task {
-            if viewModel == nil {
-                viewModel = ProfileViewModel(
-                    profileRepository: deps.profileRepository,
-                    postRepository: deps.postRepository,
-                    appRepository: deps.appRepository,
-                    followRepository: deps.followRepository,
-                    statsRepository: deps.statsRepository
-                )
-            }
-            await viewModel?.loadProfile()
-        }
-    }
-
-    // タブごとの投稿データ。
-    // - .posts: fetchUserPosts から取得した自分の投稿
-    // - .likes / .bookmarks: 対応する Repository が未実装 (LikeRepository に fetchLiked なし、
-    //   BookmarkRepository 自体なし) のため空配列 + 準備中プレースホルダ。
-    //   v1.1 以降で Like/Bookmark の fetch API を実装した時点で配線する。
-    private func postsFor(_ tab: PostTab) -> [Post] {
-        switch tab {
-        case .posts:
-            userPosts
-        case .likes, .bookmarks:
-            []
+            // ViewModel.init で SDProfileCache から同期 fetch 済 → body 初回描画時に既に
+            // profile が埋まっている (cache hit 時)。ここでは background revalidate のみ。
+            await viewModel.loadProfile()
         }
     }
 
     @ViewBuilder
-    private func postList(for tab: PostTab) -> some View {
-        let items = postsFor(tab)
-        if items.isEmpty {
-            tabEmptyState(for: tab)
-                .padding(.top, 12)
-        } else {
-            LazyVStack(spacing: 12) {
-                ForEach(items) { post in
-                    PostCardView(post: post)
-                }
-            }
-            .padding(.top, 12)
-        }
-    }
-
-    @ViewBuilder
-    private func tabEmptyState(for tab: PostTab) -> some View {
-        switch tab {
-        case .posts:
+    private var postsListSection: some View {
+        if userPosts.isEmpty {
             Text("まだ投稿がありません")
                 .font(.clCaption)
                 .foregroundStyle(Color.clTextTertiary)
                 .padding(.horizontal, 16)
-        case .likes:
-            ContentUnavailableView(
-                "準備中",
-                systemImage: "heart.slash",
-                description: Text("いいねした投稿の一覧は近日対応予定です")
-            )
-        case .bookmarks:
-            ContentUnavailableView(
-                "準備中",
-                systemImage: "bookmark.slash",
-                description: Text("ブックマークの一覧は近日対応予定です")
-            )
+                .padding(.top, 24)
+                .frame(maxWidth: .infinity)
+        } else {
+            LazyVStack(spacing: 12) {
+                ForEach(userPosts) { post in
+                    PostCardView(post: post)
+                }
+            }
+            .padding(.top, 12)
         }
     }
 

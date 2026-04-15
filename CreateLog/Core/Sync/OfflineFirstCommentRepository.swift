@@ -13,15 +13,19 @@ final class OfflineFirstCommentRepository: CommentRepositoryProtocol, @unchecked
     private let underlying: any CommentRepositoryProtocol
     private let modelContainer: ModelContainer?
     private let syncService: any SyncServiceProtocol
+    /// 2026-04-16: feed-precache pattern 同型。comment 取得時に author basic を SDProfileCache へ書き込み。
+    private let profileRepository: (any ProfileRepositoryProtocol)?
 
     init(
         underlying: any CommentRepositoryProtocol,
         modelContainer: ModelContainer?,
-        syncService: any SyncServiceProtocol
+        syncService: any SyncServiceProtocol,
+        profileRepository: (any ProfileRepositoryProtocol)? = nil
     ) {
         self.underlying = underlying
         self.modelContainer = modelContainer
         self.syncService = syncService
+        self.profileRepository = profileRepository
     }
 
     // MARK: - Read
@@ -30,12 +34,25 @@ final class OfflineFirstCommentRepository: CommentRepositoryProtocol, @unchecked
         do {
             let remote = try await underlying.fetchComments(postId: postId, cursor: cursor, limit: limit)
             await upsertCache(remote)
+            precacheAuthors(from: remote)
             return remote
         } catch {
             if let cached = await readFromCache(postId: postId, cursor: cursor, limit: limit), !cached.isEmpty {
                 return cached
             }
             throw error
+        }
+    }
+
+    private func precacheAuthors(from comments: [CommentDTO]) {
+        guard let profileRepository else { return }
+        for c in comments {
+            profileRepository.precacheBasic(
+                userId: c.userId,
+                handle: c.authorHandle,
+                displayName: c.authorDisplayName,
+                avatarUrl: c.authorAvatarUrl
+            )
         }
     }
 

@@ -82,6 +82,18 @@ struct CommentDTO: Codable, Sendable, Identifiable {
         case authorAvatarUrl = "author_avatar_url"
     }
 
+    /// JOIN embed 用の `author` alias。`CodingKeys` に含めると Encodable auto-synthesize が壊れるため分離。
+    private enum ExtraDecodeKeys: String, CodingKey {
+        case author
+    }
+
+    /// JOIN で embed される `profiles` レコード (Post と同型)。
+    enum AuthorCodingKeys: String, CodingKey {
+        case handle
+        case displayName = "display_name"
+        case avatarUrl = "avatar_url"
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(UUID.self, forKey: .id)
@@ -90,8 +102,17 @@ struct CommentDTO: Codable, Sendable, Identifiable {
         content = try container.decode(String.self, forKey: .content)
         parentCommentId = try container.decodeIfPresent(UUID.self, forKey: .parentCommentId)
         createdAt = try container.decode(Date.self, forKey: .createdAt)
-        authorDisplayName = try container.decodeIfPresent(String.self, forKey: .authorDisplayName)
-        authorHandle = try container.decodeIfPresent(String.self, forKey: .authorHandle)
-        authorAvatarUrl = try container.decodeIfPresent(String.self, forKey: .authorAvatarUrl)
+
+        // JOIN 応答 (nested author) 優先、flat fallback
+        let extraContainer = try decoder.container(keyedBy: ExtraDecodeKeys.self)
+        if let authorContainer = try? extraContainer.nestedContainer(keyedBy: AuthorCodingKeys.self, forKey: .author) {
+            authorHandle = try? authorContainer.decodeIfPresent(String.self, forKey: .handle)
+            authorDisplayName = try? authorContainer.decodeIfPresent(String.self, forKey: .displayName)
+            authorAvatarUrl = try? authorContainer.decodeIfPresent(String.self, forKey: .avatarUrl)
+        } else {
+            authorDisplayName = try container.decodeIfPresent(String.self, forKey: .authorDisplayName)
+            authorHandle = try container.decodeIfPresent(String.self, forKey: .authorHandle)
+            authorAvatarUrl = try container.decodeIfPresent(String.self, forKey: .authorAvatarUrl)
+        }
     }
 }

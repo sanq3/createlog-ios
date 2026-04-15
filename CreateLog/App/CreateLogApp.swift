@@ -30,7 +30,9 @@ struct CreateLogApp: App {
             SDLikeCache.self,
             SDFollowCache.self,
             SDCommentCache.self,
-            SDNotificationCache.self
+            SDNotificationCache.self,
+            // 2026-04-16: Profile flicker 根本修正 (SWR + cache-first rendering)
+            SDProfileCache.self
         ])
         do {
             let config = ModelConfiguration(isStoredInMemoryOnly: false)

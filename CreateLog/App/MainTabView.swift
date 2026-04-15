@@ -36,7 +36,7 @@ struct MainTabView: View {
                     }
                 case 4:
                     tabNavigationStack {
-                        ProfileView()
+                        ProfileView(dependencies: dependencies)
                     }
                 default: EmptyView()
                 }

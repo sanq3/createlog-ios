@@ -23,7 +23,12 @@ final class ProfileViewModel {
     var totalMinutes = 0
     /// 曜日 (月〜日) ラベル + 時間 (時間単位) ペア。ProfileView の週間チャート用。
     var weeklyHours: [(day: String, hours: Double)] = []
+    /// Cold cache 初回のみ true。View 側の skeleton placeholder 判定用。
+    /// SWR で cache hit 時は profile != nil のため常に false。
     var isLoading = false
+    /// background revalidation 中フラグ。cache 表示中に裏で remote fetch 中であることを UI に
+    /// 伝える (上部に控えめなインジケータ等)。View は任意で使う。
+    var isRevalidating = false
     var errorMessage: String?
 
     /// 自分のプロフィールかどうか
@@ -47,13 +52,31 @@ final class ProfileViewModel {
         self.statsRepository = statsRepository
         self.targetUserId = userId
         self.isMyProfile = userId == nil
+
+        // 2026-04-16: SWR + Cache-first rendering (Bluesky placeholderData pattern)。
+        // 同期的に SDProfileCache から profile を取得して初期値にする。cold cache なら nil。
+        // これにより View 初回描画時に空 User (handle="", name="") が一瞬表示される flicker を根絶する。
+        if let userId {
+            self.profile = profileRepository.cachedProfile(userId: userId)
+        } else {
+            self.profile = profileRepository.cachedMyProfile()
+        }
     }
 
     // MARK: - Data Loading
 
     func loadProfile() async {
-        isLoading = true
-        defer { isLoading = false }
+        // cache hit 時は isRevalidating (背景 refresh)、cold cache 時は isLoading (初回待機)
+        let hadCache = profile != nil
+        if hadCache {
+            isRevalidating = true
+        } else {
+            isLoading = true
+        }
+        defer {
+            isLoading = false
+            isRevalidating = false
+        }
 
         do {
             let userId: UUID

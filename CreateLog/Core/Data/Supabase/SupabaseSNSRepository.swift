@@ -10,12 +10,17 @@ final class SupabasePostRepository: PostRepositoryProtocol, Sendable {
         self.client = client
     }
 
+    /// Feed 取得。`author:profiles!posts_user_id_fkey(...)` で投稿者の basic 情報を JOIN で持ち帰る。
+    /// Bluesky feed-precache pattern の iOS 版。feed 読み込み 1 回で投稿者 N 人分の basic を SDProfileCache に
+    /// 先行書き込みするのに使う。PostDTO.decoder が nested `author` を優先 decode。
+    private static let feedSelectClause = "*, author:profiles!posts_user_id_fkey(handle, display_name, avatar_url)"
+
     func fetchFeed(cursor: Date?, limit: Int) async throws -> [PostDTO] {
         let formatter = ISO8601DateFormatter()
         if let cursor {
             let result: [PostDTO] = try await client
                 .from("posts")
-                .select()
+                .select(Self.feedSelectClause)
                 .eq("visibility", value: "public")
                 .lt("created_at", value: formatter.string(from: cursor))
                 .order("created_at", ascending: false)
@@ -26,7 +31,7 @@ final class SupabasePostRepository: PostRepositoryProtocol, Sendable {
         } else {
             let result: [PostDTO] = try await client
                 .from("posts")
-                .select()
+                .select(Self.feedSelectClause)
                 .eq("visibility", value: "public")
                 .order("created_at", ascending: false)
                 .limit(limit)
@@ -54,7 +59,7 @@ final class SupabasePostRepository: PostRepositoryProtocol, Sendable {
         let formatter = ISO8601DateFormatter()
         var query = client
             .from("posts")
-            .select()
+            .select(Self.feedSelectClause)
             .eq("user_id", value: userId.uuidString)
             .eq("visibility", value: "public")
         if let cursor {
@@ -240,12 +245,15 @@ final class SupabaseCommentRepository: CommentRepositoryProtocol, Sendable {
         self.client = client
     }
 
+    /// Comment 取得。author basic を JOIN で持ち帰り、SDProfileCache へ先行書き込み可能にする。
+    private static let commentSelectClause = "*, author:profiles!comments_user_id_fkey(handle, display_name, avatar_url)"
+
     func fetchComments(postId: UUID, cursor: Date?, limit: Int) async throws -> [CommentDTO] {
         let formatter = ISO8601DateFormatter()
         if let cursor {
             let result: [CommentDTO] = try await client
                 .from("comments")
-                .select()
+                .select(Self.commentSelectClause)
                 .eq("post_id", value: postId.uuidString)
                 .gt("created_at", value: formatter.string(from: cursor))
                 .order("created_at", ascending: true)
@@ -256,7 +264,7 @@ final class SupabaseCommentRepository: CommentRepositoryProtocol, Sendable {
         } else {
             let result: [CommentDTO] = try await client
                 .from("comments")
-                .select()
+                .select(Self.commentSelectClause)
                 .eq("post_id", value: postId.uuidString)
                 .order("created_at", ascending: true)
                 .limit(limit)

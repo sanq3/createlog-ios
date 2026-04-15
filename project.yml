@@ -9,6 +9,12 @@ packages:
   Supabase:
     url: https://github.com/supabase/supabase-swift
     from: "2.0.0"
+  # 2026-04-16: プロフィール画像 flicker 対策 (Bluesky/Threads/Instagram 同等品質)。
+  # Nuke 13.0+ は Swift 6.2 / Xcode 26 対応 (@globalActor ImagePipelineActor で data race safety)。
+  # 3-tier cache (memory rendered / memory raw / disk LRU) を標準装備、AsyncImage の flicker を根絶。
+  Nuke:
+    url: https://github.com/kean/Nuke
+    from: "13.0.0"
 targets:
   CreateLog:
     type: application
@@ -67,6 +73,10 @@ targets:
     dependencies:
       - package: Supabase
         product: Supabase
+      - package: Nuke
+        product: Nuke
+      - package: Nuke
+        product: NukeUI
   CreateLogTests:
     type: bundle.unit-test
     platform: iOS

@@ -32,6 +32,20 @@ struct PostDTO: Codable, Sendable, Identifiable {
         case authorAvatarUrl = "author_avatar_url"
     }
 
+    /// JOIN で embed される `profiles` レコード。`select("*, author:profiles!posts_user_id_fkey(...)")`
+    /// で返されるネスト object を decode するための専用キー。`author` は DB カラムではなく
+    /// Supabase の select で一時的に紐づけた alias なので `CodingKeys` には含めない
+    /// (含めると Encodable auto-synthesize が壊れる)。
+    private enum ExtraDecodeKeys: String, CodingKey {
+        case author
+    }
+
+    enum AuthorCodingKeys: String, CodingKey {
+        case handle
+        case displayName = "display_name"
+        case avatarUrl = "avatar_url"
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(UUID.self, forKey: .id)
@@ -44,9 +58,19 @@ struct PostDTO: Codable, Sendable, Identifiable {
         visibility = try container.decodeIfPresent(String.self, forKey: .visibility) ?? "public"
         createdAt = try container.decode(Date.self, forKey: .createdAt)
         updatedAt = try container.decode(Date.self, forKey: .updatedAt)
-        authorDisplayName = try container.decodeIfPresent(String.self, forKey: .authorDisplayName)
-        authorHandle = try container.decodeIfPresent(String.self, forKey: .authorHandle)
-        authorAvatarUrl = try container.decodeIfPresent(String.self, forKey: .authorAvatarUrl)
+
+        // 2026-04-16: JOIN 応答 (nested `author`) 優先、RPC flat 応答 (author_*) fallback。
+        // Bluesky feed precache pattern の iOS 版 — feed 取得時に author basic を持ち帰る。
+        let extraContainer = try decoder.container(keyedBy: ExtraDecodeKeys.self)
+        if let authorContainer = try? extraContainer.nestedContainer(keyedBy: AuthorCodingKeys.self, forKey: .author) {
+            authorHandle = try? authorContainer.decodeIfPresent(String.self, forKey: .handle)
+            authorDisplayName = try? authorContainer.decodeIfPresent(String.self, forKey: .displayName)
+            authorAvatarUrl = try? authorContainer.decodeIfPresent(String.self, forKey: .avatarUrl)
+        } else {
+            authorDisplayName = try container.decodeIfPresent(String.self, forKey: .authorDisplayName)
+            authorHandle = try container.decodeIfPresent(String.self, forKey: .authorHandle)
+            authorAvatarUrl = try container.decodeIfPresent(String.self, forKey: .authorAvatarUrl)
+        }
     }
 }
 

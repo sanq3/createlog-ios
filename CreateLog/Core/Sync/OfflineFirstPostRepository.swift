@@ -26,15 +26,20 @@ final class OfflineFirstPostRepository: PostRepositoryProtocol, @unchecked Senda
     private let underlying: any PostRepositoryProtocol
     private let modelContainer: ModelContainer?
     private let syncService: any SyncServiceProtocol
+    /// 2026-04-16: feed 取得成功時に post.author basic を SDProfileCache に先行書き込みするため保持。
+    /// preview 等で nil の場合は precache を skip。
+    private let profileRepository: (any ProfileRepositoryProtocol)?
 
     init(
         underlying: any PostRepositoryProtocol,
         modelContainer: ModelContainer?,
-        syncService: any SyncServiceProtocol
+        syncService: any SyncServiceProtocol,
+        profileRepository: (any ProfileRepositoryProtocol)? = nil
     ) {
         self.underlying = underlying
         self.modelContainer = modelContainer
         self.syncService = syncService
+        self.profileRepository = profileRepository
     }
 
     // MARK: - Read
@@ -43,6 +48,7 @@ final class OfflineFirstPostRepository: PostRepositoryProtocol, @unchecked Senda
         do {
             let remote = try await underlying.fetchFeed(cursor: cursor, limit: limit)
             await upsertCache(remote)
+            precacheAuthors(from: remote)
             return remote
         } catch {
             // Network 失敗 → cache fallback
@@ -57,6 +63,7 @@ final class OfflineFirstPostRepository: PostRepositoryProtocol, @unchecked Senda
         do {
             let remote = try await underlying.fetchFollowingFeed(cursor: cursor, limit: limit)
             await upsertCache(remote)
+            precacheAuthors(from: remote)
             return remote
         } catch {
             if let cached = await readFromCache(cursor: cursor, limit: limit), !cached.isEmpty {
@@ -71,7 +78,23 @@ final class OfflineFirstPostRepository: PostRepositoryProtocol, @unchecked Senda
         // cache fallback はしない (他人プロフィールを cache しても混乱の元)。
         let remote = try await underlying.fetchUserPosts(userId: userId, cursor: cursor, limit: limit)
         await upsertCache(remote)
+        precacheAuthors(from: remote)
         return remote
+    }
+
+    /// Feed precache (Bluesky pattern): 各 post の author basic を SDProfileCache に先行書き込み。
+    /// - feed JOIN で取れなかった post は author* が nil → precacheBasic 側の all-nil guard で no-op
+    /// - 後で UserProfileView 遷移時に cache hit → spinner ゼロ描画
+    private func precacheAuthors(from posts: [PostDTO]) {
+        guard let profileRepository else { return }
+        for post in posts {
+            profileRepository.precacheBasic(
+                userId: post.userId,
+                handle: post.authorHandle,
+                displayName: post.authorDisplayName,
+                avatarUrl: post.authorAvatarUrl
+            )
+        }
     }
 
     // MARK: - Write

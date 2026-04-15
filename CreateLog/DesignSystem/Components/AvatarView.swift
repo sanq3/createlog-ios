@@ -1,11 +1,17 @@
 import SwiftUI
+import NukeUI
 
 /// プロフィール / 投稿 / コメント等で使う共通アバター。
 ///
 /// 表示優先順:
 /// 1. `imageData` (オンボーディング中の local preview / PhotosPicker 直後)
-/// 2. `imageURL` (Supabase Storage `avatars` の public URL)
+/// 2. `imageURL` (Supabase Storage `avatars` の public URL、NukeUI `LazyImage` で 3-tier cache)
 /// 3. initials gradient fallback (画像なし or 読み込み失敗時)
+///
+/// 2026-04-16: `AsyncImage` → NukeUI `LazyImage` に置換。
+/// Nuke 13.0 の 3-tier cache (memory rendered / memory raw / disk LRU) で
+/// avatar flicker 根絶 (Bluesky/Threads/Instagram 同等品質)。`AsyncImage` は Apple が 2021 から
+/// cache 制御を改善しておらず production 品質に不足 (Paul Hudson "What's still missing")。
 struct AvatarView: View {
     let initials: String
     var size: CGFloat = 44
@@ -64,20 +70,18 @@ struct AvatarView: View {
                 .resizable()
                 .scaledToFill()
         } else if let imageURL {
-            AsyncImage(url: imageURL, transaction: Transaction(animation: .easeOut(duration: 0.2))) { phase in
-                switch phase {
-                case .success(let image):
+            // NukeUI `LazyImage`: 3-tier cache から即 hit した画像は同期的に描画 (flicker ゼロ)。
+            // Memory miss & disk hit 時のみ短時間 placeholder (initials gradient) → fade で切替。
+            LazyImage(url: imageURL) { state in
+                if let image = state.image {
                     image
                         .resizable()
                         .scaledToFill()
-                case .empty:
-                    initialsFallback
-                case .failure:
-                    initialsFallback
-                @unknown default:
+                } else {
                     initialsFallback
                 }
             }
+            .transition(.opacity)
         } else {
             initialsFallback
         }

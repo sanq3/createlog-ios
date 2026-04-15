@@ -98,20 +98,42 @@ struct UserProfileView: View {
         } message: {
             Text(blockErrorMessage ?? "")
         }
-        .task {
-            // 初回表示時に: ブロック状態 + 投稿 + マイプロダクト + 週間統計 + フォロー状態を並列取得
-            async let blockedCheck = (try? await dependencies.ugcRepository.isBlocked(userId: user.id)) ?? false
-            async let postsDTO = (try? await dependencies.postRepository.fetchUserPosts(userId: user.id, cursor: nil, limit: 20)) ?? []
-            async let appsDTO = (try? await dependencies.appRepository.fetchApps(userId: user.id)) ?? []
-            async let weeklyStats = try? await dependencies.statsRepository.fetchWeeklyStats(containing: Date())
-            async let followingState = (try? await dependencies.followRepository.isFollowing(userId: user.id)) ?? false
-            let (blocked, posts, apps, weekly, following) = await (blockedCheck, postsDTO, appsDTO, weeklyStats, followingState)
-            isBlocked = blocked
-            remotePosts = posts.map { Post(from: $0) }
-            remoteProjects = apps.map { Project(from: $0) }
-            weeklyHours = Self.buildWeeklyHours(from: weekly)
-            user.isFollowing = following
+        .refreshable {
+            // 2026-04-16: 大手 SNS (Instagram/X/Bluesky/Threads) 全社対応の pull-to-refresh。
+            // 下にスワイプで最新化。`.task` と同じ loadProfileData を呼び、cache lookup は
+            // 既に反映済なので skip して直接 remote refresh 部分だけ実行。
+            await loadProfileData(applyCacheFirst: false)
         }
+        .task {
+            // 初回遷移: cache 即反映 → 並列 remote fetch で完全情報に差し替え
+            await loadProfileData(applyCacheFirst: true)
+        }
+    }
+
+    /// profile + 周辺データ (posts / apps / weekly / isFollowing / isBlocked) を並列取得して View state を更新。
+    /// - `applyCacheFirst: true` (初回遷移時): SDProfileCache から basic を同期反映してから remote fetch
+    /// - `applyCacheFirst: false` (pull-to-refresh): 画面を残したまま直接 remote fetch のみ
+    private func loadProfileData(applyCacheFirst: Bool) async {
+        if applyCacheFirst, let cached = dependencies.profileRepository.cachedProfile(userId: user.id) {
+            let wasFollowing = user.isFollowing
+            user = User(from: cached)
+            user.isFollowing = wasFollowing
+        }
+        async let profileDTO = try? await dependencies.profileRepository.fetchProfile(userId: user.id)
+        async let blockedCheck = (try? await dependencies.ugcRepository.isBlocked(userId: user.id)) ?? false
+        async let postsDTO = (try? await dependencies.postRepository.fetchUserPosts(userId: user.id, cursor: nil, limit: 20)) ?? []
+        async let appsDTO = (try? await dependencies.appRepository.fetchApps(userId: user.id)) ?? []
+        async let weeklyStats = try? await dependencies.statsRepository.fetchWeeklyStats(containing: Date())
+        async let followingState = (try? await dependencies.followRepository.isFollowing(userId: user.id)) ?? false
+        let (fullProfile, blocked, posts, apps, weekly, following) = await (profileDTO, blockedCheck, postsDTO, appsDTO, weeklyStats, followingState)
+        if let fullProfile {
+            user = User(from: fullProfile)
+        }
+        isBlocked = blocked
+        remotePosts = posts.map { Post(from: $0) }
+        remoteProjects = apps.map { Project(from: $0) }
+        weeklyHours = Self.buildWeeklyHours(from: weekly)
+        user.isFollowing = following
     }
 
     /// WeeklyStats を WeeklyChart 用に曜日ラベル付き配列に変換。

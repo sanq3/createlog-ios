@@ -44,7 +44,17 @@ final class DependencyContainer: Sendable {
         let logRepo = SupabaseLogRepository(client: client)
         self.categoryRepository = SupabaseCategoryRepository(client: client)
         self.statsRepository = SupabaseStatsRepository(client: client)
-        self.profileRepository = SupabaseProfileRepository(client: client)
+        // 2026-04-16: Profile flicker 根本修正。SDProfileCache から同期 read する Decorator で wrap。
+        // ModelContainer が無い preview 経路では underlying の SupabaseProfileRepository を直接使用 (cache 無効)。
+        let supabaseProfileRepo = SupabaseProfileRepository(client: client)
+        if modelContainer != nil {
+            self.profileRepository = OfflineFirstProfileRepository(
+                underlying: supabaseProfileRepo,
+                modelContainer: modelContainer
+            )
+        } else {
+            self.profileRepository = supabaseProfileRepo
+        }
         self.appRepository = SupabaseAppRepository(client: client)
         self.searchRepository = SupabaseSearchRepository(client: client)
         self.ugcRepository = SupabaseUGCRepository(client: client)
@@ -117,15 +127,21 @@ final class DependencyContainer: Sendable {
             Task { await migrationService.migrateLogMemoRemoteIds() }
 
             // T7c: SNS Decorator Repositories (SDPostCache / Like / Follow / Comment / Notification)
+            // 2026-04-16: Post / Comment Decorator に profileRepository を注入。
+            // feed / comment 取得時に post.author (handle/displayName/avatarUrl) を
+            // SDProfileCache へ precache 書き込み (Bluesky pattern)。他人プロフィール遷移で spinner ゼロ。
+            let profileRepoForPrecache = self.profileRepository
             self.postRepository = OfflineFirstPostRepository(
                 underlying: supabasePostRepo,
                 modelContainer: modelContainer,
-                syncService: sync
+                syncService: sync,
+                profileRepository: profileRepoForPrecache
             )
             self.commentRepository = OfflineFirstCommentRepository(
                 underlying: supabaseCommentRepo,
                 modelContainer: modelContainer,
-                syncService: sync
+                syncService: sync,
+                profileRepository: profileRepoForPrecache
             )
             self.likeRepository = OfflineFirstLikeRepository(
                 underlying: supabaseLikeRepo,
