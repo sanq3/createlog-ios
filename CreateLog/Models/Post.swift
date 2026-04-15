@@ -96,11 +96,24 @@ struct PostCode: Identifiable, Sendable {
 
 struct PostImage: Identifiable, Sendable {
     let id: UUID
+    /// Full-size 画像 URL。Phase 1/2 は client 生成 1920px、Phase 3 は CDN original。
+    /// nil なら mock/旧データ (placeholderColor で描画)。
+    let url: String?
+    /// Thumbnail URL (480px)。Phase 1/2 は client 生成、Phase 3 は nil で CDN 動的生成。
+    let thumbUrl: String?
     let placeholderColor: ColorRGB
     let aspectRatio: CGFloat
 
-    init(id: UUID = UUID(), placeholderColor: ColorRGB, aspectRatio: CGFloat) {
+    init(
+        id: UUID = UUID(),
+        url: String? = nil,
+        thumbUrl: String? = nil,
+        placeholderColor: ColorRGB = ColorRGB(red: 0.5, green: 0.5, blue: 0.5),
+        aspectRatio: CGFloat = 1.0
+    ) {
         self.id = id
+        self.url = url
+        self.thumbUrl = thumbUrl
         self.placeholderColor = placeholderColor
         self.aspectRatio = aspectRatio
     }

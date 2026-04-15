@@ -121,6 +121,18 @@ final class OfflineFirstPostRepository: PostRepositoryProtocol, @unchecked Senda
         }
     }
 
+    func uploadPostMedia(thumbData: Data, fullData: Data, contentType: String, width: Int, height: Int) async throws -> PostMediaItem {
+        // upload はオフライン queue 対象外 (画像サイズが大きく queue payload に適さない、
+        // かつ投稿本体の前提条件なので失敗時は compose 画面でリトライする UX が自然)。
+        try await underlying.uploadPostMedia(
+            thumbData: thumbData,
+            fullData: fullData,
+            contentType: contentType,
+            width: width,
+            height: height
+        )
+    }
+
     // MARK: - Cache helpers
 
     private func upsertCache(_ posts: [PostDTO]) async {
@@ -133,7 +145,7 @@ final class OfflineFirstPostRepository: PostRepositoryProtocol, @unchecked Senda
             )
             if let existing = try? context.fetch(descriptor).first {
                 existing.content = dto.content
-                existing.setMediaUrls(dto.mediaUrls)
+                existing.setMedia(dto.media)
                 existing.visibility = dto.visibility
                 existing.likesCount = dto.likesCount
                 existing.commentsCount = dto.commentsCount
@@ -149,7 +161,7 @@ final class OfflineFirstPostRepository: PostRepositoryProtocol, @unchecked Senda
                     remoteId: dto.id,
                     userId: dto.userId,
                     content: dto.content,
-                    mediaUrls: dto.mediaUrls,
+                    media: dto.media,
                     visibility: dto.visibility,
                     likesCount: dto.likesCount,
                     commentsCount: dto.commentsCount,
@@ -229,11 +241,19 @@ final class OfflineFirstPostRepository: PostRepositoryProtocol, @unchecked Senda
 
 private extension SDPostCache {
     func toDTO() -> PostDTO? {
+        // media_urls は [PostMediaItem] を JSON object 配列として埋め込む。
+        let mediaJSON: Any = {
+            guard let encoded = try? JSONEncoder().encode(media),
+                  let obj = try? JSONSerialization.jsonObject(with: encoded) else {
+                return [] as [Any]
+            }
+            return obj
+        }()
         let json: [String: Any] = [
             "id": remoteId.uuidString,
             "user_id": userId.uuidString,
             "content": content,
-            "media_urls": mediaUrls,
+            "media_urls": mediaJSON,
             "visibility": visibility,
             "likes_count": likesCount,
             "comments_count": commentsCount,

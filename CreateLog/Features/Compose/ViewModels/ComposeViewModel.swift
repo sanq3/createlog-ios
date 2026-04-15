@@ -78,9 +78,41 @@ final class ComposeViewModel {
         errorMessage = nil
         defer { isPosting = false }
 
+        // Phase 1 (2026-04-16): 画像があれば先に 2 サイズ (thumb 480px / full 1920px) 生成 + upload、
+        // 戻ってきた PostMediaItem 配列を DTO に入れる。upload 失敗時は post 自体を中止し、
+        // ユーザーにエラーを表示してリトライさせる (中途半端な「画像なし投稿」防止)。
+        var uploadedMedia: [PostMediaItem] = []
+        for attached in attachedImages {
+            let original = attached.image
+            let fullImage = original.resized(maxDimension: 1920)
+            let thumbImage = original.resized(maxDimension: 480)
+            guard let fullData = fullImage.jpegData(compressionQuality: 0.85),
+                  let thumbData = thumbImage.jpegData(compressionQuality: 0.85) else {
+                errorMessage = "画像の処理に失敗しました"
+                HapticManager.error()
+                return
+            }
+            do {
+                let item = try await postRepository?.uploadPostMedia(
+                    thumbData: thumbData,
+                    fullData: fullData,
+                    contentType: "image/jpeg",
+                    width: Int(fullImage.size.width),
+                    height: Int(fullImage.size.height)
+                )
+                if let item {
+                    uploadedMedia.append(item)
+                }
+            } catch {
+                errorMessage = "画像のアップロードに失敗しました"
+                HapticManager.error()
+                return
+            }
+        }
+
         let dto = PostInsertDTO(
             content: text,
-            mediaUrls: nil,
+            media: uploadedMedia,
             visibility: "public"
         )
 

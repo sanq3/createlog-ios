@@ -3,6 +3,7 @@ import SwiftUI
 struct UserProfileView: View {
     @Environment(\.dependencies) private var dependencies
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
     @State private var user: User
     @State private var showUnfollowConfirmation = false
     @State private var showReportSheet = false
@@ -374,58 +375,157 @@ struct UserProfileView: View {
             green: project.iconColor.green,
             blue: project.iconColor.blue
         )
+        let primaryURL = nonEmptyURL(project.storeURL) ?? nonEmptyURL(project.githubURL)
 
-        return HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 10)
-                .fill(
-                    LinearGradient(
-                        colors: [iconColor, iconColor.opacity(0.7)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 44, height: 44)
-                .overlay(
-                    Text(project.iconInitials)
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.9))
-                )
+        return NavigationLink {
+            ProjectDetailView(project: project)
+        } label: {
+            HStack(spacing: 12) {
+                Button {
+                    openExternal(primaryURL)
+                } label: {
+                    serviceIcon(project: project, iconColor: iconColor)
+                }
+                .buttonStyle(.plain)
 
-            VStack(alignment: .leading, spacing: 2) {
-                HStack {
-                    Text(project.name)
-                        .font(.clHeadline)
-                        .foregroundStyle(Color.clTextPrimary)
-
-                    Spacer()
-
-                    if project.reviewCount > 0 {
-                        HStack(spacing: 3) {
-                            Image(systemName: "star.fill")
-                                .font(.system(size: 11))
-                                .foregroundStyle(Color.clAccent)
-                            Text(String(format: "%.1f", project.averageRating))
-                                .font(.system(size: 13, weight: .medium))
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 8) {
+                        Button {
+                            openExternal(primaryURL)
+                        } label: {
+                            Text(project.name)
+                                .font(.clHeadline)
                                 .foregroundStyle(Color.clTextPrimary)
-                            Text("(\(project.reviewCount))")
-                                .font(.system(size: 12))
-                                .foregroundStyle(Color.clTextTertiary)
+                                .lineLimit(1)
                         }
+                        .buttonStyle(.plain)
+                        .layoutPriority(1)
+
+                        serviceStatusBadge(project.status)
+
+                        Text(project.platform.rawValue)
+                            .font(.clCaption)
+                            .foregroundStyle(Color.clTextTertiary)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+
+                        Spacer(minLength: 8)
+
+                        ratingChip(average: project.averageRating, count: project.reviewCount)
+                            .layoutPriority(1)
+                    }
+
+                    if !project.description.isEmpty {
+                        Text(project.description)
+                            .font(.clCaption)
+                            .foregroundStyle(Color.clTextSecondary)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                     }
                 }
 
-                Text(project.description)
-                    .font(.clCaption)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(Color.clTextTertiary)
-                    .lineLimit(1)
             }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(Color.clSurfaceLow, in: RoundedRectangle(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(Color.clBorder, lineWidth: 1)
+            )
         }
-        .padding(12)
-        .background(Color.clSurfaceLow, in: RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(Color.clBorder, lineWidth: 1)
-        )
+        .buttonStyle(.plain)
         .padding(.horizontal, 16)
+    }
+
+    private func openExternal(_ url: URL?) {
+        guard let url else { return }
+        openURL(url)
+        HapticManager.light()
+    }
+
+    @ViewBuilder
+    private func ratingChip(average: Double, count: Int) -> some View {
+        if count > 0 {
+            HStack(spacing: 3) {
+                Image(systemName: "star.fill")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color.clAccent)
+                Text(String(format: "%.1f", average))
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Color.clTextPrimary)
+                Text("(\(count))")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color.clTextTertiary)
+            }
+        } else {
+            Text("未評価")
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(Color.clTextTertiary)
+        }
+    }
+
+    @ViewBuilder
+    private func serviceIcon(project: Project, iconColor: Color) -> some View {
+        if let urlString = project.iconUrl, let url = URL(string: urlString) {
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .success(let image):
+                    image.resizable().scaledToFill()
+                default:
+                    serviceIconFallback(project: project, iconColor: iconColor)
+                }
+            }
+            .frame(width: 44, height: 44)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        } else {
+            serviceIconFallback(project: project, iconColor: iconColor)
+        }
+    }
+
+    private func serviceIconFallback(project: Project, iconColor: Color) -> some View {
+        RoundedRectangle(cornerRadius: 10, style: .continuous)
+            .fill(
+                LinearGradient(
+                    colors: [iconColor, iconColor.opacity(0.7)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .frame(width: 44, height: 44)
+            .overlay(
+                Text(project.iconInitials)
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.9))
+            )
+    }
+
+    private func serviceStatusBadge(_ status: ProjectStatus) -> some View {
+        let foreground: Color
+        let background: Color
+        switch status {
+        case .draft:
+            foreground = Color.clTextSecondary
+            background = Color.clSurfaceHigh
+        case .published:
+            foreground = Color.clAccent
+            background = Color.clAccent.opacity(0.12)
+        case .archived:
+            foreground = Color.clTextTertiary
+            background = Color.clSurfaceHigh.opacity(0.6)
+        }
+        return Text(status.displayName)
+            .font(.system(size: 10, weight: .semibold))
+            .foregroundStyle(foreground)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 2)
+            .background(background, in: Capsule())
+    }
+
+    private func nonEmptyURL(_ raw: String?) -> URL? {
+        guard let raw, !raw.isEmpty, let url = URL(string: raw) else { return nil }
+        return url
     }
 }

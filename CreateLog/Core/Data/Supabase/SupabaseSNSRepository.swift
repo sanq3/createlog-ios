@@ -1,5 +1,6 @@
 import Foundation
 import Supabase
+import Storage
 
 // MARK: - Post Repository
 
@@ -90,6 +91,42 @@ final class SupabasePostRepository: PostRepositoryProtocol, Sendable {
             .delete()
             .eq("id", value: id.uuidString)
             .execute()
+    }
+}
+
+extension SupabasePostRepository {
+    /// 画像を `post-media` bucket に upload。
+    /// path 形式: `{userIdLower}/{ts}_full.jpg` / `{userIdLower}/{ts}_thumb.jpg`
+    /// **重要**: `UUID.uuidString` は uppercase だが Storage RLS の `auth.uid()::text` は lowercase。
+    /// `.lowercased()` を必ず付ける (avatars bucket で踏んだ過去 bug 防止)。
+    func uploadPostMedia(thumbData: Data, fullData: Data, contentType: String, width: Int, height: Int) async throws -> PostMediaItem {
+        let session = try await client.auth.session
+        let userIdLower = session.user.id.uuidString.lowercased()
+        let ts = Int(Date().timeIntervalSince1970 * 1000)
+        let ext = contentType.contains("png") ? "png" : "jpg"
+
+        let fullPath = "\(userIdLower)/\(ts)_full.\(ext)"
+        let thumbPath = "\(userIdLower)/\(ts)_thumb.\(ext)"
+
+        let uploadOptions = FileOptions(contentType: contentType, upsert: false)
+
+        _ = try await client.storage
+            .from("post-media")
+            .upload(fullPath, data: fullData, options: uploadOptions)
+
+        _ = try await client.storage
+            .from("post-media")
+            .upload(thumbPath, data: thumbData, options: uploadOptions)
+
+        let fullURL = try client.storage.from("post-media").getPublicURL(path: fullPath)
+        let thumbURL = try client.storage.from("post-media").getPublicURL(path: thumbPath)
+
+        return PostMediaItem(
+            url: fullURL.absoluteString,
+            thumbUrl: thumbURL.absoluteString,
+            width: width,
+            height: height
+        )
     }
 }
 

@@ -14,6 +14,10 @@ protocol PostRepositoryProtocol: Sendable {
     func insertPost(_ post: PostInsertDTO) async throws -> PostDTO
     /// 投稿削除
     func deletePost(id: UUID) async throws
+    /// 画像 (thumb + full 両方) を Supabase Storage `post-media` bucket に upload し、
+    /// `PostMediaItem` (URL + thumb URL + width + height) を返す。
+    /// caller は複数画像分を並列 / 順次で呼び、結果を `PostInsertDTO.media` に集約する。
+    func uploadPostMedia(thumbData: Data, fullData: Data, contentType: String, width: Int, height: Int) async throws -> PostMediaItem
 }
 
 // MARK: - Follow Repository

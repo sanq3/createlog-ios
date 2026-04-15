@@ -51,8 +51,38 @@ struct PostImagePlaceholder: View {
     let aspectRatio: CGFloat?
 
     var body: some View {
+        Group {
+            // 実際の画像 URL があれば AsyncImage で表示、なければ placeholder 色
+            if let urlString = image.thumbUrl ?? image.url, let url = URL(string: urlString) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .empty:
+                        placeholderFill
+                    case .success(let img):
+                        img.resizable().scaledToFill()
+                    case .failure:
+                        placeholderFill
+                    @unknown default:
+                        placeholderFill
+                    }
+                }
+                .aspectRatio(aspectRatio, contentMode: .fill)
+                .clipped()
+            } else {
+                placeholderFill
+                    .aspectRatio(aspectRatio, contentMode: .fill)
+                    .overlay(
+                        Image(systemName: "photo")
+                            .font(.system(size: 20))
+                            .foregroundStyle(.white.opacity(0.3))
+                    )
+            }
+        }
+    }
+
+    private var placeholderFill: some View {
         let c = image.placeholderColor
-        Rectangle()
+        return Rectangle()
             .fill(
                 LinearGradient(
                     colors: [
@@ -62,12 +92,6 @@ struct PostImagePlaceholder: View {
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
-            )
-            .aspectRatio(aspectRatio, contentMode: .fill)
-            .overlay(
-                Image(systemName: "photo")
-                    .font(.system(size: 20))
-                    .foregroundStyle(.white.opacity(0.3))
             )
     }
 }

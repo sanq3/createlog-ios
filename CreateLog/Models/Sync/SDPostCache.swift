@@ -27,8 +27,9 @@ final class SDPostCache {
     // MARK: - Core fields
 
     var content: String = ""
-    /// JSON encode した `[String]` (media URL 配列)。
-    /// SwiftData は `[String]` を直接保存できるが、lightweight migration 耐性のため `Data` で保持。
+    /// JSON encode した `[PostMediaItem]` (Phase 1/2/3 対応構造)。
+    /// 2026-04-16: `[String]` → `[PostMediaItem]` に型変更 (posts.media_urls の jsonb 化と整合)。
+    /// SwiftData lightweight migration 耐性のため `Data` で保持 (型自体は変えない)。
     var mediaUrlsData: Data = Data()
     var visibility: String = "public"
     var likesCount: Int = 0
@@ -58,7 +59,7 @@ final class SDPostCache {
         remoteId: UUID,
         userId: UUID,
         content: String,
-        mediaUrls: [String] = [],
+        media: [PostMediaItem] = [],
         visibility: String = "public",
         likesCount: Int = 0,
         commentsCount: Int = 0,
@@ -74,7 +75,7 @@ final class SDPostCache {
         self.remoteId = remoteId
         self.userId = userId
         self.content = content
-        self.mediaUrlsData = (try? JSONEncoder().encode(mediaUrls)) ?? Data()
+        self.mediaUrlsData = (try? JSONEncoder().encode(media)) ?? Data()
         self.visibility = visibility
         self.likesCount = likesCount
         self.commentsCount = commentsCount
@@ -88,13 +89,13 @@ final class SDPostCache {
         self.updatedAtRemote = updatedAtRemote
     }
 
-    /// `mediaUrlsData` を `[String]` として復元する computed property。
-    /// 保存時は `setMediaUrls(_:)` を使って整合性を保つ。
-    var mediaUrls: [String] {
-        (try? JSONDecoder().decode([String].self, from: mediaUrlsData)) ?? []
+    /// `mediaUrlsData` を `[PostMediaItem]` として復元する computed property。
+    /// 保存時は `setMedia(_:)` を使って整合性を保つ。
+    var media: [PostMediaItem] {
+        (try? JSONDecoder().decode([PostMediaItem].self, from: mediaUrlsData)) ?? []
     }
 
-    func setMediaUrls(_ urls: [String]) {
-        self.mediaUrlsData = (try? JSONEncoder().encode(urls)) ?? Data()
+    func setMedia(_ items: [PostMediaItem]) {
+        self.mediaUrlsData = (try? JSONEncoder().encode(items)) ?? Data()
     }
 }

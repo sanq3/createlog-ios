@@ -4,6 +4,21 @@ import Foundation
 
 extension Post {
     init(from dto: PostDTO) {
+        // 画像配列 (PostMediaItem[]) → Post.PostMedia.images([PostImage]) に変換。
+        // 空配列 / 画像以外 (code など) は v2.0 では未サポートなので nil。
+        let postMedia: PostMedia? = {
+            guard !dto.media.isEmpty else { return nil }
+            let images = dto.media.map { item in
+                PostImage(
+                    url: item.url,
+                    thumbUrl: item.thumbUrl,
+                    placeholderColor: ColorRGB(red: 0.5, green: 0.5, blue: 0.5),
+                    aspectRatio: CGFloat(item.aspectRatio)
+                )
+            }
+            return .images(images)
+        }()
+
         self.init(
             id: dto.id,
             userId: dto.userId,
@@ -16,7 +31,7 @@ extension Post {
             likes: dto.likesCount,
             reposts: dto.repostsCount,
             comments: dto.commentsCount,
-            media: nil,
+            media: postMedia,
             authorAvatarUrl: dto.authorAvatarUrl
         )
     }
