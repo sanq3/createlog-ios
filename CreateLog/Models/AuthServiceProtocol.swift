@@ -42,16 +42,6 @@ protocol OAuthSignInProtocol: Sendable {
     func signInWithGitHub() async throws -> String
 }
 
-/// Email+パスワード認証
-protocol EmailAuthProtocol: Sendable {
-    /// メール+パスワードでサインアップ
-    func signUp(email: String, password: String) async throws -> String
-    /// メール+パスワードでサインイン
-    func signIn(email: String, password: String) async throws -> String
-    /// パスワードリセット用メール送信
-    func sendPasswordResetEmail(to email: String) async throws
-}
-
 /// セッション管理
 protocol AuthSessionProtocol: Sendable {
     /// 現在の認証状態を取得
@@ -67,7 +57,8 @@ protocol AuthSessionProtocol: Sendable {
 }
 
 /// 認証サービスの統合プロトコル (全認証機能を提供する実装用)
-typealias AuthServiceProtocol = OAuthSignInProtocol & EmailAuthProtocol & AuthSessionProtocol
+/// 認証は Apple / Google / GitHub の OAuth のみ。Email/Password 認証は 2026-04-16 に廃止。
+typealias AuthServiceProtocol = OAuthSignInProtocol & AuthSessionProtocol
 
 /// Preview / 未接続時用の NoOp 実装
 final class NoOpAuthService: AuthServiceProtocol {
@@ -81,9 +72,6 @@ final class NoOpAuthService: AuthServiceProtocol {
     func signInWithGoogle(idToken: String, accessToken: String) async throws -> String { throw runtimeUsageError() }
     func signInWithGoogleOAuth() async throws -> String { throw runtimeUsageError() }
     func signInWithGitHub() async throws -> String { throw runtimeUsageError() }
-    func signUp(email: String, password: String) async throws -> String { throw runtimeUsageError() }
-    func signIn(email: String, password: String) async throws -> String { throw runtimeUsageError() }
-    func sendPasswordResetEmail(to email: String) async throws { throw runtimeUsageError() }
     func signOut() async throws { throw runtimeUsageError() }
     func deleteAccount() async throws { throw runtimeUsageError() }
     func observeAuthChanges() -> AsyncStream<AuthState> { AsyncStream { $0.finish() } }

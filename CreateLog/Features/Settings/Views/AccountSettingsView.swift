@@ -10,29 +10,6 @@ struct AccountSettingsView: View {
 
     var body: some View {
         List {
-            // Login info
-            Section {
-                settingsRow(
-                    title: "メールアドレス",
-                    detail: userInfo?.email ?? "読み込み中..."
-                )
-                NavigationLink {
-                    PasswordResetView()
-                } label: {
-                    HStack {
-                        Text("パスワード")
-                            .font(.clBody)
-                            .foregroundStyle(Color.clTextPrimary)
-                        Spacer()
-                        Text("リセットメール送信")
-                            .font(.clBody)
-                            .foregroundStyle(Color.clTextTertiary)
-                    }
-                }
-            } header: {
-                Text("ログイン情報")
-            }
-
             // Linked accounts
             Section {
                 linkedAccountRow(provider: "Apple", icon: "apple.logo", isLinked: isLinked("apple"))
@@ -125,20 +102,6 @@ struct AccountSettingsView: View {
 
     // MARK: - Rows
 
-    private func settingsRow(title: String, detail: String) -> some View {
-        HStack {
-            Text(title)
-                .font(.clBody)
-                .foregroundStyle(Color.clTextPrimary)
-            Spacer()
-            Text(detail)
-                .font(.clBody)
-                .foregroundStyle(Color.clTextTertiary)
-                .lineLimit(1)
-                .truncationMode(.middle)
-        }
-    }
-
     private func linkedAccountRow(provider: String, icon: String, isLinked: Bool) -> some View {
         HStack {
             Image(systemName: icon)
@@ -171,86 +134,3 @@ struct AccountSettingsView: View {
     }
 }
 
-// MARK: - Password reset
-
-/// メール経由のパスワードリセット画面。
-/// Supabase Auth の resetPasswordForEmail を呼ぶだけ。ログイン中でも reset-link を送信できる。
-private struct PasswordResetView: View {
-    @Environment(\.dependencies) private var dependencies
-    @Environment(\.dismiss) private var dismiss
-    @State private var email: String = ""
-    @State private var sent = false
-    @State private var errorMessage: String?
-    @State private var isLoading = false
-
-    var body: some View {
-        Form {
-            Section {
-                TextField("メールアドレス", text: $email)
-                    .textContentType(.emailAddress)
-                    .textInputAutocapitalization(.never)
-                    .keyboardType(.emailAddress)
-            } footer: {
-                Text("このメールアドレス宛にパスワードリセット用のリンクを送信します。")
-                    .font(.clCaption)
-            }
-
-            if sent {
-                Section {
-                    Text("リセットメールを送信しました。メールの指示に従ってください。")
-                        .font(.clCaption)
-                        .foregroundStyle(Color.clSuccess)
-                }
-            }
-
-            if let errorMessage {
-                Section {
-                    Text(errorMessage)
-                        .font(.clCaption)
-                        .foregroundStyle(Color.clError)
-                }
-            }
-
-            Section {
-                Button {
-                    Task { await sendResetEmail() }
-                } label: {
-                    HStack {
-                        Spacer()
-                        if isLoading {
-                            ProgressView()
-                        } else {
-                            Text("リセットメールを送信")
-                                .fontWeight(.semibold)
-                        }
-                        Spacer()
-                    }
-                }
-                .disabled(email.isEmpty || isLoading)
-            }
-        }
-        .task {
-            // 現在ユーザーの email を初期値として入れる
-            if email.isEmpty {
-                let info = await dependencies.authService.currentUserInfo
-                email = info?.email ?? ""
-            }
-        }
-        .navigationTitle("パスワードをリセット")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-
-    private func sendResetEmail() async {
-        guard !email.isEmpty else { return }
-        isLoading = true
-        errorMessage = nil
-        defer { isLoading = false }
-
-        do {
-            try await dependencies.authService.sendPasswordResetEmail(to: email)
-            sent = true
-        } catch {
-            errorMessage = "送信に失敗しました。しばらくしてから再試行してください。"
-        }
-    }
-}

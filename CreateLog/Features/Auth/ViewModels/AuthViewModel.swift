@@ -11,11 +11,6 @@ final class AuthViewModel {
     var isLoading = false
     var errorMessage: String?
 
-    // Email form
-    var email = ""
-    var password = ""
-    var isSignUpMode = false
-
     // MARK: - Dependencies
 
     @ObservationIgnored private let authService: any AuthServiceProtocol
@@ -174,25 +169,6 @@ final class AuthViewModel {
         return false
     }
 
-    // MARK: - Email Auth
-
-    func signInWithEmail() async {
-        guard validateEmailForm() else { return }
-        isLoading = true
-        errorMessage = nil
-        defer { isLoading = false }
-
-        do {
-            if isSignUpMode {
-                _ = try await authService.signUp(email: email, password: password)
-            } else {
-                _ = try await authService.signIn(email: email, password: password)
-            }
-        } catch {
-            errorMessage = mapErrorMessage(error)
-        }
-    }
-
     // MARK: - Sign Out
 
     func signOut() async {
@@ -225,25 +201,6 @@ final class AuthViewModel {
     /// observeAuthState() が走ってなくても単発で取れる。
     func loadCurrentUserInfo() async -> CurrentUserInfo? {
         await authService.currentUserInfo
-    }
-
-    // MARK: - Validation
-
-    private func validateEmailForm() -> Bool {
-        errorMessage = nil
-        guard !email.isEmpty else {
-            errorMessage = "メールアドレスを入力してください"
-            return false
-        }
-        guard email.contains("@"), email.contains(".") else {
-            errorMessage = "有効なメールアドレスを入力してください"
-            return false
-        }
-        guard password.count >= 8 else {
-            errorMessage = "パスワードは8文字以上で入力してください"
-            return false
-        }
-        return true
     }
 
     // MARK: - Helpers

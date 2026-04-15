@@ -40,19 +40,6 @@ struct AuthView: View {
                 .frame(height: 50)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
 
-                // Email Sign In (テキストのみ)
-                NavigationLink {
-                    EmailAuthView(viewModel: viewModel)
-                } label: {
-                    Text("メールアドレスでログイン")
-                        .font(.body.weight(.medium))
-                        .foregroundStyle(Color.clTextPrimary)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 50)
-                        .background(Color.clSurfaceHigh)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-
                 // Error Message
                 if let error = viewModel.errorMessage {
                     Text(error)

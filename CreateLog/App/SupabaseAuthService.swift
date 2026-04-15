@@ -147,37 +147,6 @@ final class SupabaseAuthService: AuthServiceProtocol, Sendable {
         }
     }
 
-    func signUp(email: String, password: String) async throws -> String {
-        do {
-            let response = try await client.auth.signUp(email: email, password: password)
-            guard let session = response.session else {
-                throw AuthError.unknown("No session returned after sign up")
-            }
-            return session.user.id.uuidString
-        } catch let error as AuthError {
-            throw error
-        } catch {
-            throw mapError(error)
-        }
-    }
-
-    func signIn(email: String, password: String) async throws -> String {
-        do {
-            let session = try await client.auth.signIn(email: email, password: password)
-            return session.user.id.uuidString
-        } catch {
-            throw mapError(error)
-        }
-    }
-
-    func sendPasswordResetEmail(to email: String) async throws {
-        do {
-            try await client.auth.resetPasswordForEmail(email)
-        } catch {
-            throw mapError(error)
-        }
-    }
-
     func signOut() async throws {
         do {
             try await client.auth.signOut()
