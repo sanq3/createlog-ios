@@ -2,6 +2,12 @@ import SwiftUI
 
 struct PostCardView: View {
     @State var post: Post
+    /// unlike した時に親に通知 (Profile の「いいね」タブから該当 post を除外するために使う)。
+    /// デフォルト nil — 既存 caller は何も渡さず、副作用はない (like/unlike は永続化のみ)。
+    var onLikeChanged: ((Bool) -> Void)? = nil
+    /// unbookmark した時に親に通知 (Profile の「ブックマーク」タブから該当 post を除外)。
+    var onBookmarkChanged: ((Bool) -> Void)? = nil
+    @Environment(\.dependencies) private var dependencies
     @State private var heartScale: CGFloat = 1.0
     @State private var showReport = false
     @State private var showBlock = false
@@ -131,18 +137,7 @@ struct PostCardView: View {
             Spacer()
 
             Button {
-                withAnimation(.spring(duration: 0.4, bounce: 0.5)) {
-                    post.isLiked.toggle()
-                    post.likes += post.isLiked ? 1 : -1
-                    heartScale = 1.4
-                }
-                HapticManager.light()
-                Task {
-                    try? await Task.sleep(for: .milliseconds(200))
-                    withAnimation(.spring(duration: 0.3)) {
-                        heartScale = 1.0
-                    }
-                }
+                toggleLike()
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: post.isLiked ? "heart.fill" : "heart")
@@ -161,7 +156,7 @@ struct PostCardView: View {
             Spacer()
 
             Button {
-                HapticManager.light()
+                toggleBookmark()
             } label: {
                 Image(systemName: post.isBookmarked ? "bookmark.fill" : "bookmark")
                     .font(.system(size: 15))
@@ -183,6 +178,66 @@ struct PostCardView: View {
                     .padding(.horizontal, 10)
             }
             .buttonStyle(.plain)
+        }
+    }
+
+    // MARK: - Like / Bookmark actions (2026-04-16: repository へ永続化 + 失敗時 rollback)
+
+    private func toggleLike() {
+        let wasLiked = post.isLiked
+        let newLiked = !wasLiked
+        withAnimation(.spring(duration: 0.4, bounce: 0.5)) {
+            post.isLiked = newLiked
+            post.likes += newLiked ? 1 : -1
+            heartScale = 1.4
+        }
+        HapticManager.light()
+        Task {
+            try? await Task.sleep(for: .milliseconds(200))
+            withAnimation(.spring(duration: 0.3)) {
+                heartScale = 1.0
+            }
+        }
+        Task { @MainActor in
+            do {
+                if newLiked {
+                    try await dependencies.likeRepository.like(postId: post.id)
+                } else {
+                    try await dependencies.likeRepository.unlike(postId: post.id)
+                }
+                onLikeChanged?(newLiked)
+            } catch {
+                // Rollback on failure
+                withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                    post.isLiked = wasLiked
+                    post.likes += wasLiked ? 1 : -1
+                }
+                HapticManager.error()
+            }
+        }
+    }
+
+    private func toggleBookmark() {
+        let wasBookmarked = post.isBookmarked
+        let newBookmarked = !wasBookmarked
+        withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+            post.isBookmarked = newBookmarked
+        }
+        HapticManager.light()
+        Task { @MainActor in
+            do {
+                if newBookmarked {
+                    try await dependencies.bookmarkRepository.bookmark(postId: post.id)
+                } else {
+                    try await dependencies.bookmarkRepository.unbookmark(postId: post.id)
+                }
+                onBookmarkChanged?(newBookmarked)
+            } catch {
+                withAnimation(.spring(duration: 0.3, bounce: 0.15)) {
+                    post.isBookmarked = wasBookmarked
+                }
+                HapticManager.error()
+            }
         }
     }
 

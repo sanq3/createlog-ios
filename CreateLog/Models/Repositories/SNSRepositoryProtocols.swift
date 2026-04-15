@@ -44,6 +44,25 @@ protocol LikeRepositoryProtocol: Sendable {
     func unlike(postId: UUID) async throws
     /// いいね済みか判定
     func isLiked(postId: UUID) async throws -> Bool
+    /// 自分がいいねした投稿一覧 (新しい順)。Profile の「いいね」タブ用。
+    /// 他人のいいね一覧は RLS では見えるが、業界標準 (X / Instagram) に合わせて
+    /// UI からは自分のだけしか呼ばない運用。cursor は `likes.created_at` の ISO8601 文字列。
+    func fetchLiked(cursor: Date?, limit: Int) async throws -> [PostDTO]
+}
+
+// MARK: - Bookmark Repository
+
+/// ブックマークのデータアクセス。自分のブックマークのみ RLS で操作可能。
+/// X / Instagram と同じく、他人のブックマーク一覧は本人以外見えない。
+protocol BookmarkRepositoryProtocol: Sendable {
+    /// ブックマークする
+    func bookmark(postId: UUID) async throws
+    /// ブックマーク解除
+    func unbookmark(postId: UUID) async throws
+    /// ブックマーク済みか判定
+    func isBookmarked(postId: UUID) async throws -> Bool
+    /// 自分がブックマークした投稿一覧 (新しい順)。Profile の「ブックマーク」タブ用。
+    func fetchBookmarked(cursor: Date?, limit: Int) async throws -> [PostDTO]
 }
 
 // MARK: - Comment Repository

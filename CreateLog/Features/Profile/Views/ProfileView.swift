@@ -18,6 +18,15 @@ struct ProfileView: View {
     @State private var viewModel: ProfileViewModel
     @State private var showShareSheet = false
     @State private var showEditProfile = false
+    /// 自分のプロフィールでのみ表示するタブ (投稿 / いいね / ブックマーク)。
+    /// 他人のプロフィールは UserProfileView (別 View) でタブなし、投稿のみ表示。
+    @State private var selectedPostTab: PostTab = .posts
+
+    private enum PostTab: String, CaseIterable {
+        case posts = "投稿"
+        case likes = "いいね"
+        case bookmarks = "ブックマーク"
+    }
 
     init(dependencies: DependencyContainer) {
         _viewModel = State(initialValue: ProfileViewModel(
@@ -25,7 +34,9 @@ struct ProfileView: View {
             postRepository: dependencies.postRepository,
             appRepository: dependencies.appRepository,
             followRepository: dependencies.followRepository,
-            statsRepository: dependencies.statsRepository
+            statsRepository: dependencies.statsRepository,
+            likeRepository: dependencies.likeRepository,
+            bookmarkRepository: dependencies.bookmarkRepository
         ))
     }
 
@@ -182,24 +193,40 @@ struct ProfileView: View {
                 }
                 .padding(.top, 20)
 
-                // 投稿セクション
-                // v2.0.0: タブ (投稿 / いいね / ブックマーク) は投稿のみに。
-                // いいね・ブックマークの一覧は対応 Repository 未実装 (LikeRepository.fetchLiked なし、
-                // BookmarkRepository なし) のため v2.1 で再導入する。
+                // 投稿セクション (自分のプロフィールのみタブ表示)
+                // 他人のプロフィール = UserProfileView がタブなし投稿のみ表示する別実装。
                 VStack(spacing: 0) {
-                    HStack {
-                        Text("投稿")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(Color.clTextPrimary)
-                        Spacer()
+                    // タブバー (投稿 / いいね / ブックマーク)
+                    HStack(spacing: 0) {
+                        ForEach(PostTab.allCases, id: \.self) { tab in
+                            Button {
+                                withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                                    selectedPostTab = tab
+                                }
+                                HapticManager.selection()
+                                Task { await loadSelectedTabIfNeeded(tab) }
+                            } label: {
+                                VStack(spacing: 8) {
+                                    Text(tab.rawValue)
+                                        .font(.system(size: 14, weight: selectedPostTab == tab ? .semibold : .regular))
+                                        .foregroundStyle(
+                                            selectedPostTab == tab ? Color.clTextPrimary : Color.clTextTertiary
+                                        )
+                                    Rectangle()
+                                        .fill(selectedPostTab == tab ? Color.clAccent : Color.clear)
+                                        .frame(height: 2)
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .frame(maxWidth: .infinity)
+                        }
                     }
                     .padding(.horizontal, 16)
-                    .padding(.bottom, 8)
 
                     Divider()
                         .foregroundStyle(Color.clBorder)
 
-                    postsListSection
+                    tabContentSection
                 }
                 .padding(.top, 20)
 
@@ -247,9 +274,24 @@ struct ProfileView: View {
     }
 
     @ViewBuilder
-    private var postsListSection: some View {
-        if userPosts.isEmpty {
-            Text("まだ投稿がありません")
+    private var tabContentSection: some View {
+        switch selectedPostTab {
+        case .posts:
+            postsListSection(
+                items: userPosts,
+                emptyMessage: "まだ投稿がありません"
+            )
+        case .likes:
+            likedListSection
+        case .bookmarks:
+            bookmarkedListSection
+        }
+    }
+
+    @ViewBuilder
+    private func postsListSection(items: [Post], emptyMessage: String) -> some View {
+        if items.isEmpty {
+            Text(emptyMessage)
                 .font(.clCaption)
                 .foregroundStyle(Color.clTextTertiary)
                 .padding(.horizontal, 16)
@@ -257,11 +299,88 @@ struct ProfileView: View {
                 .frame(maxWidth: .infinity)
         } else {
             LazyVStack(spacing: 12) {
-                ForEach(userPosts) { post in
+                ForEach(items) { post in
                     PostCardView(post: post)
                 }
             }
             .padding(.top, 12)
+        }
+    }
+
+    @ViewBuilder
+    private var likedListSection: some View {
+        if viewModel.isLoadingLiked && viewModel.likedPosts.isEmpty {
+            ProgressView()
+                .padding(.top, 24)
+                .frame(maxWidth: .infinity)
+        } else if viewModel.likedPosts.isEmpty {
+            Text("まだいいねした投稿がありません")
+                .font(.clCaption)
+                .foregroundStyle(Color.clTextTertiary)
+                .padding(.horizontal, 16)
+                .padding(.top, 24)
+                .frame(maxWidth: .infinity)
+        } else {
+            LazyVStack(spacing: 12) {
+                ForEach(viewModel.likedPosts, id: \.id) { dto in
+                    // 初期値は「自分がいいねした投稿」なので isLiked = true。unlike 時に親に通知して
+                    // リストから除外する。
+                    var post = Post(from: dto)
+                    let _ = (post.isLiked = true)
+                    PostCardView(
+                        post: post,
+                        onLikeChanged: { newLiked in
+                            if !newLiked {
+                                viewModel.removeLikedPost(id: dto.id)
+                            }
+                        }
+                    )
+                }
+            }
+            .padding(.top, 12)
+        }
+    }
+
+    @ViewBuilder
+    private var bookmarkedListSection: some View {
+        if viewModel.isLoadingBookmarked && viewModel.bookmarkedPosts.isEmpty {
+            ProgressView()
+                .padding(.top, 24)
+                .frame(maxWidth: .infinity)
+        } else if viewModel.bookmarkedPosts.isEmpty {
+            Text("まだブックマークした投稿がありません")
+                .font(.clCaption)
+                .foregroundStyle(Color.clTextTertiary)
+                .padding(.horizontal, 16)
+                .padding(.top, 24)
+                .frame(maxWidth: .infinity)
+        } else {
+            LazyVStack(spacing: 12) {
+                ForEach(viewModel.bookmarkedPosts, id: \.id) { dto in
+                    var post = Post(from: dto)
+                    let _ = (post.isBookmarked = true)
+                    PostCardView(
+                        post: post,
+                        onBookmarkChanged: { newBookmarked in
+                            if !newBookmarked {
+                                viewModel.removeBookmarkedPost(id: dto.id)
+                            }
+                        }
+                    )
+                }
+            }
+            .padding(.top, 12)
+        }
+    }
+
+    private func loadSelectedTabIfNeeded(_ tab: PostTab) async {
+        switch tab {
+        case .posts:
+            break  // 投稿は loadProfile() で fetch 済
+        case .likes:
+            await viewModel.loadLikedPosts()
+        case .bookmarks:
+            await viewModel.loadBookmarkedPosts()
         }
     }
 

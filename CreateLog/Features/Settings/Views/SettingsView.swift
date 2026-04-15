@@ -249,24 +249,25 @@ enum AppLanguage: String, CaseIterable {
 
 // MARK: - Integration Settings
 
+/// エディタ連携画面。v2.0.0 では marketing/予告のみ。
+/// v2.1 で `AutoTrackingRepository` (現在 stub) の Edge Function 実装 + VS Code / Cursor 拡張の
+/// publish を経て、実際の「コーディング時間自動記録」機能を有効化する。
 struct IntegrationSettingsView: View {
     var body: some View {
         List {
             Section {
-                integrationRow(
+                comingSoonRow(
                     name: "VS Code",
-                    icon: "chevron.left.forwardslash.chevron.right",
-                    status: .notConnected
+                    icon: "chevron.left.forwardslash.chevron.right"
                 )
-                integrationRow(
+                comingSoonRow(
                     name: "Cursor",
-                    icon: "cursorarrow.rays",
-                    status: .notConnected
+                    icon: "cursorarrow.rays"
                 )
             } header: {
                 Text("エディタ連携")
             } footer: {
-                Text("拡張機能をインストールして、コーディング時間を自動で記録します")
+                Text("エディタ拡張機能によるコーディング時間の自動記録は今後のアップデートで公開予定です。")
                     .font(.clCaption)
             }
         }
@@ -276,64 +277,27 @@ struct IntegrationSettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    @ViewBuilder
-    private func integrationRow(
-        name: String,
-        icon: String,
-        status: IntegrationStatus
-    ) -> some View {
+    private func comingSoonRow(name: String, icon: String) -> some View {
         HStack(spacing: 14) {
             Image(systemName: icon)
                 .font(.system(size: 18))
                 .foregroundStyle(Color.clTextPrimary)
                 .frame(width: 28)
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(name)
-                    .font(.clBody)
-                    .foregroundStyle(Color.clTextPrimary)
-                Text(status.label)
-                    .font(.clCaption)
-                    .foregroundStyle(status.color)
-            }
+            Text(name)
+                .font(.clBody)
+                .foregroundStyle(Color.clTextPrimary)
 
             Spacer()
 
-            // エディタ拡張機能は v2.1 対応。現時点では marketplace へのリンクのみ提供。
-            Link(destination: extensionURL(for: name)) {
-                Text("インストール")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Color.clAccent)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color.clAccent.opacity(0.12), in: .capsule)
-            }
-            .buttonStyle(.plain)
+            Text("今後追加")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(Color.clTextTertiary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(Color.clTextTertiary.opacity(0.12), in: .capsule)
         }
-    }
-
-    private func extensionURL(for editor: String) -> URL {
-        // 拡張機能 publish 前は公式サイトのアナウンスページに飛ばす
-        URL(string: "https://createlog.app/integrations/\(editor.lowercased())")!
-    }
-}
-
-private enum IntegrationStatus {
-    case connected
-    case notConnected
-
-    var label: String {
-        switch self {
-        case .connected: "接続済み"
-        case .notConnected: "未接続"
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .connected: Color.clSuccess
-        case .notConnected: Color.clTextTertiary
-        }
+        .opacity(0.75)
     }
 }
 
@@ -361,7 +325,7 @@ struct LegalTextView: View {
                     .font(.clCaption)
                     .foregroundStyle(Color.clTextTertiary)
 
-                Text(placeholderText)
+                Text(content)
                     .font(.clBody)
                     .foregroundStyle(Color.clTextSecondary)
                     .lineSpacing(6)
@@ -374,7 +338,10 @@ struct LegalTextView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    private var placeholderText: String {
+    /// v2.0.0 公開用の利用規約 / プライバシーポリシー本文。
+    /// legal review を経ていない汎用文面のため、TestFlight 外部配布 / App Store 公開前に
+    /// 弁護士レビューを受けた正式版への差し替えを強く推奨する (最終更新日も合わせて更新)。
+    private var content: String {
         switch type {
         case .privacy:
             """

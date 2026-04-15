@@ -28,6 +28,7 @@ struct CreateLogApp: App {
             // T7c: SNS キャッシュ層 5 種
             SDPostCache.self,
             SDLikeCache.self,
+            SDBookmarkCache.self,
             SDFollowCache.self,
             SDCommentCache.self,
             SDNotificationCache.self,

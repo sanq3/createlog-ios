@@ -84,6 +84,37 @@ final class LikeFlushExecutor: FlushExecuting {
     }
 }
 
+// MARK: - Bookmark
+
+final class BookmarkFlushExecutor: FlushExecuting {
+    let supportedEntityTypes: [String] = [SyncEntityType.bookmark.rawValue]
+
+    private let bookmarkRepository: any BookmarkRepositoryProtocol
+
+    init(bookmarkRepository: any BookmarkRepositoryProtocol) {
+        self.bookmarkRepository = bookmarkRepository
+    }
+
+    func execute(_ snapshot: QueuedOperationSnapshot) async throws {
+        guard let operation = SyncOperationType(rawValue: snapshot.operationType) else {
+            throw SyncError.decodingFailed
+        }
+        guard let payload = try? JSONDecoder().decode([String: String].self, from: snapshot.payload),
+              let postIdString = payload["post_id"],
+              let postId = UUID(uuidString: postIdString) else {
+            throw SyncError.decodingFailed
+        }
+        switch operation {
+        case .insert:
+            try await bookmarkRepository.bookmark(postId: postId)
+        case .delete:
+            try await bookmarkRepository.unbookmark(postId: postId)
+        case .update:
+            return
+        }
+    }
+}
+
 // MARK: - Follow
 
 final class FollowFlushExecutor: FlushExecuting {

@@ -3,67 +3,6 @@ import Foundation
 #if DEBUG
 extension MockData {
 
-    // MARK: - Articles
-
-    static let articles: [Article] = [
-        Article(
-            title: "SwiftUIで作るカスタムチャート完全ガイド",
-            body: """
-            Swift Chartsフレームワークを使わずに、SwiftUIだけでカスタムチャートを実装する方法を解説します。
-
-            ## なぜカスタムチャート？
-
-            Swift Chartsは便利ですが、デザインの自由度に制限があります。ブランドカラーや独自のインタラクションを実装したい場合、カスタム実装が必要になることがあります。
-
-            ## Path を使った描画
-
-            SwiftUIのPath APIを使えば、任意の形状を描画できます。棒グラフ、折れ線グラフ、円グラフなど、あらゆるチャートを実装可能です。
-
-            ## アニメーション
-
-            `.trim(from:to:)` モディファイアと `withAnimation` を組み合わせることで、美しいアニメーション付きのチャートを作れます。
-
-            ## まとめ
-
-            カスタムチャートの実装は一見大変に見えますが、基本的なPath操作を理解すれば意外とシンプルです。
-            """,
-            authorName: "佐藤健太",
-            authorHandle: "sato_k",
-            authorInitials: "佐",
-            coverColor: ColorRGB(red: 0.15, green: 0.2, blue: 0.3),
-            readingTime: 8,
-            likes: 324,
-            comments: 12,
-            tags: ["SwiftUI", "iOS", "チャート"]
-        ),
-        Article(
-            title: "個人開発で月10万円稼ぐまでの全記録",
-            body: """
-            個人開発を始めて2年。ようやく月10万円の収益を達成しました。その道のりを包み隠さず共有します。
-
-            ## 最初の半年: 収益ゼロ
-
-            最初に作ったアプリは全くダウンロードされませんでした。マーケティングの重要性を痛感しました。
-
-            ## 転機
-
-            X（旧Twitter）での発信を始めたことが転機でした。開発過程を共有することでフォロワーが増え、アプリのダウンロード数も伸びました。
-
-            ## 収益化のポイント
-
-            広告とサブスクリプションの2本柱。広告だけでは限界があるので、プレミアム機能を用意することが重要です。
-            """,
-            authorName: "Maria Santos",
-            authorHandle: "maria_dev",
-            authorInitials: "M",
-            coverColor: ColorRGB(red: 0.18, green: 0.22, blue: 0.18),
-            readingTime: 12,
-            likes: 2100,
-            comments: 45,
-            tags: ["個人開発", "収益化", "マーケティング"]
-        ),
-    ]
-
     // MARK: - Projects
 
     static let projects: [Project] = [

@@ -11,6 +11,8 @@ final class ProfileViewModel {
     @ObservationIgnored private let appRepository: any AppRepositoryProtocol
     @ObservationIgnored private let followRepository: any FollowRepositoryProtocol
     @ObservationIgnored private let statsRepository: any StatsRepositoryProtocol
+    @ObservationIgnored private let likeRepository: any LikeRepositoryProtocol
+    @ObservationIgnored private let bookmarkRepository: any BookmarkRepositoryProtocol
 
     // MARK: - State
 
@@ -31,6 +33,16 @@ final class ProfileViewModel {
     var isRevalidating = false
     var errorMessage: String?
 
+    /// 自分がいいねした投稿一覧 (「いいね」タブ)。isMyProfile == true のときだけ埋める。
+    var likedPosts: [PostDTO] = []
+    /// 自分がブックマークした投稿一覧 (「ブックマーク」タブ)。isMyProfile == true のときだけ埋める。
+    var bookmarkedPosts: [PostDTO] = []
+    var isLoadingLiked = false
+    var isLoadingBookmarked = false
+    /// 初回遷移後の load が済んだかどうか (再 fetch 抑制用)。
+    private var hasLoadedLikedOnce = false
+    private var hasLoadedBookmarkedOnce = false
+
     /// 自分のプロフィールかどうか
     let isMyProfile: Bool
     private let targetUserId: UUID?
@@ -43,6 +55,8 @@ final class ProfileViewModel {
         appRepository: any AppRepositoryProtocol,
         followRepository: any FollowRepositoryProtocol,
         statsRepository: any StatsRepositoryProtocol,
+        likeRepository: any LikeRepositoryProtocol,
+        bookmarkRepository: any BookmarkRepositoryProtocol,
         userId: UUID? = nil
     ) {
         self.profileRepository = profileRepository
@@ -50,6 +64,8 @@ final class ProfileViewModel {
         self.appRepository = appRepository
         self.followRepository = followRepository
         self.statsRepository = statsRepository
+        self.likeRepository = likeRepository
+        self.bookmarkRepository = bookmarkRepository
         self.targetUserId = userId
         self.isMyProfile = userId == nil
 
@@ -122,6 +138,44 @@ final class ProfileViewModel {
             let label = idx < labels.count ? labels[idx] : ""
             return (label, Double(stats.totalMinutes) / 60.0)
         }
+    }
+
+    // MARK: - Liked / Bookmarked Lists (自分のプロフィールのみ)
+
+    /// 「いいね」タブ初回表示時 / pull-to-refresh 時に呼ぶ。自分のプロフィール以外では no-op。
+    func loadLikedPosts(force: Bool = false) async {
+        guard isMyProfile, !isLoadingLiked else { return }
+        if !force && hasLoadedLikedOnce { return }
+        isLoadingLiked = true
+        defer { isLoadingLiked = false }
+        do {
+            likedPosts = try await likeRepository.fetchLiked(cursor: nil, limit: AppConfig.feedPageSize)
+            hasLoadedLikedOnce = true
+        } catch {
+            // silent: keep previous list
+        }
+    }
+
+    func loadBookmarkedPosts(force: Bool = false) async {
+        guard isMyProfile, !isLoadingBookmarked else { return }
+        if !force && hasLoadedBookmarkedOnce { return }
+        isLoadingBookmarked = true
+        defer { isLoadingBookmarked = false }
+        do {
+            bookmarkedPosts = try await bookmarkRepository.fetchBookmarked(cursor: nil, limit: AppConfig.feedPageSize)
+            hasLoadedBookmarkedOnce = true
+        } catch {
+            // silent
+        }
+    }
+
+    /// PostCardView で unlike された時に即リストから消す (user 合意「取り消し時即時リストから消える」)。
+    func removeLikedPost(id: UUID) {
+        likedPosts.removeAll { $0.id == id }
+    }
+
+    func removeBookmarkedPost(id: UUID) {
+        bookmarkedPosts.removeAll { $0.id == id }
     }
 
     // MARK: - Actions

@@ -230,10 +230,130 @@ final class SupabaseLikeRepository: LikeRepositoryProtocol, Sendable {
             .value
         return !result.isEmpty
     }
+
+    /// 自分がいいねした投稿一覧。`likes` を pivot、`posts` を JOIN、さらに
+    /// posts.author を `profiles!posts_user_id_fkey` で JOIN して投稿者 basic も一緒に取る
+    /// (Bluesky feed-precache pattern と整合)。並び順は likes.created_at DESC (新しくいいねした順)。
+    func fetchLiked(cursor: Date?, limit: Int) async throws -> [PostDTO] {
+        let session = try await client.auth.session
+        let formatter = ISO8601DateFormatter()
+
+        let selectClause = "created_at, post:posts!likes_post_id_fkey(*, author:profiles!posts_user_id_fkey(handle, display_name, avatar_url))"
+
+        let rows: [LikedPostRow]
+        if let cursor {
+            rows = try await client
+                .from("likes")
+                .select(selectClause)
+                .eq("user_id", value: session.user.id.uuidString)
+                .lt("created_at", value: formatter.string(from: cursor))
+                .order("created_at", ascending: false)
+                .limit(limit)
+                .execute()
+                .value
+        } else {
+            rows = try await client
+                .from("likes")
+                .select(selectClause)
+                .eq("user_id", value: session.user.id.uuidString)
+                .order("created_at", ascending: false)
+                .limit(limit)
+                .execute()
+                .value
+        }
+        return rows.map(\.post)
+    }
 }
 
 private struct LikeRow: Codable {
     let id: UUID
+}
+
+/// `likes` JOIN `posts` の decode 用。`likes.created_at` は page cursor として
+/// ViewModel 側で参照するが、ここでは post embed だけ取り出す。
+private struct LikedPostRow: Decodable {
+    let post: PostDTO
+}
+
+// MARK: - Bookmark Repository
+
+final class SupabaseBookmarkRepository: BookmarkRepositoryProtocol, Sendable {
+    private let client: SupabaseClient
+
+    init(client: SupabaseClient) {
+        self.client = client
+    }
+
+    func bookmark(postId: UUID) async throws {
+        let session = try await client.auth.session
+        try await client
+            .from("bookmarks")
+            .insert(["user_id": session.user.id.uuidString, "post_id": postId.uuidString])
+            .execute()
+    }
+
+    func unbookmark(postId: UUID) async throws {
+        let session = try await client.auth.session
+        try await client
+            .from("bookmarks")
+            .delete()
+            .eq("user_id", value: session.user.id.uuidString)
+            .eq("post_id", value: postId.uuidString)
+            .execute()
+    }
+
+    func isBookmarked(postId: UUID) async throws -> Bool {
+        let session = try await client.auth.session
+        let result: [BookmarkRow] = try await client
+            .from("bookmarks")
+            .select("id")
+            .eq("user_id", value: session.user.id.uuidString)
+            .eq("post_id", value: postId.uuidString)
+            .limit(1)
+            .execute()
+            .value
+        return !result.isEmpty
+    }
+
+    /// 自分がブックマークした投稿一覧。`bookmarks` を pivot、`posts` を JOIN。
+    /// RLS で自分のみ SELECT 可能なので user_id フィルタは不要だが、明示的に付けて index 利用を促す。
+    func fetchBookmarked(cursor: Date?, limit: Int) async throws -> [PostDTO] {
+        let session = try await client.auth.session
+        let formatter = ISO8601DateFormatter()
+
+        let selectClause = "created_at, post:posts!bookmarks_post_id_fkey(*, author:profiles!posts_user_id_fkey(handle, display_name, avatar_url))"
+
+        let rows: [BookmarkedPostRow]
+        if let cursor {
+            rows = try await client
+                .from("bookmarks")
+                .select(selectClause)
+                .eq("user_id", value: session.user.id.uuidString)
+                .lt("created_at", value: formatter.string(from: cursor))
+                .order("created_at", ascending: false)
+                .limit(limit)
+                .execute()
+                .value
+        } else {
+            rows = try await client
+                .from("bookmarks")
+                .select(selectClause)
+                .eq("user_id", value: session.user.id.uuidString)
+                .order("created_at", ascending: false)
+                .limit(limit)
+                .execute()
+                .value
+        }
+        return rows.map(\.post)
+    }
+}
+
+private struct BookmarkRow: Codable {
+    let id: UUID
+}
+
+private struct BookmarkedPostRow: Decodable {
+    let post: PostDTO
 }
 
 // MARK: - Comment Repository

@@ -31,15 +31,6 @@ final class ComposeViewModel {
 
     // MARK: - Computed
 
-    var detectedType: ComposeContentType {
-        if attachedCode != nil {
-            return .codeSnippet
-        } else if text.count > articleThreshold {
-            return .article
-        }
-        return .post
-    }
-
     var canPost: Bool {
         let hasText = !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         let hasMedia = !attachedImages.isEmpty || attachedCode != nil

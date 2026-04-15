@@ -17,6 +17,7 @@ final class DependencyContainer: Sendable {
     let postRepository: any PostRepositoryProtocol
     let followRepository: any FollowRepositoryProtocol
     let likeRepository: any LikeRepositoryProtocol
+    let bookmarkRepository: any BookmarkRepositoryProtocol
     let commentRepository: any CommentRepositoryProtocol
     let notificationRepository: any NotificationRepositoryProtocol
     let searchRepository: any SearchRepositoryProtocol
@@ -71,6 +72,7 @@ final class DependencyContainer: Sendable {
         let supabasePostRepo = SupabasePostRepository(client: client)
         let supabaseFollowRepo = SupabaseFollowRepository(client: client)
         let supabaseLikeRepo = SupabaseLikeRepository(client: client)
+        let supabaseBookmarkRepo = SupabaseBookmarkRepository(client: client)
         let supabaseCommentRepo = SupabaseCommentRepository(client: client)
         let supabaseNotificationRepo = SupabaseNotificationRepository(client: client)
 
@@ -96,6 +98,7 @@ final class DependencyContainer: Sendable {
             )
             let postExecutor = PostFlushExecutor(postRepository: supabasePostRepo)
             let likeExecutor = LikeFlushExecutor(likeRepository: supabaseLikeRepo)
+            let bookmarkExecutor = BookmarkFlushExecutor(bookmarkRepository: supabaseBookmarkRepo)
             let followExecutor = FollowFlushExecutor(followRepository: supabaseFollowRepo)
             let commentExecutor = CommentFlushExecutor(commentRepository: supabaseCommentRepo)
             let notificationExecutor = NotificationFlushExecutor(notificationRepository: supabaseNotificationRepo)
@@ -107,6 +110,7 @@ final class DependencyContainer: Sendable {
                     logExecutor,
                     postExecutor,
                     likeExecutor,
+                    bookmarkExecutor,
                     followExecutor,
                     commentExecutor,
                     notificationExecutor
@@ -149,6 +153,12 @@ final class DependencyContainer: Sendable {
                 syncService: sync,
                 currentUserIdProvider: userIdProvider
             )
+            self.bookmarkRepository = OfflineFirstBookmarkRepository(
+                underlying: supabaseBookmarkRepo,
+                modelContainer: modelContainer,
+                syncService: sync,
+                currentUserIdProvider: userIdProvider
+            )
             self.followRepository = OfflineFirstFollowRepository(
                 underlying: supabaseFollowRepo,
                 modelContainer: modelContainer,
@@ -167,6 +177,7 @@ final class DependencyContainer: Sendable {
             self.postRepository = supabasePostRepo
             self.followRepository = supabaseFollowRepo
             self.likeRepository = supabaseLikeRepo
+            self.bookmarkRepository = supabaseBookmarkRepo
             self.commentRepository = supabaseCommentRepo
             self.notificationRepository = supabaseNotificationRepo
             self.syncService = NoOpSyncService()

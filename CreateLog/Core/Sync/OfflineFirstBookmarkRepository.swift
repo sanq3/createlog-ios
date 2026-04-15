@@ -1,36 +1,34 @@
 import Foundation
 import SwiftData
 
-/// Offline-first Decorator for `LikeRepositoryProtocol`.
+/// Offline-first Decorator for `BookmarkRepositoryProtocol`。
+/// OfflineFirstLikeRepository と完全同型の pattern で、`SDBookmarkCache` を cache として使う。
 ///
 /// ## 戦略
-/// - **like(postId:)**:
-///   1. `SDLikeCache` 即時 insert (`syncStatus = .queued`) — 楽観的 UI 反映
+/// - **bookmark(postId:)**:
+///   1. `SDBookmarkCache` 即時 insert (`syncStatus = .queued`) — 楽観的 UI 反映
 ///   2. remote 成功 → `syncStatus = .synced`
 ///   3. remote 失敗 → `syncService.enqueue` で queue 積む、cache は `.queued` のまま
 ///
-/// - **unlike(postId:)**:
-///   1. `SDLikeCache.isDeleted = true` (tombstone)
+/// - **unbookmark(postId:)**:
+///   1. `SDBookmarkCache.isDeleted = true` (tombstone)
 ///   2. remote 成功 → cache row 物理削除
 ///   3. remote 失敗 → `syncService.enqueue` で queue 積む
 ///
-/// - **isLiked(postId:)**:
-///   1. SDLikeCache から local 判定 (offline 対応)
+/// - **isBookmarked(postId:)**:
+///   1. SDBookmarkCache から local 判定 (offline 対応)
 ///   2. local に存在しない & modelContainer 無し → underlying 問合せ
 ///
-/// ## MVP 注意
-/// - 楽観的 insert は user 自身の like のみ (他 user の like count は post 側更新)
-/// - counter の server-side increment trigger に依存 (Supabase function)
-final class OfflineFirstLikeRepository: LikeRepositoryProtocol, @unchecked Sendable {
-    private let underlying: any LikeRepositoryProtocol
+/// - **fetchBookmarked(cursor:limit:)**: underlying 直接、cache は更新しない
+///   (一覧は毎回 remote 最新を取る方が UX 良い)
+final class OfflineFirstBookmarkRepository: BookmarkRepositoryProtocol, @unchecked Sendable {
+    private let underlying: any BookmarkRepositoryProtocol
     private let modelContainer: ModelContainer?
     private let syncService: any SyncServiceProtocol
-    /// 現在の user UUID (Auth session から取得 or nil)。
-    /// nil の場合は local cache に insert 不可 (cache が機能しないだけ、remote 呼び出しは走る)。
     private let currentUserIdProvider: @Sendable () async -> UUID?
 
     init(
-        underlying: any LikeRepositoryProtocol,
+        underlying: any BookmarkRepositoryProtocol,
         modelContainer: ModelContainer?,
         syncService: any SyncServiceProtocol,
         currentUserIdProvider: @Sendable @escaping () async -> UUID?
@@ -41,52 +39,49 @@ final class OfflineFirstLikeRepository: LikeRepositoryProtocol, @unchecked Senda
         self.currentUserIdProvider = currentUserIdProvider
     }
 
-    func like(postId: UUID) async throws {
+    func bookmark(postId: UUID) async throws {
         let userId = await currentUserIdProvider()
         await insertOptimisticLocal(userId: userId, postId: postId)
 
         do {
-            try await underlying.like(postId: postId)
+            try await underlying.bookmark(postId: postId)
             await markSynced(userId: userId, postId: postId)
         } catch {
-            await enqueueLike(postId: postId)
+            await enqueueBookmark(postId: postId)
             throw error
         }
     }
 
-    func unlike(postId: UUID) async throws {
+    func unbookmark(postId: UUID) async throws {
         let userId = await currentUserIdProvider()
         await markTombstoneLocal(userId: userId, postId: postId)
 
         do {
-            try await underlying.unlike(postId: postId)
+            try await underlying.unbookmark(postId: postId)
             await purgeLocal(userId: userId, postId: postId)
         } catch {
-            await enqueueUnlike(postId: postId)
+            await enqueueUnbookmark(postId: postId)
             throw error
         }
     }
 
-    func isLiked(postId: UUID) async throws -> Bool {
-        // Local 判定優先 (offline でも正しく答える)
+    func isBookmarked(postId: UUID) async throws -> Bool {
         if let userId = await currentUserIdProvider(), let container = modelContainer {
             let context = ModelContext(container)
-            let descriptor = FetchDescriptor<SDLikeCache>(
-                predicate: #Predicate { like in
-                    like.userId == userId && like.postId == postId && like.isDeleted == false
+            let descriptor = FetchDescriptor<SDBookmarkCache>(
+                predicate: #Predicate { b in
+                    b.userId == userId && b.postId == postId && b.isDeleted == false
                 }
             )
             if let count = try? context.fetchCount(descriptor), count > 0 {
                 return true
             }
         }
-        // Fallback: underlying 問合せ
-        return try await underlying.isLiked(postId: postId)
+        return try await underlying.isBookmarked(postId: postId)
     }
 
-    /// `fetchLiked` は一覧取得なので underlying に直接流す (cache は like/unlike の個別操作のみで管理)。
-    func fetchLiked(cursor: Date?, limit: Int) async throws -> [PostDTO] {
-        try await underlying.fetchLiked(cursor: cursor, limit: limit)
+    func fetchBookmarked(cursor: Date?, limit: Int) async throws -> [PostDTO] {
+        try await underlying.fetchBookmarked(cursor: cursor, limit: limit)
     }
 
     // MARK: - Local helpers
@@ -94,9 +89,9 @@ final class OfflineFirstLikeRepository: LikeRepositoryProtocol, @unchecked Senda
     private func insertOptimisticLocal(userId: UUID?, postId: UUID) async {
         guard let userId, let container = modelContainer else { return }
         let context = ModelContext(container)
-        let descriptor = FetchDescriptor<SDLikeCache>(
-            predicate: #Predicate { like in
-                like.userId == userId && like.postId == postId
+        let descriptor = FetchDescriptor<SDBookmarkCache>(
+            predicate: #Predicate { b in
+                b.userId == userId && b.postId == postId
             }
         )
         if let existing = try? context.fetch(descriptor).first {
@@ -104,7 +99,7 @@ final class OfflineFirstLikeRepository: LikeRepositoryProtocol, @unchecked Senda
             existing.syncStatus = .queued
             existing.syncedAt = Date()
         } else {
-            let cache = SDLikeCache(
+            let cache = SDBookmarkCache(
                 userId: userId,
                 postId: postId,
                 createdAt: Date(),
@@ -119,7 +114,7 @@ final class OfflineFirstLikeRepository: LikeRepositoryProtocol, @unchecked Senda
     private func markSynced(userId: UUID?, postId: UUID) async {
         guard let userId, let container = modelContainer else { return }
         let context = ModelContext(container)
-        let descriptor = FetchDescriptor<SDLikeCache>(
+        let descriptor = FetchDescriptor<SDBookmarkCache>(
             predicate: #Predicate { $0.userId == userId && $0.postId == postId }
         )
         if let existing = try? context.fetch(descriptor).first {
@@ -132,7 +127,7 @@ final class OfflineFirstLikeRepository: LikeRepositoryProtocol, @unchecked Senda
     private func markTombstoneLocal(userId: UUID?, postId: UUID) async {
         guard let userId, let container = modelContainer else { return }
         let context = ModelContext(container)
-        let descriptor = FetchDescriptor<SDLikeCache>(
+        let descriptor = FetchDescriptor<SDBookmarkCache>(
             predicate: #Predicate { $0.userId == userId && $0.postId == postId }
         )
         if let existing = try? context.fetch(descriptor).first {
@@ -146,7 +141,7 @@ final class OfflineFirstLikeRepository: LikeRepositoryProtocol, @unchecked Senda
     private func purgeLocal(userId: UUID?, postId: UUID) async {
         guard let userId, let container = modelContainer else { return }
         let context = ModelContext(container)
-        let descriptor = FetchDescriptor<SDLikeCache>(
+        let descriptor = FetchDescriptor<SDBookmarkCache>(
             predicate: #Predicate { $0.userId == userId && $0.postId == postId }
         )
         if let existing = try? context.fetch(descriptor).first {
@@ -157,24 +152,24 @@ final class OfflineFirstLikeRepository: LikeRepositoryProtocol, @unchecked Senda
 
     // MARK: - Enqueue
 
-    private func enqueueLike(postId: UUID) async {
+    private func enqueueBookmark(postId: UUID) async {
         let payload = (try? JSONEncoder().encode(["post_id": postId.uuidString])) ?? Data()
         let snapshot = QueuedOperationSnapshot(
-            entityType: SyncEntityType.like.rawValue,
+            entityType: SyncEntityType.bookmark.rawValue,
             operationType: SyncOperationType.insert.rawValue,
             payload: payload,
-            priority: SyncEntityType.like.drainPriority
+            priority: SyncEntityType.bookmark.drainPriority
         )
         await syncService.enqueue(snapshot)
     }
 
-    private func enqueueUnlike(postId: UUID) async {
+    private func enqueueUnbookmark(postId: UUID) async {
         let payload = (try? JSONEncoder().encode(["post_id": postId.uuidString])) ?? Data()
         let snapshot = QueuedOperationSnapshot(
-            entityType: SyncEntityType.like.rawValue,
+            entityType: SyncEntityType.bookmark.rawValue,
             operationType: SyncOperationType.delete.rawValue,
             payload: payload,
-            priority: SyncEntityType.like.drainPriority
+            priority: SyncEntityType.bookmark.drainPriority
         )
         await syncService.enqueue(snapshot)
     }

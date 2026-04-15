@@ -1,19 +1,9 @@
 import SwiftUI
 
+/// プレミアム案内画面。v2.0.0 では marketing/期待値醸成のみに留め、購入フローは未提供。
+/// v2.1 で Premium 機能を公開するタイミングで、購入ボタン / プラン選択 / StoreKit 連携を再有効化する。
+/// StoreKitManager は残してあるが、現在はどこからも呼ばれない (v2.1 で再配線予定)。
 struct PremiumView: View {
-    @State private var selectedPlan: PremiumPlan = .monthly
-    @State private var storeKitManager = StoreKitManager()
-    @State private var showTermsSheet = false
-    @Environment(\.dismiss) private var dismiss
-
-    /// App Store 連携前の mock 表示価格。loadProducts() 後は実価格 (localizedPrice) で上書きされる。
-    private var subscribeTitle: String {
-        if storeKitManager.isPremium {
-            return "プレミアム登録済み"
-        }
-        return "プレミアムに登録"
-    }
-
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
@@ -22,73 +12,17 @@ struct PremiumView: View {
 
                 featuresSection
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 32)
+                    .padding(.bottom, 20)
 
-                planSection
+                comingSoonNotice
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 24)
-
-                subscribeButton
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 12)
-
-                Button {
-                    Task { await storeKitManager.restorePurchases() }
-                    HapticManager.light()
-                } label: {
-                    Text("購入履歴を復元")
-                        .font(.clCaption)
-                        .foregroundStyle(Color.clTextTertiary)
-                }
-                .buttonStyle(.plain)
-                .padding(.bottom, 8)
-
-                Text("いつでもキャンセル可能 - Apple IDで管理")
-                    .font(.clCaption)
-                    .foregroundStyle(Color.clTextTertiary)
-                    .padding(.bottom, 8)
-
-                Button {
-                    HapticManager.light()
-                    showTermsSheet = true
-                } label: {
-                    Text("利用規約とプライバシーポリシー")
-                        .font(.clCaption)
-                        .foregroundStyle(Color.clAccent)
-                }
-                .buttonStyle(.plain)
-                .padding(.bottom, 40)
-
-                if let errorMessage = storeKitManager.errorMessage {
-                    Text(errorMessage)
-                        .font(.clCaption)
-                        .foregroundStyle(Color.clError)
-                        .padding(.bottom, 20)
-                }
+                    .padding(.bottom, 40)
             }
         }
         .scrollIndicators(.hidden)
         .background(Color.clBackground)
         .navigationTitle("プレミアム")
         .navigationBarTitleDisplayMode(.inline)
-        .task {
-            await storeKitManager.loadProducts()
-        }
-        .sheet(isPresented: $showTermsSheet) {
-            NavigationStack {
-                List {
-                    Link("利用規約", destination: URL(string: "https://createlog.app/terms")!)
-                    Link("プライバシーポリシー", destination: URL(string: "https://createlog.app/privacy")!)
-                }
-                .navigationTitle("利用規約とプライバシー")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("閉じる") { showTermsSheet = false }
-                    }
-                }
-            }
-        }
     }
 
     // MARK: - Header
@@ -181,9 +115,9 @@ struct PremiumView: View {
 
                 Spacer()
 
-                Image(systemName: "checkmark")
+                Image(systemName: "sparkle")
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(Color.clSuccess)
+                    .foregroundStyle(Color.clAccent.opacity(0.6))
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
@@ -197,116 +131,34 @@ struct PremiumView: View {
         }
     }
 
-    // MARK: - Plan Selection
+    // MARK: - Coming Soon Notice
 
-    private var planSection: some View {
-        HStack(spacing: 12) {
-            planCard(plan: .monthly)
-            planCard(plan: .yearly)
+    private var comingSoonNotice: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "sparkles")
+                .font(.system(size: 22))
+                .foregroundStyle(Color.clAccent)
+
+            Text("プレミアム機能は今後のアップデートで公開予定です")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(Color.clTextPrimary)
+                .multilineTextAlignment(.center)
+
+            Text("現在はすべての機能を無料でご利用いただけます。公開時に改めてアプリ内でご案内します。")
+                .font(.clCaption)
+                .foregroundStyle(Color.clTextSecondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
         }
-    }
-
-    private func planCard(plan: PremiumPlan) -> some View {
-        let isSelected = selectedPlan == plan
-
-        return Button {
-            withAnimation(.spring(duration: 0.3, bounce: 0.2)) {
-                selectedPlan = plan
-            }
-            HapticManager.selection()
-        } label: {
-            VStack(spacing: 8) {
-                if plan == .yearly {
-                    Text("2ヶ月分お得")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(Color.clAccent, in: .capsule)
-                }
-
-                Text(plan.label)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(Color.clTextSecondary)
-
-                Text(plan.price)
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundStyle(Color.clTextPrimary)
-
-                Text(plan.period)
-                    .font(.clCaption)
-                    .foregroundStyle(Color.clTextTertiary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
-            .background {
-                RoundedRectangle(cornerRadius: 14)
-                    .strokeBorder(
-                        isSelected ? Color.clAccent : Color.clBorder,
-                        lineWidth: isSelected ? 2 : 1
-                    )
-            }
-        }
-        .buttonStyle(.plain)
-    }
-
-    // MARK: - Subscribe
-
-    private var subscribeButton: some View {
-        Button {
-            HapticManager.medium()
-            Task {
-                // 選択されたプランに対応する product を取得 (現時点では monthly のみ存在)
-                guard let product = storeKitManager.products.first else {
-                    storeKitManager.errorMessage = "商品情報が読み込めません"
-                    return
-                }
-                await storeKitManager.purchase(product)
-            }
-        } label: {
-            HStack {
-                if storeKitManager.isLoading {
-                    ProgressView()
-                        .tint(.white)
-                } else {
-                    Text(subscribeTitle)
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(.white)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .background(storeKitManager.isPremium ? Color.clTextTertiary : Color.clAccent, in: .capsule)
-        }
-        .buttonStyle(.bounce)
-        .disabled(storeKitManager.isPremium || storeKitManager.isLoading || storeKitManager.products.isEmpty)
-    }
-}
-
-// MARK: - Plan Model
-
-private enum PremiumPlan: CaseIterable {
-    case monthly
-    case yearly
-
-    var label: String {
-        switch self {
-        case .monthly: "月額プラン"
-        case .yearly: "年額プラン"
-        }
-    }
-
-    var price: String {
-        switch self {
-        case .monthly: "¥480"
-        case .yearly: "¥4,800"
-        }
-    }
-
-    var period: String {
-        switch self {
-        case .monthly: "/月"
-        case .yearly: "/年（¥400/月）"
-        }
+        .frame(maxWidth: .infinity)
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color.clSurfaceLow)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(Color.clBorder, lineWidth: 1)
+                )
+        )
     }
 }

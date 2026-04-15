@@ -17,6 +17,7 @@ enum SyncEntityType: String, Codable, CaseIterable, Sendable {
     case post = "post"
     case comment = "comment"
     case like = "like"
+    case bookmark = "bookmark"
     case follow = "follow"
     case notification = "notification"
 
@@ -31,8 +32,9 @@ enum SyncEntityType: String, Codable, CaseIterable, Sendable {
         case .post: return 5
         case .comment: return 6
         case .like: return 7
-        case .follow: return 8
-        case .notification: return 9
+        case .bookmark: return 8
+        case .follow: return 9
+        case .notification: return 10
         }
     }
 }

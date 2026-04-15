@@ -441,6 +441,8 @@ struct PostDetailView: View {
     }
 
     private func commentMeta(_ comment: Comment) -> some View {
+        // v2.0.0: 返信機能 (スレッド化) は未実装のため「返信」ラベルは非表示。
+        // タップできない Text を出すと誤解を生むので削除した。v2.1 で replies schema + UI とセットで再導入予定。
         HStack(spacing: 16) {
             Text(relativeTime(from: comment.timestamp))
                 .font(.system(size: 12))
@@ -451,10 +453,6 @@ struct PostDetailView: View {
                     .font(.system(size: 12))
                     .foregroundStyle(Color.clTextTertiary)
             }
-
-            Text("返信")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(Color.clTextTertiary)
         }
         .padding(.top, 4)
     }
