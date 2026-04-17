@@ -1498,6 +1498,296 @@
           }
         }
       }
+    },
+    "アカウント作成完了!" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account created!"
+          }
+        }
+      }
+    },
+    "プロフィールを設定しましょう" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Let's set up your profile"
+          }
+        }
+      }
+    },
+    "準備完了!" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All set!"
+          }
+        }
+      }
+    },
+    "つくろぐへようこそ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to CreateLog"
+          }
+        }
+      }
+    },
+    "保存中" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saving"
+          }
+        }
+      }
+    },
+    "保存した" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved"
+          }
+        }
+      }
+    },
+    "アカウント作成後に詳細を設定できます" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can configure details after creating an account"
+          }
+        }
+      }
+    },
+    "例: SwiftUI で個人開発中。毎日コツコツ記録" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e.g. Building solo with SwiftUI. Daily steady logs"
+          }
+        }
+      }
+    },
+    "例: つくろぐ太郎" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e.g. Jane Doe"
+          }
+        }
+      }
+    },
+    "例 つくろぐ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e.g. CreateLog"
+          }
+        }
+      }
+    },
+    "例: 集中時間を記録するポモドーロタイマー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e.g. A Pomodoro timer for focus time"
+          }
+        }
+      }
+    },
+    "ハンドルを決めよう" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose your handle"
+          }
+        }
+      }
+    },
+    "このハンドルで決定" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use this handle"
+          }
+        }
+      }
+    },
+    "このハンドルは使えます" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This handle is available"
+          }
+        }
+      }
+    },
+    "このハンドルは既に使われています" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This handle is already taken"
+          }
+        }
+      }
+    },
+    "プロジェクトの名前は？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's your project's name?"
+          }
+        }
+      }
+    },
+    "使用している技術は？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Which technologies do you use?"
+          }
+        }
+      }
+    },
+    "現在製作中、制作予定の\nプラットフォームは？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What platforms\nare you building for?"
+          }
+        }
+      }
+    },
+    "言語" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Languages"
+          }
+        }
+      }
+    },
+    "フレームワーク" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frameworks"
+          }
+        }
+      }
+    },
+    "その他" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other"
+          }
+        }
+      }
+    },
+    "まだ決めていない" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not decided yet"
+          }
+        }
+      }
+    },
+    "iOS 開発" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS dev"
+          }
+        }
+      }
+    },
+    "Android 開発" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android dev"
+          }
+        }
+      }
+    },
+    "Web 開発" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web dev"
+          }
+        }
+      }
+    },
+    "バックエンド" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backend"
+          }
+        }
+      }
+    },
+    "個人開発" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo dev"
+          }
+        }
+      }
+    },
+    "スタートアップ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Startup"
+          }
+        }
+      }
+    },
+    "学生" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Student"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
