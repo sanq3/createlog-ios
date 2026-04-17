@@ -4,8 +4,11 @@ import Foundation
 
 /// 投稿のデータアクセス
 protocol PostRepositoryProtocol: Sendable {
-    /// フィード取得 (カーソルベースページネーション)
+    /// フィード取得 (カーソルベースページネーション) — Home タイムライン用、全 public 投稿
     func fetchFeed(cursor: Date?, limit: Int) async throws -> [PostDTO]
+    /// Discover 専用フィード。「読む意味のある投稿」だけ (media あり OR 200 文字以上 OR リプライ 1 件以上)。
+    /// server 側で RPC `get_discover_feed` が判定、短文 text only post は除外される。
+    func fetchDiscoverFeed(cursor: Date?, limit: Int) async throws -> [PostDTO]
     /// フォロー中ユーザーの投稿取得
     func fetchFollowingFeed(cursor: Date?, limit: Int) async throws -> [PostDTO]
     /// 特定ユーザーの投稿一覧 (プロフィール画面用)

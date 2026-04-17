@@ -4,7 +4,7 @@ struct TabItem: Identifiable {
     let id: Int
     let icon: String
     let iconFill: String
-    let label: String
+    let label: LocalizedStringKey
 }
 
 struct CustomTabBar: View {
@@ -12,11 +12,11 @@ struct CustomTabBar: View {
     var onReselect: ((Int) -> Void)?
 
     private let tabs: [TabItem] = [
-        TabItem(id: 0, icon: "house", iconFill: "house.fill", label: "ホーム"),
-        TabItem(id: 1, icon: "magnifyingglass", iconFill: "magnifyingglass", label: "発見"),
-        TabItem(id: 2, icon: "circle.dotted.and.circle", iconFill: "circle.dotted.and.circle", label: "記録"),
-        TabItem(id: 3, icon: "chart.bar", iconFill: "chart.bar.fill", label: "レポート"),
-        TabItem(id: 4, icon: "person", iconFill: "person.fill", label: "マイ"),
+        TabItem(id: 0, icon: "house", iconFill: "house.fill", label: "tab.home"),
+        TabItem(id: 1, icon: "magnifyingglass", iconFill: "magnifyingglass", label: "tab.discover"),
+        TabItem(id: 2, icon: "circle.dotted.and.circle", iconFill: "circle.dotted.and.circle", label: "tab.record"),
+        TabItem(id: 3, icon: "chart.bar", iconFill: "chart.bar.fill", label: "tab.report"),
+        TabItem(id: 4, icon: "person", iconFill: "person.fill", label: "tab.profile"),
     ]
 
     var body: some View {
@@ -48,6 +48,7 @@ struct CustomTabBar: View {
                             .frame(height: 36)
                             .padding(.vertical, 4)
                             .contentShape(Rectangle())
+                            .accessibilityLabel(Text(tab.label))
                     }
                     .buttonStyle(.plain)
                 }

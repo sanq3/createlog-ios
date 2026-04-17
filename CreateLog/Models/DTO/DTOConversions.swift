@@ -125,6 +125,8 @@ extension ExperienceLevel {
 
 extension Project {
     init(from dto: AppDTO) {
+        let resolvedName = dto.authorDisplayName ?? dto.authorHandle ?? ""
+        let initials = resolvedName.isEmpty ? "?" : String(resolvedName.prefix(1))
         self.init(
             id: dto.id,
             name: dto.name,
@@ -135,11 +137,14 @@ extension Project {
             status: ProjectStatus(serverValue: dto.status),
             storeURL: dto.storeUrl,
             githubURL: dto.githubUrl,
-            authorName: "",
-            authorHandle: "",
-            authorInitials: "",
+            authorName: resolvedName,
+            authorHandle: dto.authorHandle ?? "",
+            authorInitials: initials,
+            authorAvatarUrl: dto.authorAvatarUrl,
             averageRating: dto.avgRating ?? 0,
-            reviewCount: dto.reviewCount
+            reviewCount: dto.reviewCount,
+            createdAt: dto.createdAt,
+            lastBumpedAt: dto.lastBumpedAt
         )
     }
 }

@@ -23,7 +23,7 @@ struct OnboardingTutorialIntroStep: View {
             VStack(spacing: 0) {
                 Spacer()
 
-                Text("あなたのプロジェクトを\n登録してみましょう")
+                Text("onboarding.tutorial.intro.title")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary)
                     .tracking(-0.5)
@@ -35,7 +35,7 @@ struct OnboardingTutorialIntroStep: View {
 
                 Spacer()
 
-                Text("タップして続ける")
+                Text("onboarding.hint.tapToContinue")
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(Color.clTextSecondary)
                     .opacity(hintVisible ? (hintPulse ? 0.9 : 0.4) : 0)

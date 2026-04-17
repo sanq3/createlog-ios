@@ -27,13 +27,11 @@ struct DiscoverView: View {
                         searchResultsSection(viewModel: viewModel)
                             .padding(.top, headerHeight + 8)
                             .padding(.bottom, 100)
-                    } else if !viewModel.trendingTags.isEmpty || !viewModel.suggestedUsers.isEmpty {
-                        exploreSection(viewModel: viewModel)
+                    } else {
+                        feedSection(viewModel: viewModel)
+                            .padding(.horizontal, 12)
                             .padding(.top, headerHeight + 8)
                             .padding(.bottom, 100)
-                    } else {
-                        emptyState
-                            .padding(.top, headerHeight + 80)
                     }
                 }
             }
@@ -45,25 +43,33 @@ struct DiscoverView: View {
             } action: { _, newValue in
                 isAtTop = newValue <= 5
             }
+            .refreshable {
+                await viewModel?.refreshFeed()
+            }
 
             searchHeader
                 .offset(y: headerOffset)
-
         }
         .background(Color.clBackground)
         .toolbar(.hidden, for: .navigationBar)
         .task {
             if viewModel == nil {
-                viewModel = DiscoverViewModel(searchRepository: deps.searchRepository)
+                viewModel = DiscoverViewModel(
+                    searchRepository: deps.searchRepository,
+                    postRepository: deps.postRepository,
+                    appRepository: deps.appRepository
+                )
             }
-            await viewModel?.loadInitialData()
+            if viewModel?.feedItems.isEmpty == true {
+                await viewModel?.loadFeed()
+            }
         }
         .onChange(of: reselectCount) {
             if isAtTop {
                 isRefreshing = true
                 HapticManager.light()
                 Task {
-                    await viewModel?.loadInitialData()
+                    await viewModel?.refreshFeed()
                     isRefreshing = false
                 }
             } else {
@@ -80,37 +86,25 @@ struct DiscoverView: View {
     // MARK: - Sections
 
     @ViewBuilder
-    private func exploreSection(viewModel: DiscoverViewModel) -> some View {
-        VStack(alignment: .leading, spacing: 24) {
-            if !viewModel.trendingTags.isEmpty {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("トレンドタグ")
-                        .font(.clHeadline)
-                        .foregroundStyle(Color.clTextPrimary)
-                        .padding(.horizontal, 20)
-                    FlowLayout(spacing: 8) {
-                        ForEach(viewModel.trendingTags, id: \.self) { tag in
-                            Text("#\(tag)")
-                                .font(.clBody)
-                                .foregroundStyle(Color.clAccent)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(Color.clAccent.opacity(0.12), in: .capsule)
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                }
+    private func feedSection(viewModel: DiscoverViewModel) -> some View {
+        if viewModel.feedItems.isEmpty {
+            if viewModel.isLoadingFeed {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 40)
+            } else {
+                emptyState
+                    .padding(.top, 80)
             }
+        } else {
+            VStack(spacing: 12) {
+                DiscoverFeedGrid(items: viewModel.feedItems) {
+                    Task { await viewModel.loadMoreFeed() }
+                }
 
-            if !viewModel.suggestedUsers.isEmpty {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("おすすめユーザー")
-                        .font(.clHeadline)
-                        .foregroundStyle(Color.clTextPrimary)
-                        .padding(.horizontal, 20)
-                    ForEach(viewModel.suggestedUsers, id: \.id) { profile in
-                        suggestedUserRow(profile)
-                    }
+                if viewModel.isLoadingMore {
+                    ProgressView()
+                        .padding(.vertical, 16)
                 }
             }
         }

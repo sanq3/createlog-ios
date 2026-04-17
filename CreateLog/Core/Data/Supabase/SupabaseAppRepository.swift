@@ -33,6 +33,56 @@ final class SupabaseAppRepository: AppRepositoryProtocol, Sendable {
         return result
     }
 
+    /// Discover 用: 全ユーザーの apps を `last_bumped_at` DESC で新着順取得 + 作者 basic を別 query で client-side merge。
+    /// status フィルタは無し (開発中/公開中/停止 全部表示)。RLS は「公開アプリは全認証ユーザー閲覧可」だが、
+    /// Discover コンセプト刷新で draft/archived も他人に見せたい (宣伝目的) 方針。RLS 側を緩める必要がある。
+    /// 現行 RLS が published のみ許可ならサーバー側で 0 件返るので、同時に RLS 緩和 migration が別途必要になる可能性あり。
+    ///
+    /// **2 step fetch の理由**: `apps.user_id` → `auth.users.id` の FK のため、PostgREST で
+    /// `profiles!apps_user_id_fkey` 形式の JOIN が書けない (profiles への直接 FK なし)。
+    /// userIds を抽出 → profiles を `.in` でバッチ fetch → Dictionary lookup で merge する。N+1 ではない。
+    func fetchAllApps(cursor: Date?, limit: Int) async throws -> [AppDTO] {
+        let formatter = ISO8601DateFormatter()
+        var apps: [AppDTO]
+        if let cursor {
+            apps = try await client
+                .from("apps")
+                .select()
+                .lt("last_bumped_at", value: formatter.string(from: cursor))
+                .order("last_bumped_at", ascending: false)
+                .limit(limit)
+                .execute()
+                .value
+        } else {
+            apps = try await client
+                .from("apps")
+                .select()
+                .order("last_bumped_at", ascending: false)
+                .limit(limit)
+                .execute()
+                .value
+        }
+
+        guard !apps.isEmpty else { return apps }
+
+        let userIds = Array(Set(apps.map(\.userId))).map(\.uuidString)
+        let profiles: [ProfileDTO] = try await client
+            .from("profiles")
+            .select()
+            .in("id", values: userIds)
+            .execute()
+            .value
+
+        let profileMap = Dictionary(uniqueKeysWithValues: profiles.map { ($0.id, $0) })
+        for index in apps.indices {
+            guard let profile = profileMap[apps[index].userId] else { continue }
+            apps[index].authorDisplayName = profile.displayName
+            apps[index].authorHandle = profile.handle
+            apps[index].authorAvatarUrl = profile.avatarUrl
+        }
+        return apps
+    }
+
     func insertApp(_ app: AppInsertDTO) async throws -> AppDTO {
         let result: AppDTO = try await client
             .from("apps")

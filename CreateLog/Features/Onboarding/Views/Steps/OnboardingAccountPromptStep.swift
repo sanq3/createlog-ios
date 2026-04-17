@@ -16,12 +16,14 @@ struct OnboardingAccountPromptStep: View {
     @State private var cardVisible = false
     @State private var ctaVisible = false
 
-    private var titleText: String {
-        isLoginMode ? "アカウントにログイン" : "アカウントを作成"
+    private var titleKey: LocalizedStringKey {
+        isLoginMode ? "onboarding.account.title.login" : "onboarding.account.title.signup"
     }
 
-    private var buttonSuffix: String {
-        isLoginMode ? "でログイン" : "で続ける"
+    private func providerButtonKey(_ provider: String) -> LocalizedStringKey {
+        isLoginMode
+            ? "onboarding.account.button.login \(provider)"
+            : "onboarding.account.button.signup \(provider)"
     }
 
     var body: some View {
@@ -31,7 +33,7 @@ struct OnboardingAccountPromptStep: View {
             VStack(spacing: 0) {
                 Spacer().frame(height: 100)
 
-                Text(titleText)
+                Text(titleKey)
                     .font(.system(size: 26, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary)
                     .tracking(-0.5)
@@ -95,7 +97,7 @@ struct OnboardingAccountPromptStep: View {
                 // Auth buttons (3ボタン完全同一UI: Capsule + 透過 bg + 黒枠 + SF/Canvas アイコン + 統一 font)
                 VStack(spacing: 12) {
                     AppleSignInButton(
-                        labelText: "Apple" + buttonSuffix,
+                        labelText: providerButtonKey("Apple"),
                         onRequest: { request in
                             let prepared = authViewModel.prepareAppleSignIn()
                             request.requestedScopes = prepared.requestedScopes
@@ -123,7 +125,7 @@ struct OnboardingAccountPromptStep: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 18, height: 18)
-                            Text("Google" + buttonSuffix)
+                            Text(providerButtonKey("Google"))
                                 .font(.system(size: 16, weight: .medium))
                                 .foregroundStyle(Color.clTextPrimary)
                         }
@@ -151,7 +153,7 @@ struct OnboardingAccountPromptStep: View {
                                 .scaledToFit()
                                 .frame(width: 18, height: 18)
                                 .foregroundStyle(Color.clTextPrimary)
-                            Text("GitHub" + buttonSuffix)
+                            Text(providerButtonKey("GitHub"))
                                 .font(.system(size: 16, weight: .medium))
                                 .foregroundStyle(Color.clTextPrimary)
                         }
@@ -171,9 +173,9 @@ struct OnboardingAccountPromptStep: View {
                             onBackToWelcome()
                         } label: {
                             HStack(spacing: 4) {
-                                Text("初めての方は")
+                                Text("onboarding.account.signupPrefix")
                                     .foregroundStyle(Color.clTextPrimary.opacity(0.5))
-                                Text("こちら")
+                                Text("onboarding.account.signupLink")
                                     .foregroundStyle(Color.clTextPrimary.opacity(0.85))
                                     .underline()
                             }

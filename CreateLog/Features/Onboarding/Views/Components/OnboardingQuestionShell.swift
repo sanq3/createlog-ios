@@ -6,8 +6,8 @@ import SwiftUI
 ///
 /// 3 段フェード (title → input → CTA) と スキップ時のフェード + advance を統一。
 struct OnboardingQuestionShell<Input: View, Preview: View>: View {
-    let title: String
-    let subtitle: String?
+    let title: LocalizedStringKey
+    let subtitle: LocalizedStringKey?
     let isOptional: Bool
     let canAdvance: Bool
     let isSaving: Bool
@@ -77,7 +77,7 @@ struct OnboardingQuestionShell<Input: View, Preview: View>: View {
                 // CTA (前半ステップと共通の OnboardingPrimaryCTA を使用)
                 VStack(spacing: 10) {
                     OnboardingPrimaryCTA(
-                        title: "続ける",
+                        title: "common.continue",
                         isEnabled: canAdvance,
                         isLoading: isSaving,
                         disabledStyle: .dimmed,
@@ -89,7 +89,7 @@ struct OnboardingQuestionShell<Input: View, Preview: View>: View {
                             HapticManager.light()
                             onSkip()
                         } label: {
-                            Text("あとで設定する")
+                            Text("onboarding.action.skip")
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundStyle(Color.clTextPrimary.opacity(0.45))
                         }
@@ -130,7 +130,7 @@ struct OnboardingQuestionShell<Input: View, Preview: View>: View {
 // MARK: - Labeled input row (共通入力スタイル)
 
 struct OnboardingLabeledInput<Content: View>: View {
-    let label: String?
+    let label: LocalizedStringKey?
     @ViewBuilder let content: () -> Content
 
     var body: some View {

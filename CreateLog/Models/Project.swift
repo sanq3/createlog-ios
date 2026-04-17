@@ -21,6 +21,11 @@ struct Project: Identifiable, Sendable {
     let reviewCount: Int
     let likes: Int
     let tags: [String]
+    /// apps.created_at / SDProject.createdAt。履歴表示用。
+    let createdAt: Date
+    /// Discover 新着順ソートキー。user が編集画面で「更新を公開」を押した時に now() に更新される。
+    /// 通常編集では更新されない (apps.last_bumped_at、新規登録時は created_at と同値)。
+    let lastBumpedAt: Date
 
     init(
         id: UUID = UUID(),
@@ -41,7 +46,9 @@ struct Project: Identifiable, Sendable {
         averageRating: Double = 0,
         reviewCount: Int = 0,
         likes: Int = 0,
-        tags: [String] = []
+        tags: [String] = [],
+        createdAt: Date = Date(),
+        lastBumpedAt: Date? = nil
     ) {
         self.id = id
         self.name = name
@@ -62,6 +69,8 @@ struct Project: Identifiable, Sendable {
         self.reviewCount = reviewCount
         self.likes = likes
         self.tags = tags
+        self.createdAt = createdAt
+        self.lastBumpedAt = lastBumpedAt ?? createdAt
     }
 }
 

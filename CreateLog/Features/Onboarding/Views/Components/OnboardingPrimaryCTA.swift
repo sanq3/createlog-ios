@@ -15,7 +15,7 @@ struct OnboardingPrimaryCTA: View {
         case hidden
     }
 
-    let title: String
+    let title: LocalizedStringKey
     var isEnabled: Bool = true
     var isLoading: Bool = false
     var disabledStyle: DisabledStyle = .dimmed
@@ -35,7 +35,7 @@ struct OnboardingPrimaryCTA: View {
                             .tint(Color.clBackground)
                             .scaleEffect(0.85)
                     }
-                    Text(isLoading ? "保存中..." : title)
+                    Text(isLoading ? LocalizedStringKey("common.saving") : title)
                         .font(.system(size: 17, weight: .bold))
                         .foregroundStyle(Color.clBackground)
                 }

@@ -169,4 +169,34 @@ struct ProfileUpdateDTO: Codable, Sendable {
         case statusStartedAt = "status_started_at"
         case statusUpdatedAt = "status_updated_at"
     }
+
+    /// PATCH-style encoding: nil の field は body から omit する。
+    /// default Codable は nil を `null` として送るため他列を破壊的に NULL 上書きしてしまう事故を防ぐ。
+    /// 空 body (全 field nil) を送ると PostgREST が "Cannot coerce the result to a single JSON object" を返すので、
+    /// 呼出側は本当に「更新する値」を持っているときだけ updateProfile を呼ぶこと。
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encodeIfPresent(handle, forKey: .handle)
+        try c.encodeIfPresent(displayName, forKey: .displayName)
+        try c.encodeIfPresent(avatarUrl, forKey: .avatarUrl)
+        try c.encodeIfPresent(ageGroup, forKey: .ageGroup)
+        try c.encodeIfPresent(gender, forKey: .gender)
+        try c.encodeIfPresent(occupation, forKey: .occupation)
+        try c.encodeIfPresent(workType, forKey: .workType)
+        try c.encodeIfPresent(incomeStatus, forKey: .incomeStatus)
+        try c.encodeIfPresent(experienceYears, forKey: .experienceYears)
+        try c.encodeIfPresent(bio, forKey: .bio)
+        try c.encodeIfPresent(notificationEnabled, forKey: .notificationEnabled)
+        try c.encodeIfPresent(onboardingCompleted, forKey: .onboardingCompleted)
+        try c.encodeIfPresent(nickname, forKey: .nickname)
+        try c.encodeIfPresent(visibility, forKey: .visibility)
+        try c.encodeIfPresent(githubUrl, forKey: .githubUrl)
+        try c.encodeIfPresent(xUrl, forKey: .xUrl)
+        try c.encodeIfPresent(websiteUrl, forKey: .websiteUrl)
+        try c.encodeIfPresent(currentStatus, forKey: .currentStatus)
+        try c.encodeIfPresent(statusType, forKey: .statusType)
+        try c.encodeIfPresent(statusProject, forKey: .statusProject)
+        try c.encodeIfPresent(statusStartedAt, forKey: .statusStartedAt)
+        try c.encodeIfPresent(statusUpdatedAt, forKey: .statusUpdatedAt)
+    }
 }

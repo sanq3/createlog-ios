@@ -16,6 +16,7 @@ struct CreateLogApp: App {
     @State private var deepLinkHandler = DeepLinkHandler()
     @State private var storeKitManager = StoreKitManager()
     @State private var pushService: PushNotificationService
+    @State private var localizationManager = LocalizationManager()
     @State private var splashFinished = false
 
     init() {
@@ -58,48 +59,14 @@ struct CreateLogApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
-                // Base: 本編 (onboarding or main)
-                if onboardingCompleted {
-                    MainTabView()
-                        .modelContainer(modelContainer)
-                        .environment(\.dependencies, dependencies)
-                        .environment(deepLinkHandler)
-                        .environment(pushService)
-                        .onAppear {
-                            applyTheme(animated: false)
-                            seedDefaultCategories()
-                        }
-                        .onChange(of: appearanceMode) {
-                            applyTheme(animated: true)
-                        }
-                        .task { await authViewModel.observeAuthState() }
-                        .task {
-                            // onboarding 完了後の初回起動時に通知許可を要求する
-                            await pushService.refreshAuthorizationStatus()
-                            if pushService.authorizationStatus == .notDetermined {
-                                await pushService.requestAuthorization()
-                            }
-                        }
-                        .onOpenURL { url in deepLinkHandler.handle(url) }
-                        .opacity(splashFinished ? 1.0 : 0.0)
-                        .animation(.easeIn(duration: 0.15), value: splashFinished)
-                } else {
-                    OnboardingView(
-                        isPresented: Binding(
-                            get: { !onboardingCompleted },
-                            set: { if !$0 { onboardingCompleted = true } }
-                        ),
-                        authViewModel: authViewModel
-                    )
-                    .modelContainer(modelContainer)
-                    .environment(\.dependencies, dependencies)
-                    .onAppear { applyTheme(animated: false) }
-                    .onChange(of: appearanceMode) { applyTheme(animated: true) }
-                    .opacity(splashFinished ? 1.0 : 0.0)
-                    .animation(.easeIn(duration: 0.15), value: splashFinished)
-                }
+                // Base: 本編 (auth session + onboardingCompleted の 2 軸で分岐)
+                // - session なし → Onboarding (welcome → login / signup)
+                // - session あり + onboardingCompleted=false → Onboarding (プロフィール設定途中)
+                // - session あり + onboardingCompleted=true → MainTabView
+                // - session unknown (起動直後) → 空背景 (Splash に覆われる)
+                rootView
 
-                // Overlay: 起動時動画スプラッシュ (onboarding/main を覆って再生、終了後に fade out)
+                // Overlay: 起動時動画スプラッシュ (rootView を覆って再生、終了後に fade out)
                 if !splashFinished {
                     SplashView {
                         withAnimation(.spring(duration: 0.35, bounce: 0.0)) {
@@ -116,7 +83,72 @@ struct CreateLogApp: App {
                     .zIndex(1)
                 }
             }
+            .environment(\.locale, localizationManager.currentLocale)
+            .environment(localizationManager)
+            .task { await authViewModel.observeAuthState() }
         }
+    }
+
+    /// 現在の認証状態と onboarding 完了フラグから root view を決定する。
+    /// 業界標準 (X/Instagram 等) の session-gated ルーティング: session が無ければ必ず auth 画面を経由させる。
+    @ViewBuilder
+    private var rootView: some View {
+        switch authViewModel.authState {
+        case .unknown:
+            // Splash に覆われる想定。observe 完了前にたまたま splash が終わっても背景だけ見える。
+            Color.clBackground.ignoresSafeArea()
+
+        case .unauthenticated:
+            onboardingScreen
+
+        case .authenticated:
+            if onboardingCompleted {
+                mainScreen
+            } else {
+                onboardingScreen
+            }
+        }
+    }
+
+    private var mainScreen: some View {
+        MainTabView()
+            .modelContainer(modelContainer)
+            .environment(\.dependencies, dependencies)
+            .environment(deepLinkHandler)
+            .environment(pushService)
+            .onAppear {
+                applyTheme(animated: false)
+                seedDefaultCategories()
+            }
+            .onChange(of: appearanceMode) {
+                applyTheme(animated: true)
+            }
+            .task {
+                // onboarding 完了後の初回起動時に通知許可を要求する
+                await pushService.refreshAuthorizationStatus()
+                if pushService.authorizationStatus == .notDetermined {
+                    await pushService.requestAuthorization()
+                }
+            }
+            .onOpenURL { url in deepLinkHandler.handle(url) }
+            .opacity(splashFinished ? 1.0 : 0.0)
+            .animation(.easeIn(duration: 0.15), value: splashFinished)
+    }
+
+    private var onboardingScreen: some View {
+        OnboardingView(
+            isPresented: Binding(
+                get: { !onboardingCompleted },
+                set: { if !$0 { onboardingCompleted = true } }
+            ),
+            authViewModel: authViewModel
+        )
+        .modelContainer(modelContainer)
+        .environment(\.dependencies, dependencies)
+        .onAppear { applyTheme(animated: false) }
+        .onChange(of: appearanceMode) { applyTheme(animated: true) }
+        .opacity(splashFinished ? 1.0 : 0.0)
+        .animation(.easeIn(duration: 0.15), value: splashFinished)
     }
 
     private func seedDefaultCategories() {

@@ -42,6 +42,24 @@ final class SupabasePostRepository: PostRepositoryProtocol, Sendable {
         }
     }
 
+    /// Discover RPC 呼び出し。server side で「読む意味のある投稿」を絞り込む (media / 200 文字 / リプライ)。
+    func fetchDiscoverFeed(cursor: Date?, limit: Int) async throws -> [PostDTO] {
+        struct Params: Encodable {
+            let page_limit: Int
+            let cursor_created_at: String?
+        }
+        let formatter = ISO8601DateFormatter()
+        let params = Params(
+            page_limit: limit,
+            cursor_created_at: cursor.map { formatter.string(from: $0) }
+        )
+        let result: [PostDTO] = try await client
+            .rpc("get_discover_feed", params: params)
+            .execute()
+            .value
+        return result
+    }
+
     func fetchFollowingFeed(cursor: Date?, limit: Int) async throws -> [PostDTO] {
         // フォロー中ユーザーの投稿はRPC関数で取得
         let session = try await client.auth.session

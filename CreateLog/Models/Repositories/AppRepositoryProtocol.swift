@@ -6,6 +6,10 @@ protocol AppRepositoryProtocol: Sendable {
     func fetchMyApps() async throws -> [AppDTO]
     /// 指定ユーザーの公開アプリ一覧
     func fetchApps(userId: UUID) async throws -> [AppDTO]
+    /// Discover 用: 全ユーザーの全マイプロダクトを `last_bumped_at` DESC で取得 (status 問わず、
+    /// 開発中/公開中/停止 すべて含む)。cursor は最古の `apps.last_bumped_at`。
+    /// profiles を 2-step fetch + client-side merge で author basic を載せる。
+    func fetchAllApps(cursor: Date?, limit: Int) async throws -> [AppDTO]
     /// アプリ登録
     func insertApp(_ app: AppInsertDTO) async throws -> AppDTO
     /// アプリ更新

@@ -253,7 +253,7 @@ struct OnboardingAppShowcaseStep: View {
                             HapticManager.light()
                             withAnimation(.spring(duration: 0.25)) { selectedTag = tag }
                         } label: {
-                            Text(tag)
+                            Text(LocalizedStringKey(tag))
                                 .font(.system(size: 10, weight: .semibold))
                                 .foregroundStyle(on ? Color.clBackground : Color.clTextPrimary.opacity(0.7))
                                 .frame(maxWidth: .infinity)
@@ -357,12 +357,12 @@ struct OnboardingAppShowcaseStep: View {
             // 週間バーチャート
             HStack(alignment: .bottom, spacing: 4) {
                 let heights: [CGFloat] = [32, 24, 48, 16, 40, 56, 28]
-                let days = ["月", "火", "水", "木", "金", "土", "日"]
-                ForEach(Array(zip(days, heights)), id: \.0) { day, h in
+                let days: [LocalizedStringKey] = ["月", "火", "水", "木", "金", "土", "日"]
+                ForEach(Array(days.enumerated()), id: \.offset) { index, day in
                     VStack(spacing: 2) {
                         RoundedRectangle(cornerRadius: 2, style: .continuous)
-                            .fill(day == "土" ? Color.clAccent : Color.clTextPrimary.opacity(0.15))
-                            .frame(width: 12, height: chartBarsGrown ? h : 4)
+                            .fill(index == 5 ? Color.clAccent : Color.clTextPrimary.opacity(0.15))
+                            .frame(width: 12, height: chartBarsGrown ? heights[index] : 4)
                         Text(day)
                             .font(.system(size: 7, weight: .medium))
                             .foregroundStyle(Color.clTextPrimary.opacity(0.5))
@@ -386,7 +386,7 @@ struct OnboardingAppShowcaseStep: View {
 
             VStack(spacing: 6) {
                 if newRecordAppeared {
-                    timelineRow(selectedTag, "30m", Color.clCat04, highlighted: true)
+                    timelineRow(LocalizedStringKey(selectedTag), "30m", Color.clCat04, highlighted: true)
                         .transition(.asymmetric(
                             insertion: .move(edge: .top).combined(with: .opacity).combined(with: .scale(scale: 0.95)),
                             removal: .identity
@@ -405,7 +405,7 @@ struct OnboardingAppShowcaseStep: View {
 
     // MARK: - Helpers
 
-    private func timelineRow(_ name: String, _ time: String, _ color: Color, highlighted: Bool = false) -> some View {
+    private func timelineRow(_ name: LocalizedStringKey, _ time: String, _ color: Color, highlighted: Bool = false) -> some View {
         HStack(spacing: 6) {
             RoundedRectangle(cornerRadius: 2, style: .continuous)
                 .fill(color)
@@ -428,7 +428,7 @@ struct OnboardingAppShowcaseStep: View {
         }
     }
 
-    private func miniKpi(_ value: String, _ label: String) -> some View {
+    private func miniKpi(_ value: String, _ label: LocalizedStringKey) -> some View {
         VStack(spacing: 1) {
             Text(value)
                 .font(.system(size: 12, weight: .bold, design: .rounded))

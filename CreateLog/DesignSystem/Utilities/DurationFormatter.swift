@@ -1,15 +1,16 @@
 import Foundation
+import SwiftUI
 
 enum DurationFormat: String, CaseIterable {
     case system
     case japanese
     case english
 
-    var label: String {
+    var localizedKey: LocalizedStringKey {
         switch self {
-        case .system: "端末の設定に従う"
-        case .japanese: "日本語 (1時間30分)"
-        case .english: "English (1h 30m)"
+        case .system: "common.systemDefault"
+        case .japanese: "settings.duration.japanese"
+        case .english: "settings.duration.english"
         }
     }
 }

@@ -181,6 +181,12 @@ final class OnboardingViewModel {
     // MARK: - Navigation
 
     func advance() {
+        // welcome → appShowcase の瞬間は「新規ユーザーフロー開始」なので、
+        // 過去に完了済みフラグが残っていても強制 reset して onboarding を in-progress にする。
+        // これを怠ると OAuth 成功時点で root view が MainTabView に遷移してプロフィール設定 step が skip される。
+        if currentStep == .welcome {
+            UserDefaults.standard.set(false, forKey: "onboardingCompleted")
+        }
         guard let next = Step(rawValue: currentStep.rawValue + 1) else { return }
         currentStep = next
     }
@@ -284,20 +290,17 @@ final class OnboardingViewModel {
         }
     }
 
-    /// bio step (任意)。
+    /// bio step (任意)。空入力なら server 呼出 skip (空 body の PATCH は PostgREST が弾く)。
     func saveBio() async -> Bool {
         let trimmed = bio.trimmingCharacters(in: .whitespacesAndNewlines)
-        return await updateProfilePartial(
-            ProfileUpdateDTO(bio: trimmed.isEmpty ? nil : trimmed)
-        )
+        guard !trimmed.isEmpty else { return true }
+        return await updateProfilePartial(ProfileUpdateDTO(bio: trimmed))
     }
 
-    /// roleTag step (任意、複数選択されても occupation に先頭のみ保存)。
+    /// roleTag step (任意、複数選択されても occupation に先頭のみ保存)。未選択なら server 呼出 skip。
     func saveRoleTag() async -> Bool {
-        let first = roleTags.sorted().first
-        return await updateProfilePartial(
-            ProfileUpdateDTO(occupation: first)
-        )
+        guard let first = roleTags.sorted().first else { return true }
+        return await updateProfilePartial(ProfileUpdateDTO(occupation: first))
     }
 
     /// 共通の部分更新ヘルパ。

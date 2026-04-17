@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 
 /// プロフィール画面のViewModel
 @MainActor @Observable
@@ -124,6 +125,67 @@ final class ProfileViewModel {
             weeklyHours = Self.buildWeeklyHours(from: w)
         } catch {
             errorMessage = "プロフィールの読み込みに失敗しました"
+        }
+    }
+
+    /// ローカル SDProject のうち Supabase `apps` に未同期 (`remoteAppId==nil`) のものを一括 sync。
+    /// onboarding 時に同期失敗したケースや以前のビルドで sync 前終了したケースを救済し、
+    /// Discover フィードに表示されるようにする。冪等 — 既同期分はスキップ、失敗時は local に残し次回 retry。
+    func syncUnsyncedProjectsIfNeeded(modelContext: ModelContext) async {
+        guard isMyProfile else { return }
+
+        let descriptor = FetchDescriptor<SDProject>(
+            predicate: #Predicate<SDProject> { $0.remoteAppId == nil }
+        )
+        guard let unsynced = try? modelContext.fetch(descriptor), !unsynced.isEmpty else { return }
+
+        var syncedCount = 0
+        for project in unsynced {
+            if await syncOneProject(project) {
+                syncedCount += 1
+            }
+        }
+
+        if syncedCount > 0 {
+            try? modelContext.save()
+            // UI に反映するため自分の apps 一覧を再 fetch
+            if let refreshed = try? await appRepository.fetchMyApps() {
+                apps = refreshed
+            }
+        }
+    }
+
+    /// 戻り値: sync 成功で `remoteAppId` がセットされたら true。
+    private func syncOneProject(_ project: SDProject) async -> Bool {
+        do {
+            var iconURLString: String?
+            if let iconData = project.iconImageData {
+                let url = try await appRepository.uploadAppIcon(
+                    imageData: iconData,
+                    contentType: "image/jpeg"
+                )
+                iconURLString = url.absoluteString
+            }
+
+            let insertDTO = AppInsertDTO(
+                name: project.name,
+                description: project.appDescription.isEmpty ? nil : project.appDescription,
+                iconUrl: iconURLString,
+                screenshots: nil,
+                platform: project.platforms.first ?? "other",
+                appUrl: nil,
+                storeUrl: project.storeURL,
+                githubUrl: project.githubURL,
+                status: project.statusRaw,
+                category: nil
+            )
+            let inserted = try await appRepository.insertApp(insertDTO)
+            project.remoteAppId = inserted.id
+            project.remoteIconUrl = iconURLString
+            return true
+        } catch {
+            print("[ProfileViewModel] syncOneProject failed: \(error.localizedDescription)")
+            return false
         }
     }
 

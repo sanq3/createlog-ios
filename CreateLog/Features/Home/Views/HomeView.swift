@@ -280,7 +280,7 @@ struct HomeView: View {
             Image(systemName: segmentIndex == 0 ? "tray" : "person.2")
                 .font(.system(size: 44, weight: .light))
                 .foregroundStyle(Color.clTextTertiary)
-            Text(segmentIndex == 0 ? "まだ投稿がありません" : "フォロー中のユーザーの投稿はありません")
+            Text(segmentIndex == 0 ? "home.empty.timeline" : "home.empty.following")
                 .font(.clBody)
                 .foregroundStyle(Color.clTextSecondary)
             if segmentIndex == 1 {
@@ -298,14 +298,14 @@ struct HomeView: View {
 
     private var tabBar: some View {
         HStack(spacing: 24) {
-            tabLabel(title: "タイムライン", index: 0)
-            tabLabel(title: "フォロー中", index: 1)
+            tabLabel(title: "home.tab.timeline", index: 0)
+            tabLabel(title: "home.tab.following", index: 1)
         }
         .padding(.vertical, 8)
         .frame(height: tabBarSectionHeight)
     }
 
-    private func tabLabel(title: String, index: Int) -> some View {
+    private func tabLabel(title: LocalizedStringKey, index: Int) -> some View {
         Button {
             withAnimation(.spring(duration: 0.3, bounce: 0.1)) {
                 segmentIndex = index

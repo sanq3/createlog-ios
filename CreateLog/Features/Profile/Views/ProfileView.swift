@@ -5,6 +5,7 @@ import CoreImage.CIFilterBuiltins
 struct ProfileView: View {
     @Environment(\.dependencies) private var deps
     @Environment(\.openURL) private var openURL
+    @Environment(\.modelContext) private var modelContext
     /// オンボーディングで作成したローカル SDProject。remote (apps) に同期済 (remoteAppId != nil)
     /// は ProfileViewModel.apps 経由で出るので除外し、二重表示を防ぐ。
     @Query(
@@ -271,6 +272,9 @@ struct ProfileView: View {
             // ViewModel.init で SDProfileCache から同期 fetch 済 → body 初回描画時に既に
             // profile が埋まっている (cache hit 時)。ここでは background revalidate のみ。
             await viewModel.loadProfile()
+            // Onboarding 時に sync 失敗した SDProject (remoteAppId==nil) を救済 sync。
+            // Discover フィードに表示されるようにする。冪等なので毎回 Profile 開く度に実行しても安全。
+            await viewModel.syncUnsyncedProjectsIfNeeded(modelContext: modelContext)
         }
     }
 

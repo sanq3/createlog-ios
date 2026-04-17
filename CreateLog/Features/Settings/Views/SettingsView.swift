@@ -5,11 +5,11 @@ enum AppearanceMode: String, CaseIterable {
     case light
     case dark
 
-    var label: String {
+    var localizedKey: LocalizedStringKey {
         switch self {
-        case .system: "端末の設定に従う"
-        case .light: "ライト"
-        case .dark: "ダーク"
+        case .system: "common.systemDefault"
+        case .light: "settings.appearance.light"
+        case .dark: "settings.appearance.dark"
         }
     }
 
@@ -24,9 +24,9 @@ enum AppearanceMode: String, CaseIterable {
 
 struct SettingsView: View {
     @Environment(\.dependencies) private var dependencies
+    @Environment(LocalizationManager.self) private var localizationManager
     @AppStorage("appearanceMode") private var appearanceMode: String = AppearanceMode.system.rawValue
     @AppStorage("durationFormat") private var durationFormat: String = DurationFormat.system.rawValue
-    @AppStorage("appLanguage") private var appLanguage: String = AppLanguage.system.rawValue
     @State private var showOnboarding = false
 
     private var selectedMode: AppearanceMode {
@@ -35,10 +35,6 @@ struct SettingsView: View {
 
     private var selectedDurationFormat: DurationFormat {
         DurationFormat(rawValue: durationFormat) ?? .system
-    }
-
-    private var selectedLanguage: AppLanguage {
-        AppLanguage(rawValue: appLanguage) ?? .system
     }
 
     var body: some View {
@@ -53,7 +49,7 @@ struct SettingsView: View {
                             .font(.system(size: 16))
                             .foregroundStyle(Color.clAccent)
                             .frame(width: 24)
-                        Text("プレミアム")
+                        Text("settings.premium")
                             .font(.clBody)
                             .foregroundStyle(Color.clTextPrimary)
                     }
@@ -65,19 +61,19 @@ struct SettingsView: View {
                 NavigationLink {
                     AccountSettingsView()
                 } label: {
-                    settingsRow(icon: "person", title: "アカウント")
+                    settingsRow(icon: "person", title: "settings.account")
                 }
 
                 NavigationLink {
                     NotificationSettingsView()
                 } label: {
-                    settingsRow(icon: "bell", title: "通知")
+                    settingsRow(icon: "bell", title: "settings.notifications")
                 }
 
                 NavigationLink {
                     IntegrationSettingsView()
                 } label: {
-                    settingsRow(icon: "link", title: "連携管理")
+                    settingsRow(icon: "link", title: "settings.integration")
                 }
             }
 
@@ -89,7 +85,7 @@ struct SettingsView: View {
                         HapticManager.light()
                     } label: {
                         HStack {
-                            Text(mode.label)
+                            Text(mode.localizedKey)
                                 .font(.clBody)
                                 .foregroundStyle(Color.clTextPrimary)
 
@@ -104,7 +100,7 @@ struct SettingsView: View {
                     }
                 }
             } header: {
-                Text("外観")
+                Text("settings.appearance.section")
             }
 
             // Duration format
@@ -115,7 +111,7 @@ struct SettingsView: View {
                         HapticManager.light()
                     } label: {
                         HStack {
-                            Text(format.label)
+                            Text(format.localizedKey)
                                 .font(.clBody)
                                 .foregroundStyle(Color.clTextPrimary)
 
@@ -130,24 +126,24 @@ struct SettingsView: View {
                     }
                 }
             } header: {
-                Text("時間の表示形式")
+                Text("settings.duration.section")
             }
 
             // Language
             Section {
                 ForEach(AppLanguage.allCases, id: \.self) { lang in
                     Button {
-                        appLanguage = lang.rawValue
+                        localizationManager.setLanguage(lang)
                         HapticManager.light()
                     } label: {
                         HStack {
-                            Text(lang.label)
+                            Text(lang.localizedKey)
                                 .font(.clBody)
                                 .foregroundStyle(Color.clTextPrimary)
 
                             Spacer()
 
-                            if selectedLanguage == lang {
+                            if localizationManager.appLanguage == lang {
                                 Image(systemName: "checkmark")
                                     .font(.system(size: 14, weight: .semibold))
                                     .foregroundStyle(Color.clAccent)
@@ -156,7 +152,7 @@ struct SettingsView: View {
                     }
                 }
             } header: {
-                Text("言語")
+                Text("settings.language.section")
             }
 
             // Legal & Support
@@ -164,32 +160,32 @@ struct SettingsView: View {
                 NavigationLink {
                     LegalTextView(type: .privacy)
                 } label: {
-                    settingsRow(icon: "hand.raised", title: "プライバシーポリシー")
+                    settingsRow(icon: "hand.raised", title: "settings.support.privacy")
                 }
 
                 NavigationLink {
                     LegalTextView(type: .terms)
                 } label: {
-                    settingsRow(icon: "doc.text", title: "利用規約")
+                    settingsRow(icon: "doc.text", title: "settings.support.terms")
                 }
 
                 NavigationLink {
                     SupportView()
                 } label: {
-                    settingsRow(icon: "questionmark.circle", title: "お問い合わせ")
+                    settingsRow(icon: "questionmark.circle", title: "settings.support.contact")
                 }
             } header: {
-                Text("サポート")
+                Text("settings.support.section")
             }
 
             // Version
             Section {
                 HStack {
-                    Text("バージョン")
+                    Text("settings.version")
                         .font(.clBody)
                         .foregroundStyle(Color.clTextPrimary)
                     Spacer()
-                    Text("2.0.0")
+                    Text(verbatim: "2.0.0")
                         .font(.clBody)
                         .foregroundStyle(Color.clTextTertiary)
                 }
@@ -200,15 +196,15 @@ struct SettingsView: View {
                 Button {
                     showOnboarding = true
                 } label: {
-                    settingsRow(icon: "arrow.counterclockwise", title: "オンボーディングを表示")
+                    settingsRow(icon: "arrow.counterclockwise", title: "settings.dev.showOnboarding")
                 }
             } header: {
-                Text("開発用")
+                Text("settings.dev.section")
             }
         }
         .scrollContentBackground(.hidden)
         .background(Color.clBackground)
-        .navigationTitle("設定")
+        .navigationTitle(Text("settings.title"))
         .navigationBarTitleDisplayMode(.inline)
         .fullScreenCover(isPresented: $showOnboarding) {
             OnboardingView(
@@ -218,7 +214,7 @@ struct SettingsView: View {
         }
     }
 
-    private func settingsRow(icon: String, title: String) -> some View {
+    private func settingsRow(icon: String, title: LocalizedStringKey) -> some View {
         HStack(spacing: 14) {
             Image(systemName: icon)
                 .font(.system(size: 16))
@@ -227,22 +223,6 @@ struct SettingsView: View {
             Text(title)
                 .font(.clBody)
                 .foregroundStyle(Color.clTextPrimary)
-        }
-    }
-}
-
-// MARK: - Language
-
-enum AppLanguage: String, CaseIterable {
-    case system
-    case japanese
-    case english
-
-    var label: String {
-        switch self {
-        case .system: "端末の設定に従う"
-        case .japanese: "日本語"
-        case .english: "English"
         }
     }
 }
@@ -265,15 +245,15 @@ struct IntegrationSettingsView: View {
                     icon: "cursorarrow.rays"
                 )
             } header: {
-                Text("エディタ連携")
+                Text("integration.editor.section")
             } footer: {
-                Text("エディタ拡張機能によるコーディング時間の自動記録は今後のアップデートで公開予定です。")
+                Text("integration.editor.footer")
                     .font(.clCaption)
             }
         }
         .scrollContentBackground(.hidden)
         .background(Color.clBackground)
-        .navigationTitle("連携管理")
+        .navigationTitle(Text("integration.title"))
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -284,13 +264,13 @@ struct IntegrationSettingsView: View {
                 .foregroundStyle(Color.clTextPrimary)
                 .frame(width: 28)
 
-            Text(name)
+            Text(verbatim: name)
                 .font(.clBody)
                 .foregroundStyle(Color.clTextPrimary)
 
             Spacer()
 
-            Text("今後追加")
+            Text("integration.comingSoon")
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Color.clTextTertiary)
                 .padding(.horizontal, 8)
@@ -307,10 +287,10 @@ enum LegalType {
     case privacy
     case terms
 
-    var title: String {
+    var localizedKey: LocalizedStringKey {
         switch self {
-        case .privacy: "プライバシーポリシー"
-        case .terms: "利用規約"
+        case .privacy: "legal.privacy.title"
+        case .terms: "legal.terms.title"
         }
     }
 }
@@ -321,11 +301,11 @@ struct LegalTextView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text("最終更新日: 2026年4月1日")
+                Text("legal.lastUpdated")
                     .font(.clCaption)
                     .foregroundStyle(Color.clTextTertiary)
 
-                Text(content)
+                Text(verbatim: content)
                     .font(.clBody)
                     .foregroundStyle(Color.clTextSecondary)
                     .lineSpacing(6)
@@ -334,7 +314,7 @@ struct LegalTextView: View {
         }
         .scrollIndicators(.hidden)
         .background(Color.clBackground)
-        .navigationTitle(type.title)
+        .navigationTitle(Text(type.localizedKey))
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -426,9 +406,9 @@ struct SupportView: View {
     var body: some View {
         List {
             Section {
-                Picker("カテゴリ", selection: $category) {
+                Picker("support.categoryLabel", selection: $category) {
                     ForEach(SupportCategory.allCases) { cat in
-                        Text(cat.label).tag(cat)
+                        Text(cat.localizedKey).tag(cat)
                     }
                 }
                 .font(.clBody)
@@ -436,16 +416,16 @@ struct SupportView: View {
             }
 
             Section {
-                TextField("お問い合わせ内容", text: $message, axis: .vertical)
+                TextField("support.messagePlaceholder", text: $message, axis: .vertical)
                     .font(.clBody)
                     .lineLimit(5...10)
             } header: {
-                Text("メッセージ")
+                Text("support.messageSection")
             }
 
             if sent {
                 Section {
-                    Text("メールアプリが開きます。そのまま送信してください。")
+                    Text("support.sentHint")
                         .font(.clCaption)
                         .foregroundStyle(Color.clSuccess)
                 }
@@ -456,7 +436,7 @@ struct SupportView: View {
                     HapticManager.success()
                     sendMail()
                 } label: {
-                    Text("送信")
+                    Text("support.submit")
                         .font(.system(size: 15, weight: .bold))
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
@@ -472,13 +452,13 @@ struct SupportView: View {
         }
         .scrollContentBackground(.hidden)
         .background(Color.clBackground)
-        .navigationTitle("お問い合わせ")
+        .navigationTitle(Text("support.title"))
         .navigationBarTitleDisplayMode(.inline)
     }
 
     /// メールアプリを mailto: で起動。body に category + message を prefill する。
     private func sendMail() {
-        let subject = "[CreateLog] \(category.label)"
+        let subject = "[CreateLog] \(category.englishLabel)"
         let body = message
         var components = URLComponents(string: "mailto:\(supportEmail)")
         components?.queryItems = [
@@ -500,12 +480,22 @@ private enum SupportCategory: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    var label: String {
+    var localizedKey: LocalizedStringKey {
         switch self {
-        case .bug: "不具合報告"
-        case .feature: "機能リクエスト"
-        case .account: "アカウント"
-        case .other: "その他"
+        case .bug: "support.category.bug"
+        case .feature: "support.category.feature"
+        case .account: "support.category.account"
+        case .other: "support.category.other"
+        }
+    }
+
+    /// メール subject 用の English 固定ラベル (locale 非依存)
+    var englishLabel: String {
+        switch self {
+        case .bug: "Bug Report"
+        case .feature: "Feature Request"
+        case .account: "Account"
+        case .other: "Other"
         }
     }
 }

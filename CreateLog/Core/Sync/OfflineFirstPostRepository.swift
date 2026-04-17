@@ -73,6 +73,23 @@ final class OfflineFirstPostRepository: PostRepositoryProtocol, @unchecked Senda
         }
     }
 
+    /// Discover 専用フィード (server 側 RPC で「読む意味のある投稿」を絞り込み)。
+    /// cache は fetchFeed / fetchFollowingFeed と共有して upsert。offline fallback は
+    /// Home cache をそのまま返す (Discover は online 前提、厳密な cache 整合は重要度低)。
+    func fetchDiscoverFeed(cursor: Date?, limit: Int) async throws -> [PostDTO] {
+        do {
+            let remote = try await underlying.fetchDiscoverFeed(cursor: cursor, limit: limit)
+            await upsertCache(remote)
+            precacheAuthors(from: remote)
+            return remote
+        } catch {
+            if let cached = await readFromCache(cursor: cursor, limit: limit), !cached.isEmpty {
+                return cached
+            }
+            throw error
+        }
+    }
+
     func fetchUserPosts(userId: UUID, cursor: Date?, limit: Int) async throws -> [PostDTO] {
         // プロフィール画面用。remote 直接 fetch + 成功時 upsert。
         // cache fallback はしない (他人プロフィールを cache しても混乱の元)。

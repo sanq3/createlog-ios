@@ -8,7 +8,7 @@ import AuthenticationServices
 /// Apple HIG の要件 (apple.logo + 指定文言 + 黒/白 の foreground) は満たしつつ、
 /// Capsule + 透過背景 + 黒枠 outline で他 OAuth ボタンと揃える。
 struct AppleSignInButton: View {
-    let labelText: String
+    let labelText: LocalizedStringKey
     let onRequest: (ASAuthorizationAppleIDRequest) -> Void
     let onCompletion: (Result<ASAuthorization, Error>) -> Void
 

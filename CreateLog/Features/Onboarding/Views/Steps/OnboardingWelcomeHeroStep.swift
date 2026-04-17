@@ -74,7 +74,7 @@ struct OnboardingWelcomeHeroStep: View {
 
                 Spacer().frame(height: 20)
 
-                Text("エンジニアのためのアプリ")
+                Text("onboarding.welcome.tagline1")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(Color.clTextSecondary)
                     .opacity(tagline1Visible ? 1 : 0)
@@ -82,7 +82,7 @@ struct OnboardingWelcomeHeroStep: View {
 
                 Spacer().frame(height: 8)
 
-                Text("自分だけの作業記録。新感覚のポートフォリオ")
+                Text("onboarding.welcome.tagline2")
                     .font(.system(size: 13, weight: .regular))
                     .foregroundStyle(Color.clTextPrimary.opacity(0.45))
                     .opacity(tagline2Visible ? 1 : 0)
@@ -90,7 +90,7 @@ struct OnboardingWelcomeHeroStep: View {
 
                 Spacer()
 
-                Text("タップして続ける")
+                Text("onboarding.hint.tapToContinue")
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(Color.clTextSecondary)
                     .opacity(hintVisible ? (hintPulse ? 0.9 : 0.4) : 0)
@@ -106,9 +106,9 @@ struct OnboardingWelcomeHeroStep: View {
                     onLogin()
                 } label: {
                     HStack(spacing: 4) {
-                        Text("すでにアカウントをお持ちの方")
+                        Text("onboarding.welcome.loginPrefix")
                             .foregroundStyle(Color.clTextPrimary.opacity(0.5))
-                        Text("ログイン")
+                        Text("onboarding.welcome.loginLink")
                             .foregroundStyle(Color.clTextPrimary.opacity(0.85))
                             .underline()
                     }
