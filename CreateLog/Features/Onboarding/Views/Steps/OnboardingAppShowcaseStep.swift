@@ -9,7 +9,7 @@ struct OnboardingAppShowcaseStep: View {
 
     @State private var phoneAppeared = false
     @State private var timerCount = 0
-    @State private var selectedTag = "category.dev"
+    @State private var selectedTag = "開発"
     @State private var showCheckFlash = false
     @State private var newRecordAppeared = false
     @State private var chartBarsGrown = false
@@ -24,7 +24,7 @@ struct OnboardingAppShowcaseStep: View {
             VStack(spacing: 0) {
                 Spacer().frame(height: 36)
 
-                Text(scrollPosition == 0 ? "onboarding.welcome.featureRecord" : "onboarding.celebration.subtitle")
+                Text(scrollPosition == 0 ? "作業を記録する" : "タイムラインに追加される")
                     .font(.system(size: 24, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary)
                     .tracking(-0.5)
@@ -34,8 +34,8 @@ struct OnboardingAppShowcaseStep: View {
                 Spacer().frame(height: 4)
 
                 Text(scrollPosition == 0
-                     ? "onboarding.welcome.featureTimer"
-                     : "onboarding.welcome.featureLog")
+                     ? "タイマーや手入力で開発時間を記録"
+                     : "いつでも見返せる作業の記録")
                     .font(.system(size: 13))
                     .foregroundStyle(Color.clTextPrimary.opacity(0.6))
                     .contentTransition(.interpolate)
@@ -90,7 +90,7 @@ struct OnboardingAppShowcaseStep: View {
                 Spacer()
 
                 OnboardingPrimaryCTA(
-                    title: "common.continue",
+                    title: "続ける",
                     disabledStyle: .dimmed,
                     action: onAdvance
                 )
@@ -229,14 +229,14 @@ struct OnboardingAppShowcaseStep: View {
         ZStack {
             VStack(spacing: 0) {
                 Spacer().frame(height: 46)
-                Text("recording.title")
+                Text("記録")
                     .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary)
                 Spacer().frame(height: 14)
                 HStack(spacing: 0) {
-                    miniKpi("30m", "recording.today")
-                    miniKpi("12h", "recording.total")
-                    miniKpi("15%", "recording.vsLastWeek")
+                    miniKpi("30m", "今日")
+                    miniKpi("12h", "累計")
+                    miniKpi("15%", "先週比")
                 }
                 .padding(.horizontal, 10)
                 Spacer().frame(height: 14)
@@ -247,7 +247,7 @@ struct OnboardingAppShowcaseStep: View {
                     .animation(.spring(duration: 0.3), value: timerCount)
                 Spacer().frame(height: 12)
                 LazyVGrid(columns: [GridItem(.flexible(), spacing: 5), GridItem(.flexible(), spacing: 5)], spacing: 5) {
-                    ForEach(["category.dev", "onboarding.role.design", "category.learn", "category.plan"], id: \.self) { tag in
+                    ForEach(["開発", "デザイン", "学習", "設計"], id: \.self) { tag in
                         let on = selectedTag == tag
                         Button {
                             HapticManager.light()
@@ -286,7 +286,7 @@ struct OnboardingAppShowcaseStep: View {
                             newRecordAppeared = true
                         }
                     } label: {
-                        Text("recording.action")
+                        Text("記録する")
                             .font(.system(size: 10, weight: .bold))
                             .foregroundStyle(Color.clBackground)
                             .padding(.horizontal, 20)
@@ -306,9 +306,9 @@ struct OnboardingAppShowcaseStep: View {
                 }
                 Spacer().frame(height: 12)
                 VStack(spacing: 6) {
-                    timelineRow("brand.wordmark.ja", "1h 30m", Color.clCat01)
-                    timelineRow("onboarding.role.portfolio", "45m", Color.clCat02)
-                    timelineRow("onboarding.platform.swiftLearn", "2h", Color.clCat03)
+                    timelineRow("つくろぐ", "1h 30m", Color.clCat01)
+                    timelineRow("ポートフォリオ", "45m", Color.clCat02)
+                    timelineRow("Swift学習", "2h", Color.clCat03)
                 }
                 .padding(.horizontal, 12)
                 Spacer()
@@ -329,7 +329,7 @@ struct OnboardingAppShowcaseStep: View {
     private var timelineScreenView: some View {
         VStack(spacing: 0) {
             Spacer().frame(height: 46)
-            Text("recording.title")
+            Text("記録")
                 .font(.system(size: 13, weight: .bold))
                 .foregroundStyle(Color.clTextPrimary)
             Spacer().frame(height: 12)
@@ -343,13 +343,13 @@ struct OnboardingAppShowcaseStep: View {
                         .contentTransition(.numericText(countsDown: false))
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
-                    Text("recording.today")
+                    Text("今日")
                         .font(.system(size: 7, weight: .medium))
                         .foregroundStyle(Color.clTextPrimary.opacity(0.5))
                 }
                 .frame(maxWidth: .infinity)
-                miniKpi("12h", "recording.thisWeek")
-                miniKpi("48h", "recording.thisMonth")
+                miniKpi("12h", "今週")
+                miniKpi("48h", "今月")
             }
             .padding(.horizontal, 10)
             Spacer().frame(height: 14)
@@ -357,7 +357,7 @@ struct OnboardingAppShowcaseStep: View {
             // 週間バーチャート
             HStack(alignment: .bottom, spacing: 4) {
                 let heights: [CGFloat] = [32, 24, 48, 16, 40, 56, 28]
-                let days: [LocalizedStringKey] = ["weekday.mon", "weekday.tue", "weekday.wed", "weekday.thu", "weekday.fri", "weekday.sat", "weekday.sun"]
+                let days: [LocalizedStringKey] = ["月", "火", "水", "木", "金", "土", "日"]
                 ForEach(Array(days.enumerated()), id: \.offset) { index, day in
                     VStack(spacing: 2) {
                         RoundedRectangle(cornerRadius: 2, style: .continuous)
@@ -376,7 +376,7 @@ struct OnboardingAppShowcaseStep: View {
 
             // タイムラインセクション
             HStack {
-                Text("recording.todayRecords")
+                Text("今日の記録")
                     .font(.system(size: 9, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary.opacity(0.5))
                 Spacer()
@@ -392,9 +392,9 @@ struct OnboardingAppShowcaseStep: View {
                             removal: .identity
                         ))
                 }
-                timelineRow("brand.wordmark.ja", "1h 30m", Color.clCat01)
-                timelineRow("onboarding.role.portfolio", "45m", Color.clCat02)
-                timelineRow("onboarding.platform.swiftLearn", "2h", Color.clCat03)
+                timelineRow("つくろぐ", "1h 30m", Color.clCat01)
+                timelineRow("ポートフォリオ", "45m", Color.clCat02)
+                timelineRow("Swift学習", "2h", Color.clCat03)
             }
             .padding(.horizontal, 12)
             .animation(.spring(duration: 0.65, bounce: 0.25), value: newRecordAppeared)

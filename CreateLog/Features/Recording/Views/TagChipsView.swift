@@ -100,7 +100,7 @@ struct TagChipsView: View {
             HStack(spacing: 4) {
                 Image(systemName: "plus")
                     .font(.system(size: 12, weight: .medium))
-                Text("common.add")
+                Text("追加")
                     .font(.system(size: 13, weight: .medium))
             }
             .foregroundStyle(Color.clTextTertiary)

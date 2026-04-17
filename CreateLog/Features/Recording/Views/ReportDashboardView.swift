@@ -63,7 +63,7 @@ struct ReportDashboardView: View {
                     .padding(.bottom, 20)
 
                 HStack {
-                    Text("recording.thisMonth.category")
+                    Text("今月のカテゴリ")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Color.clTextTertiary)
                     Spacer()
@@ -81,7 +81,7 @@ struct ReportDashboardView: View {
                     .padding(.bottom, 14)
 
                 HStack {
-                    Text("recording.weeklyTrend.long")
+                    Text("週間の推移")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Color.clTextTertiary)
                     Spacer()
@@ -96,7 +96,7 @@ struct ReportDashboardView: View {
         }
         .scrollIndicators(.hidden)
         .background(Color.clBackground)
-        .navigationTitle("recording.report")
+        .navigationTitle("レポート")
         .toolbarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -185,7 +185,7 @@ struct ReportDashboardView: View {
         guard let weekly = try? await dependencies.statsRepository.fetchWeeklyStats(containing: currentWeekStart) else {
             return (0, [], [])
         }
-        let labels = ["weekday.mon", "weekday.tue", "weekday.wed", "weekday.thu", "weekday.fri", "weekday.sat", "weekday.sun"]
+        let labels = ["月", "火", "水", "木", "金", "土", "日"]
         let sorted = weekly.dailyTotals.sorted { $0.date < $1.date }
 
         var hoursData: [(day: String, hours: Double)] = []
@@ -208,9 +208,9 @@ struct ReportDashboardView: View {
 
     private var kpiRow: some View {
         HStack(spacing: 0) {
-            kpiItem(hours: animateIn ? todayHours : 0, label: "recording.today")
-            kpiItem(hours: animateIn ? weekHours : 0, label: "recording.thisWeek")
-            kpiItem(hours: animateIn ? monthHours : 0, label: "recording.thisMonth")
+            kpiItem(hours: animateIn ? todayHours : 0, label: "今日")
+            kpiItem(hours: animateIn ? weekHours : 0, label: "今週")
+            kpiItem(hours: animateIn ? monthHours : 0, label: "今月")
         }
     }
 
@@ -456,10 +456,10 @@ struct ReportDashboardView: View {
             }
             .chartForegroundStyleScale([
                 "iOS開発": LogEntry.color(for: "iOS開発"),
-                "category.learn": LogEntry.color(for: "category.learn"),
+                "学習": LogEntry.color(for: "学習"),
                 "バグ修正": LogEntry.color(for: "バグ修正"),
                 "Web開発": LogEntry.color(for: "Web開発"),
-                "onboarding.role.design": LogEntry.color(for: "onboarding.role.design"),
+                "デザイン": LogEntry.color(for: "デザイン"),
             ])
             .chartLegend(.hidden)
             .chartYAxis(.hidden)

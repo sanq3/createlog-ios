@@ -5,7 +5,7 @@ struct NotificationsView: View {
     @State private var viewModel: NotificationViewModel?
     @State private var filterIndex = 0
 
-    private let filterLabels = ["すべて", "いいね", "profile.follow", "メンション", "システム"]
+    private let filterLabels = ["すべて", "いいね", "フォロー", "メンション", "システム"]
 
     private var allNotifications: [NotificationItem] {
         viewModel?.notifications ?? []
@@ -55,7 +55,7 @@ struct NotificationsView: View {
         }
         .scrollIndicators(.hidden)
         .background(Color.clBackground)
-        .navigationTitle("notification.title")
+        .navigationTitle("通知")
         .refreshable {
             await viewModel?.loadNotifications()
         }
@@ -208,7 +208,7 @@ struct NotificationsView: View {
                 .font(.system(size: 40, weight: .light))
                 .foregroundStyle(Color.clTextTertiary)
 
-            Text("notification.empty")
+            Text("通知はありません")
                 .font(.clHeadline)
                 .foregroundStyle(Color.clTextSecondary)
 

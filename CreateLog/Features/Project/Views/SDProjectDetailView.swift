@@ -135,7 +135,7 @@ struct SDProjectDetailView: View {
 
     private var platformsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            sectionTitle("project.platform.label")
+            sectionTitle("プラットフォーム")
             FlowLayout(spacing: 8) {
                 ForEach(project.platforms, id: \.self) { platform in
                     chip(text: platform, foreground: Color.clTextPrimary, background: Color.clSurfaceHigh)

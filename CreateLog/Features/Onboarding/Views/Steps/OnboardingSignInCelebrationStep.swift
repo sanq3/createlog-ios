@@ -38,13 +38,13 @@ struct OnboardingSignInCelebrationStep: View {
                 }
 
                 VStack(spacing: 10) {
-                    Text("onboarding.celebration.title")
+                    Text("アカウント作成完了!")
                         .font(.system(size: 26, weight: .bold))
                         .foregroundStyle(Color.clTextPrimary)
                         .tracking(-0.5)
                         .opacity(titleOpacity)
 
-                    Text("onboarding.profileIntro.title")
+                    Text("プロフィールを設定しましょう")
                         .font(.system(size: 15, weight: .medium))
                         .foregroundStyle(Color.clTextPrimary.opacity(0.55))
                         .opacity(subtitleOpacity)

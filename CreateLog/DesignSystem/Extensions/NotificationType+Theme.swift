@@ -26,7 +26,7 @@ extension NotificationType {
     var filterLabel: String {
         switch self {
         case .like: return "いいね"
-        case .follow: return "profile.follow"
+        case .follow: return "フォロー"
         case .repost: return "リポスト"
         case .comment: return "コメント"
         case .mention: return "メンション"

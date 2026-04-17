@@ -9,7 +9,7 @@ struct OnboardingPlatformStep: View {
     @State private var appeared = false
     @State private var chipsAppeared = false
 
-    private static let platforms = ["iOS", "Android", "Web", "Desktop", "common.other"]
+    private static let platforms = ["iOS", "Android", "Web", "Desktop", "その他"]
 
     private var canAdvance: Bool { !selectedPlatforms.isEmpty }
 
@@ -31,7 +31,7 @@ struct OnboardingPlatformStep: View {
 
                 Spacer().frame(height: 8)
 
-                Text("onboarding.tech.subtitle")
+                Text("複数選択できます")
                     .font(.system(size: 14))
                     .foregroundStyle(Color.clTextPrimary.opacity(0.5))
                     .opacity(appeared ? 1 : 0)
@@ -44,7 +44,7 @@ struct OnboardingPlatformStep: View {
                 Spacer()
 
                 OnboardingPrimaryCTA(
-                    title: "common.continue",
+                    title: "続ける",
                     isEnabled: canAdvance,
                     disabledStyle: .dimmed,
                     action: onAdvance

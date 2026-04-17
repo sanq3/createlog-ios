@@ -69,8 +69,8 @@ final class ProfileEditViewModel {
     }
 
     static let interestOptions = [
-        "iOS", "Android", "Web", "onboarding.platform.backend", "インフラ",
-        "AI/ML", "ゲーム", "onboarding.role.design", "onboarding.role.soloDev", "OSS",
+        "iOS", "Android", "Web", "バックエンド", "インフラ",
+        "AI/ML", "ゲーム", "デザイン", "個人開発", "OSS",
         "セキュリティ", "データ", "モバイル", "クラウド", "DevOps",
     ]
 
@@ -119,7 +119,7 @@ final class ProfileEditViewModel {
             do {
                 let available = try await profileRepository.checkHandleAvailability(handle)
                 guard available else {
-                    errorMessage = "auth.handle.taken"
+                    errorMessage = "このハンドルは既に使われています"
                     return
                 }
             } catch {

@@ -14,7 +14,7 @@ struct ErrorBanner: View {
                 .frame(width: 3)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("common.error")
+                Text("エラー")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(Color.clError)
                     .textCase(.uppercase)
@@ -27,7 +27,7 @@ struct ErrorBanner: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            Button("common.close") {
+            Button("閉じる") {
                 onDismiss()
             }
             .font(.system(size: 12, weight: .medium))

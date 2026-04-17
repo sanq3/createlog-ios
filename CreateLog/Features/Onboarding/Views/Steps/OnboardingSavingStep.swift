@@ -21,13 +21,13 @@ struct OnboardingSavingStep: View {
                 Spacer()
 
                 ZStack {
-                    Text("action.saving")
+                    Text("保存中")
                         .font(.system(size: 34, weight: .bold))
                         .foregroundStyle(Color.clTextPrimary.opacity(0.4))
                         .opacity(showSaving && !savedText ? 1 : 0)
                         .blur(radius: savedText ? 6 : 0)
 
-                    Text("action.saved")
+                    Text("保存した")
                         .font(.system(size: 34, weight: .bold))
                         .foregroundStyle(Color.clTextPrimary)
                         .opacity(savedText ? 1 : 0)
@@ -45,7 +45,7 @@ struct OnboardingSavingStep: View {
                 Spacer()
 
                 OnboardingPrimaryCTA(
-                    title: "common.continue",
+                    title: "続ける",
                     disabledStyle: .dimmed,
                     action: onAdvance
                 )
@@ -108,7 +108,7 @@ struct OnboardingSavingStep: View {
                         .lineLimit(1)
                 }
 
-                Text("onboarding.profileIntro.hint")
+                Text("アカウント作成後に詳細を設定できます")
                     .font(.system(size: 11))
                     .foregroundStyle(Color.clTextPrimary.opacity(0.3))
                     .lineLimit(1)
@@ -145,7 +145,7 @@ struct OnboardingSavingStep: View {
 
 #Preview {
     OnboardingSavingStep(
-        projectName: "brand.wordmark.ja",
+        projectName: "つくろぐ",
         platform: "iOS",
         languages: ["Swift", "TypeScript"],
         onAdvance: {}

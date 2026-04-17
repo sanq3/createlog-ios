@@ -134,7 +134,7 @@ struct FollowListView: View {
                 .font(.system(size: 15))
                 .foregroundStyle(Color.clTextTertiary)
 
-            TextField("common.search", text: $searchText)
+            TextField("検索", text: $searchText)
                 .font(.system(size: 15))
                 .foregroundStyle(Color.clTextPrimary)
                 .textInputAutocapitalization(.never)
@@ -233,7 +233,7 @@ struct FollowListView: View {
         Button {
             toggleFollow(user)
         } label: {
-            Text(user.isFollowing ? "profile.following" : "profile.follow")
+            Text(user.isFollowing ? "フォロー中" : "フォロー")
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(user.isFollowing ? Color.clTextPrimary : .white)
                 .padding(.horizontal, 16)

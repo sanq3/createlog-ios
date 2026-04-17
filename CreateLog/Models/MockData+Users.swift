@@ -22,7 +22,7 @@ extension MockData {
         occupation: "iOSエンジニア",
         experienceLevel: .threeToFive,
         skills: ["Swift", "SwiftUI", "UIKit", "Combine", "Core Data", "Firebase", "Supabase", "Git"],
-        interests: ["iOS", "onboarding.role.soloDev", "UI/UX", "Swift"]
+        interests: ["iOS", "個人開発", "UI/UX", "Swift"]
     )
 
     static let users: [User] = [
@@ -42,7 +42,7 @@ extension MockData {
             occupation: "iOSエンジニア",
             experienceLevel: .threeToFive,
             skills: ["Swift", "SwiftUI", "Combine", "Core Data", "CloudKit"],
-            interests: ["iOS", "onboarding.role.soloDev", "OSS"]
+            interests: ["iOS", "個人開発", "OSS"]
         ),
         User(
             name: "Emily Chen",
@@ -75,10 +75,10 @@ extension MockData {
             projectCount: 1,
             reviewCount: 3,
             trustScore: 5.0,
-            occupation: "onboarding.role.student",
+            occupation: "学生",
             experienceLevel: .lessThanOne,
             skills: ["Python", "SwiftUI"],
-            interests: ["category.learn", "iOS", "AI"]
+            interests: ["学習", "iOS", "AI"]
         ),
         User(
             name: "Alex Kim",
@@ -132,7 +132,7 @@ extension MockData {
             occupation: "フロントエンドエンジニア",
             experienceLevel: .threeToFive,
             skills: ["React", "Next.js", "TypeScript", "Figma", "Tailwind CSS"],
-            interests: ["Web", "onboarding.role.design", "onboarding.role.soloDev"]
+            interests: ["Web", "デザイン", "個人開発"]
         ),
     ]
 }

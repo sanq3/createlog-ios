@@ -82,7 +82,7 @@ struct QRScannerView: View {
                         .fill(.black.opacity(0.01))
                 )
 
-            Text("share.qr.scanTitle")
+            Text("QRコードをスキャン")
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(.white)
 
@@ -109,7 +109,7 @@ struct QRScannerView: View {
                 NavigationLink {
                     UserProfileView(user: User(name: username, handle: username))
                 } label: {
-                    Text("profile.view")
+                    Text("プロフィールを見る")
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(.black)
                         .frame(maxWidth: .infinity)
@@ -137,7 +137,7 @@ struct QRScannerView: View {
                 .font(.system(size: 40))
                 .foregroundStyle(.white.opacity(0.4))
 
-            Text("share.camera.permissionTitle")
+            Text("カメラへのアクセスが必要です")
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(.white)
 
@@ -151,7 +151,7 @@ struct QRScannerView: View {
                     UIApplication.shared.open(url)
                 }
             } label: {
-                Text("common.openSettings")
+                Text("設定を開く")
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(.black)
                     .frame(width: 160, height: 44)

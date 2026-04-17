@@ -21,7 +21,7 @@ struct OnboardingHandleStep: View {
             VStack(spacing: 0) {
                 Spacer().frame(height: 100)
 
-                Text("onboarding.handle.title")
+                Text("ハンドルを決めよう")
                     .font(.system(size: 26, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary)
                     .tracking(-0.5)
@@ -30,7 +30,7 @@ struct OnboardingHandleStep: View {
 
                 Spacer().frame(height: 12)
 
-                Text("onboarding.handle.subtitle")
+                Text("プロフィール URL とメンションに使われます")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(Color.clTextPrimary.opacity(0.55))
                     .multilineTextAlignment(.center)
@@ -134,7 +134,7 @@ struct OnboardingHandleStep: View {
                                     .tint(.white)
                                     .scaleEffect(0.9)
                             }
-                            Text(viewModel.isConfirmingHandle ? "common.saving" : "auth.handle.confirm")
+                            Text(viewModel.isConfirmingHandle ? "保存中..." : "このハンドルで決定")
                                 .font(.system(size: 16, weight: .semibold))
                                 .foregroundStyle(.white)
                         }
@@ -206,9 +206,9 @@ struct OnboardingHandleStep: View {
         }
         switch viewModel.handleAvailability {
         case .available:
-            return "auth.handle.available"
+            return "このハンドルは使えます"
         case .taken:
-            return "auth.handle.taken"
+            return "このハンドルは既に使われています"
         case .error(let message):
             return "確認エラー: \(message)"
         case .checking, .unknown:

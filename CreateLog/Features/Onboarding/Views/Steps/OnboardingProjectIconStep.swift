@@ -10,8 +10,8 @@ struct OnboardingProjectIconStep: View {
 
     var body: some View {
         OnboardingQuestionShell(
-            title: "onboarding.project.icon.label",
-            subtitle: "onboarding.profileIntro.subtitle",
+            title: "プロダクトのアイコン",
+            subtitle: "あとで変更できます",
             isOptional: true,
             canAdvance: true,
             isSaving: false,

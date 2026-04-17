@@ -25,7 +25,7 @@ struct OfflineBadgeModifier: ViewModifier {
                     HStack(spacing: 6) {
                         Image(systemName: "wifi.slash")
                             .font(.system(size: 12, weight: .medium))
-                        Text("common.offline")
+                        Text("オフライン")
                             .font(.system(size: 13, weight: .medium))
                     }
                     .foregroundStyle(Color.clTextPrimary)

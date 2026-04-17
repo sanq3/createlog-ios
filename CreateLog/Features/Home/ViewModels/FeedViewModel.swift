@@ -18,7 +18,7 @@ final class FeedViewModel {
         var label: String {
             switch self {
             case .timeline: "タイムライン"
-            case .following: "profile.following"
+            case .following: "フォロー中"
             }
         }
     }

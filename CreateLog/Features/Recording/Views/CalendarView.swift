@@ -6,7 +6,7 @@ struct CalendarView: View {
     @Environment(\.dependencies) private var dependencies
     @State private var viewModel: CalendarViewModel?
 
-    private let dayLabels = ["weekday.mon", "weekday.tue", "weekday.wed", "weekday.thu", "weekday.fri", "weekday.sat", "weekday.sun"]
+    private let dayLabels = ["月", "火", "水", "木", "金", "土", "日"]
 
     private var today: Int {
         Calendar.current.component(.day, from: Date())
@@ -143,7 +143,7 @@ struct CalendarView: View {
                         Text(String(format: "%.1fh", Double(viewModel.monthTotalMinutes) / 60.0))
                             .font(.clNumber)
                             .foregroundStyle(Color.clTextPrimary)
-                        Text("recording.totalTime")
+                        Text("合計時間")
                             .font(.clCaption)
                             .foregroundStyle(Color.clTextTertiary)
                     }
@@ -154,7 +154,7 @@ struct CalendarView: View {
                             .foregroundStyle(Color.clTextPrimary)
                             .lineLimit(1)
                             .minimumScaleFactor(0.5)
-                        Text("recording.topCategory")
+                        Text("最多カテゴリ")
                             .font(.clCaption)
                             .foregroundStyle(Color.clTextTertiary)
                     }
@@ -163,7 +163,7 @@ struct CalendarView: View {
                         Text(viewModel.bestDay > 0 ? "\(viewModel.displayMonth)/\(viewModel.bestDay)" : "-")
                             .font(.clNumber)
                             .foregroundStyle(Color.clTextPrimary)
-                        Text("recording.bestDay")
+                        Text("ベストデイ")
                             .font(.clCaption)
                             .foregroundStyle(Color.clTextTertiary)
                     }

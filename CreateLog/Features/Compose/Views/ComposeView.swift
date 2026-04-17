@@ -35,7 +35,7 @@ struct ComposeView: View {
                             .frame(minHeight: 160)
                             .overlay(alignment: .topLeading) {
                                 if (viewModel?.text ?? "").isEmpty {
-                                    Text("compose.placeholder")
+                                    Text("いまなにしてる?")
                                         .font(.system(size: 17))
                                         .foregroundStyle(Color.clTextTertiary)
                                         .allowsHitTesting(false)
@@ -99,7 +99,7 @@ struct ComposeView: View {
                         HapticManager.light()
                         dismiss()
                     } label: {
-                        Text("common.cancel")
+                        Text("キャンセル")
                             .font(.system(size: 16))
                             .foregroundStyle(Color.clTextPrimary)
                     }
@@ -120,7 +120,7 @@ struct ComposeView: View {
                                 ProgressView()
                                     .tint(Color.clAccent)
                             }
-                            Text("post.title")
+                            Text("投稿")
                                 .font(.system(size: 15, weight: .bold))
                                 .foregroundStyle(
                                     (viewModel?.canPost ?? false) && viewModel?.isPosting != true

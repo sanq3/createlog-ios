@@ -1,3071 +1,2315 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "": {},
-    " ": {},
-    "-": {},
-    "(%lld)": {},
-    "@": {},
-    "@%@": {},
-    "%@": {},
-    "%@ / %@": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "new",
-            "value": "%1$@ / %2$@"
+  "sourceLanguage" : "ja",
+  "strings" : {
+    "" : {
+
+    },
+    " " : {
+
+    },
+    "-" : {
+
+    },
+    "(%lld)" : {
+
+    },
+    "「%@」を報告する理由を選択してください" : {
+
+    },
+    "「削除」と入力" : {
+
+    },
+    "@" : {
+
+    },
+    "@%@" : {
+
+    },
+    "@%@ に返信..." : {
+
+    },
+    "@%@ に返信中" : {
+
+    },
+    "@%@ をブロック" : {
+
+    },
+    "%@" : {
+
+    },
+    "%@ / %@" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ / %2$@"
           }
         }
       }
     },
-    "%lld": {},
-    "%lld/%lld": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "new",
-            "value": "%1$lld/%2$lld"
+    "%@のフォローを解除しますか？" : {
+
+    },
+    "%lld" : {
+
+    },
+    "%lld/%lld" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld/%2$lld"
           }
         }
       }
     },
-    "%lld%%": {},
-    "Category": {},
-    "CL": {},
-    "Coming Soon": {},
-    "common.continue": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "続ける"
+    "%lld%%" : {
+
+    },
+    "%lld件のレビュー" : {
+
+    },
+    "%lld月のサマリー" : {
+
+    },
+    "1-2 行で簡潔に" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep it to 1-2 lines"
           }
         }
       }
     },
-    "common.saving": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "保存中..."
+    "14:30 ・ 2026年3月28日" : {
+
+    },
+    "Android 開発" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android dev"
           }
         }
       }
     },
-    "common.systemDefault": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "System default"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "端末の設定に従う"
+    "App Store / Google Play / Web サイト など" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store / Google Play / website, etc."
           }
         }
       }
     },
-    "CreateLog": {},
-    "CreateLog Premium": {},
-    "createlog.app": {},
-    "Day": {},
-    "h": {},
-    "home.empty.following": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No posts from people you follow"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フォロー中のユーザーの投稿はありません"
-          }
-        }
-      }
+    "Category" : {
+
     },
-    "home.empty.timeline": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No posts yet"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "まだ投稿がありません"
-          }
-        }
-      }
+    "CL" : {
+
     },
-    "home.tab.following": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Following"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フォロー中"
-          }
-        }
-      }
+    "Coming Soon" : {
+
     },
-    "home.tab.timeline": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Timeline"
+    "common.continue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "タイムライン"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "続ける"
           }
         }
       }
     },
-    "Hours": {},
-    "https://": {},
-    "https://...": {},
-    "https://apps.apple.com/...": {},
-    "https://github.com/...": {},
-    "integration.comingSoon": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Coming Soon"
+    "common.saving" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saving..."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今後追加"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存中..."
           }
         }
       }
     },
-    "integration.editor.footer": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Coding time auto-tracking via editor extensions will be available in a future update."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "エディタ拡張機能によるコーディング時間の自動記録は今後のアップデートで公開予定です。"
-          }
-        }
-      }
-    },
-    "integration.editor.section": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Editor Integration"
+    "common.systemDefault" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System default"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "エディタ連携"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "端末の設定に従う"
           }
         }
       }
     },
-    "integration.title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Integrations"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "連携管理"
+    "CreateLog" : {
+
+    },
+    "CreateLog Premium" : {
+
+    },
+    "CreateLog レポート" : {
+
+    },
+    "createlog.app" : {
+
+    },
+    "CreateLogで繋がろう!" : {
+
+    },
+    "CreateLogユーザーのQRコードを\nカメラに映してください" : {
+
+    },
+    "Day" : {
+
+    },
+    "GitHub リポジトリは?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub repository?"
           }
         }
       }
     },
-    "legal.lastUpdated": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Last updated: April 1, 2026"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最終更新日: 2026年4月1日"
-          }
-        }
-      }
+    "h" : {
+
     },
-    "legal.privacy.title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Privacy Policy"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プライバシーポリシー"
-          }
-        }
-      }
-    },
-    "legal.terms.title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Terms of Service"
+    "home.empty.following" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No posts from people you follow"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "利用規約"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォロー中のユーザーの投稿はありません"
           }
         }
       }
     },
-    "m": {},
-    "OK": {},
-    "onboarding.account.button.login %@": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Log in with %@"
+    "home.empty.timeline" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No posts yet"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ でログイン"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "まだ投稿がありません"
           }
         }
       }
     },
-    "onboarding.account.button.signup %@": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Continue with %@"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ で続ける"
-          }
-        }
-      }
-    },
-    "onboarding.account.signupLink": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Start here"
+    "home.tab.following" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Following"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "こちら"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォロー中"
           }
         }
       }
     },
-    "onboarding.account.signupPrefix": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "New here?"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "初めての方は"
-          }
-        }
-      }
-    },
-    "onboarding.account.title.login": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Log in to your account"
+    "home.tab.timeline" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timeline"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アカウントにログイン"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タイムライン"
           }
         }
       }
     },
-    "onboarding.account.title.signup": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Create your account"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アカウントを作成"
-          }
-        }
-      }
+    "Hours" : {
+
     },
-    "onboarding.action.skip": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Set up later"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "あとで設定する"
-          }
-        }
-      }
+    "https://" : {
+
     },
-    "onboarding.hint.tapToContinue": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tap to continue"
+    "https://..." : {
+
+    },
+    "https://apps.apple.com/..." : {
+
+    },
+    "https://github.com/..." : {
+
+    },
+    "integration.comingSoon" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coming Soon"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "タップして続ける"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今後追加"
           }
         }
       }
     },
-    "onboarding.tutorial.intro.title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Let's register\nyour project"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "あなたのプロジェクトを\n登録してみましょう"
-          }
-        }
-      }
-    },
-    "onboarding.welcome.loginLink": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Log in"
+    "integration.editor.footer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coding time auto-tracking via editor extensions will be available in a future update."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ログイン"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エディタ拡張機能によるコーディング時間の自動記録は今後のアップデートで公開予定です。"
           }
         }
       }
     },
-    "onboarding.welcome.loginPrefix": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Already have an account?"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "すでにアカウントをお持ちの方"
-          }
-        }
-      }
-    },
-    "onboarding.welcome.tagline1": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "An app for engineers"
+    "integration.editor.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editor Integration"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "エンジニアのためのアプリ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エディタ連携"
           }
         }
       }
     },
-    "onboarding.welcome.tagline2": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your work log. A new kind of portfolio."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "自分だけの作業記録。新感覚のポートフォリオ"
-          }
-        }
-      }
-    },
-    "settings.account": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Account"
+    "integration.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Integrations"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アカウント"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連携管理"
           }
         }
       }
     },
-    "settings.appearance.dark": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dark"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ダーク"
+    "iOS 開発" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS dev"
           }
         }
       }
     },
-    "settings.appearance.light": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Light"
+    "legal.lastUpdated" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last updated: April 1, 2026"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ライト"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最終更新日: 2026年4月1日"
           }
         }
       }
     },
-    "settings.appearance.section": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Appearance"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "外観"
-          }
-        }
-      }
-    },
-    "settings.dev.section": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Developer"
+    "legal.privacy.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Policy"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "開発用"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プライバシーポリシー"
           }
         }
       }
     },
-    "settings.dev.showOnboarding": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show Onboarding"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "オンボーディングを表示"
-          }
-        }
-      }
-    },
-    "settings.duration.english": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "English (1h 30m)"
+    "legal.terms.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms of Service"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "English (1h 30m)"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "利用規約"
           }
         }
       }
     },
-    "settings.duration.japanese": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Japanese (1h 30m)"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "日本語 (1時間30分)"
-          }
-        }
-      }
+    "m" : {
+
     },
-    "settings.duration.section": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Duration format"
+    "OK" : {
+
+    },
+    "onboarding.account.button.login %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log in with %@"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "時間の表示形式"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ でログイン"
           }
         }
       }
     },
-    "settings.integration": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Integrations"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "連携管理"
-          }
-        }
-      }
-    },
-    "settings.language.english": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "English"
+    "onboarding.account.button.signup %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue with %@"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "English"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ で続ける"
           }
         }
       }
     },
-    "settings.language.japanese": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Japanese"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "日本語"
-          }
-        }
-      }
-    },
-    "settings.language.section": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Language"
+    "onboarding.account.signupLink" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start here"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "言語"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "こちら"
           }
         }
       }
     },
-    "settings.notifications": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Notifications"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "通知"
-          }
-        }
-      }
-    },
-    "settings.premium": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プレミアム"
-          }
-        }
-      }
-    },
-    "settings.support.contact": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Contact"
+    "onboarding.account.signupPrefix" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New here?"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "お問い合わせ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "初めての方は"
           }
         }
       }
     },
-    "settings.support.privacy": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Privacy Policy"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プライバシーポリシー"
-          }
-        }
-      }
-    },
-    "settings.support.section": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Support"
+    "onboarding.account.title.login" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log in to your account"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "サポート"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントにログイン"
           }
         }
       }
     },
-    "settings.support.terms": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Terms of Service"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "利用規約"
-          }
-        }
-      }
-    },
-    "settings.title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Settings"
+    "onboarding.account.title.signup" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create your account"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "設定"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントを作成"
           }
         }
       }
     },
-    "settings.version": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Version"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "バージョン"
-          }
-        }
-      }
-    },
-    "support.category.account": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Account"
+    "onboarding.action.skip" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set up later"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アカウント"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "あとで設定する"
           }
         }
       }
     },
-    "support.category.bug": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bug Report"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "不具合報告"
-          }
-        }
-      }
-    },
-    "support.category.feature": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Feature Request"
+    "onboarding.hint.tapToContinue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to continue"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "機能リクエスト"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タップして続ける"
           }
         }
       }
     },
-    "support.category.other": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Other"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "その他"
-          }
-        }
-      }
-    },
-    "support.categoryLabel": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Category"
+    "onboarding.tutorial.intro.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Let's register\nyour project"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "カテゴリ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "あなたのプロジェクトを\n登録してみましょう"
           }
         }
       }
     },
-    "support.messagePlaceholder": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your message"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "お問い合わせ内容"
-          }
-        }
-      }
-    },
-    "support.messageSection": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Message"
+    "onboarding.welcome.loginLink" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log in"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "メッセージ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログイン"
           }
         }
       }
     },
-    "support.sentHint": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The mail app will open. Please send the message as is."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "メールアプリが開きます。そのまま送信してください。"
-          }
-        }
-      }
-    },
-    "support.submit": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Send"
+    "onboarding.welcome.loginPrefix" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Already have an account?"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "送信"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すでにアカウントをお持ちの方"
           }
         }
       }
     },
-    "support.title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Contact"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "お問い合わせ"
-          }
-        }
-      }
-    },
-    "tab.discover": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Discover"
+    "onboarding.welcome.tagline1" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An app for engineers"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "発見"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エンジニアのためのアプリ"
           }
         }
       }
     },
-    "tab.home": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Home"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ホーム"
-          }
-        }
-      }
-    },
-    "tab.profile": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mine"
+    "onboarding.welcome.tagline2" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your work log. A new kind of portfolio."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "マイ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自分だけの作業記録。新感覚のポートフォリオ"
           }
         }
       }
     },
-    "tab.record": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Record"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "記録"
+    "OSS なら公開しておくと反応がもらえます" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Publishing OSS helps get feedback"
           }
         }
       }
     },
-    "tab.report": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Report"
+    "QRコードをスキャン" : {
+
+    },
+    "settings.account" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "レポート"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウント"
           }
         }
       }
     },
-    "username": {},
-    "common.close": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "閉じる"
+    "settings.appearance.dark" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dark"
           }
-        }
-      }
-    },
-    "common.cancel": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "キャンセル"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダーク"
           }
         }
       }
     },
-    "common.save": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "保存"
+    "settings.appearance.light" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Light"
           }
-        }
-      }
-    },
-    "common.create": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "作成"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライト"
           }
         }
       }
     },
-    "common.add": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "追加"
+    "settings.appearance.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appearance"
           }
-        }
-      }
-    },
-    "common.delete": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "削除する"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外観"
           }
         }
       }
     },
-    "common.search": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "検索"
+    "settings.dev.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Developer"
           }
-        }
-      }
-    },
-    "common.optional": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "任意"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開発用"
           }
         }
       }
     },
-    "common.copied": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "コピーしました!"
+    "settings.dev.showOnboarding" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Onboarding"
           }
-        }
-      }
-    },
-    "common.error": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "エラー"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンボーディングを表示"
           }
         }
       }
     },
-    "common.offline": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "オフライン"
+    "settings.duration.english" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English (1h 30m)"
           }
-        }
-      }
-    },
-    "common.comingSoon": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今後追加"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English (1h 30m)"
           }
         }
       }
     },
-    "common.comingSoonLong": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今後追加予定"
+    "settings.duration.japanese" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Japanese (1h 30m)"
           }
-        }
-      }
-    },
-    "common.comingSoon.description": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "これらの機能は今後のアップデートで公開予定です。"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日本語 (1時間30分)"
           }
         }
       }
     },
-    "common.other": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "その他"
+    "settings.duration.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duration format"
           }
-        }
-      }
-    },
-    "common.share": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "シェアする"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時間の表示形式"
           }
         }
       }
     },
-    "common.requestReview": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "レビューを依頼する"
+    "settings.integration" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Integrations"
           }
-        }
-      }
-    },
-    "common.openSettings": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "設定を開く"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連携管理"
           }
         }
       }
     },
-    "common.skipNoProduct": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "スキップ（サービスなし）"
+    "settings.language.english" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English"
           }
-        }
-      }
-    },
-    "weekday.sun": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "日"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English"
           }
         }
       }
     },
-    "weekday.mon": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "月"
+    "settings.language.japanese" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Japanese"
           }
-        }
-      }
-    },
-    "weekday.tue": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "火"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日本語"
           }
         }
       }
     },
-    "weekday.wed": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "水"
+    "settings.language.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
           }
-        }
-      }
-    },
-    "weekday.thu": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "木"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "言語"
           }
         }
       }
     },
-    "weekday.fri": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "金"
+    "settings.notifications" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications"
           }
-        }
-      }
-    },
-    "weekday.sat": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "土"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通知"
           }
         }
       }
     },
-    "onboarding.welcome.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "つくろぐへようこそ"
+    "settings.premium" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premium"
           }
-        }
-      }
-    },
-    "onboarding.welcome.subtitle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "エンジニアのための\n作業記録プラットフォーム"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレミアム"
           }
         }
       }
     },
-    "onboarding.welcome.featureLog": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "いつでも見返せる作業の記録"
+    "settings.support.contact" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact"
           }
-        }
-      }
-    },
-    "onboarding.welcome.featureTimer": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "タイマーや手入力で開発時間を記録"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お問い合わせ"
           }
         }
       }
     },
-    "onboarding.welcome.featureRecord": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "作業を記録する"
+    "settings.support.privacy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Policy"
           }
-        }
-      }
-    },
-    "onboarding.celebration.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アカウント作成完了!"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プライバシーポリシー"
           }
         }
       }
     },
-    "onboarding.celebration.subtitle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "タイムラインに追加される"
+    "settings.support.section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support"
           }
-        }
-      }
-    },
-    "onboarding.ready.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "準備完了!"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サポート"
           }
         }
       }
     },
-    "onboarding.profileIntro.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プロフィールを設定しましょう"
+    "settings.support.terms" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms of Service"
           }
-        }
-      }
-    },
-    "onboarding.profileIntro.subtitle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "あとで変更できます"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "利用規約"
           }
         }
       }
     },
-    "onboarding.profileIntro.hint": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アカウント作成後に詳細を設定できます"
+    "settings.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
           }
-        }
-      }
-    },
-    "onboarding.displayName.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "あなたの名前は?"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
           }
         }
       }
     },
-    "onboarding.displayName.subtitle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プロフィールに表示されます"
+    "settings.version" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version"
           }
-        }
-      }
-    },
-    "onboarding.displayName.placeholder": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "例: つくろぐ太郎"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バージョン"
           }
         }
       }
     },
-    "onboarding.handle.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ハンドルを決めよう"
+    "support.category.account" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
           }
-        }
-      }
-    },
-    "onboarding.handle.subtitle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プロフィール URL とメンションに使われます"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウント"
           }
         }
       }
     },
-    "onboarding.handle.available": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "利用可能です"
+    "support.category.bug" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bug Report"
           }
-        }
-      }
-    },
-    "onboarding.handle.taken": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "既に使われています"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不具合報告"
           }
         }
       }
     },
-    "onboarding.handle.rule": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "英数字とアンダースコア、3-15文字"
+    "support.category.feature" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feature Request"
           }
-        }
-      }
-    },
-    "onboarding.bio.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ひとこと自己紹介"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "機能リクエスト"
           }
         }
       }
     },
-    "onboarding.bio.subtitle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1-2 行で簡潔に"
+    "support.category.other" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other"
           }
-        }
-      }
-    },
-    "onboarding.bio.placeholder": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "例: SwiftUI で個人開発中。毎日コツコツ記録"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "その他"
           }
         }
       }
     },
-    "onboarding.role.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "何をしている人ですか?"
+    "support.categoryLabel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Category"
           }
-        }
-      }
-    },
-    "onboarding.role.subtitle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プロフィールにバッジで表示されます"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カテゴリ"
           }
         }
       }
     },
-    "onboarding.role.soloDev": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "個人開発"
+    "support.messagePlaceholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your message"
           }
-        }
-      }
-    },
-    "onboarding.role.student": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "学生"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お問い合わせ内容"
           }
         }
       }
     },
-    "onboarding.role.startup": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "スタートアップ"
+    "support.messageSection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message"
           }
-        }
-      }
-    },
-    "onboarding.role.design": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "デザイン"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メッセージ"
           }
         }
       }
     },
-    "onboarding.role.portfolio": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ポートフォリオ"
+    "support.sentHint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The mail app will open. Please send the message as is."
           }
-        }
-      }
-    },
-    "onboarding.tech.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "使用している技術は?"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メールアプリが開きます。そのまま送信してください。"
           }
         }
       }
     },
-    "onboarding.tech.subtitle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "複数選択できます"
+    "support.submit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send"
           }
-        }
-      }
-    },
-    "onboarding.tech.languages": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "言語"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "送信"
           }
         }
       }
     },
-    "onboarding.tech.frameworks": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フレームワーク"
+    "support.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact"
           }
-        }
-      }
-    },
-    "onboarding.platform.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "現在製作中、制作予定の\nプラットフォームは?"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お問い合わせ"
           }
         }
       }
     },
-    "onboarding.platform.subtitle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "どんな開発をしていますか"
+    "Swift学習" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swift Learning"
           }
         }
       }
     },
-    "onboarding.platform.web": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Web 開発"
+    "tab.discover" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discover"
           }
-        }
-      }
-    },
-    "onboarding.platform.ios": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS 開発"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "発見"
           }
         }
       }
     },
-    "onboarding.platform.android": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Android 開発"
+    "tab.home" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
           }
-        }
-      }
-    },
-    "onboarding.platform.swiftLearn": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Swift学習"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ホーム"
           }
         }
       }
     },
-    "onboarding.platform.backend": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "バックエンド"
+    "tab.profile" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mine"
           }
-        }
-      }
-    },
-    "onboarding.product.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "どんなプロダクトですか?"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マイ"
           }
         }
       }
     },
-    "onboarding.project.name.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プロジェクトの名前は?"
+    "tab.record" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record"
           }
-        }
-      }
-    },
-    "onboarding.project.name.placeholder": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "例 つくろぐ"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "記録"
           }
         }
       }
     },
-    "onboarding.project.name.input": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アプリ名を入力"
+    "tab.report" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Report"
           }
-        }
-      }
-    },
-    "onboarding.project.desc.placeholder": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "例: 集中時間を記録するポモドーロタイマー"
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レポート"
           }
         }
       }
     },
-    "onboarding.project.desc.input": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アプリの説明を入力"
-          }
-        }
-      }
+    "username" : {
+
     },
-    "onboarding.project.service.input": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "サービス名を入力"
+    "Web 開発" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web dev"
           }
         }
       }
     },
-    "onboarding.project.icon.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アイコンを選びましょう"
+    "アイコンを選びましょう" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose an icon"
           }
         }
       }
     },
-    "onboarding.project.icon.hint": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "タップで色を変更"
-          }
-        }
-      }
+    "アカウント" : {
+
     },
-    "onboarding.project.icon.label": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プロダクトのアイコン"
-          }
-        }
-      }
+    "アカウントの削除" : {
+
     },
-    "onboarding.project.status.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今のリリース状況は?"
-          }
-        }
-      }
+    "アカウントを削除" : {
+
     },
-    "onboarding.project.url.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "公開 URL はありますか?"
-          }
-        }
-      }
+    "アカウントを削除すると、全てのデータが完全に削除されます。この操作は取り消せません。" : {
+
     },
-    "onboarding.project.github.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "GitHub リポジトリは?"
+    "アカウント作成完了!" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account created!"
           }
         }
       }
     },
-    "onboarding.project.github.subtitle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "OSS なら公開しておくと反応がもらえます"
+    "アカウント作成後に詳細を設定できます" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can configure details after creating an account"
           }
         }
       }
     },
-    "onboarding.project.url.subtitle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App Store / Google Play / Web サイト など"
+    "あとで変更できます" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can change this later"
           }
         }
       }
     },
-    "onboarding.project.status.undecided": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "まだ決めていない"
+    "あなたの名前は?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's your name?"
           }
         }
       }
     },
-    "onboarding.project.status.inDev": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "開発中"
-          }
-        }
-      }
+    "あなたを見つけるための一意のIDです" : {
+
     },
-    "onboarding.project.status.published": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "公開中"
-          }
-        }
-      }
+    "アプリの説明を入力" : {
+
     },
-    "onboarding.project.status.archived": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "停止"
-          }
-        }
-      }
+    "アプリ名を入力" : {
+
     },
-    "onboarding.tagIntro.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "記録する項目を作ろう"
-          }
-        }
-      }
+    "いいね %lld" : {
+
     },
-    "onboarding.tagIntro.subtitle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "よくやる作業をタグとして登録すると\nタップ+時間入力だけで記録できます"
-          }
-        }
-      }
+    "いいね・コメント・フォロー・メンション・リポストの通知がすべて送信されます。" : {
+
     },
-    "auth.handle.setup.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ハンドルを設定"
-          }
-        }
-      }
+    "いいね、フォロー、コメントなどの\n通知がここに表示されます" : {
+
     },
-    "auth.handle.setup.subtitle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "あなたを見つけるための一意のIDです"
+    "いつでも見返せる作業の記録" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A work log you can always revisit"
           }
         }
       }
     },
-    "auth.handle.check": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "利用可否を確認"
-          }
-        }
-      }
+    "いまなにしてる?" : {
+
     },
-    "auth.handle.checking": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "確認中..."
-          }
-        }
-      }
+    "エラー" : {
+
     },
-    "auth.handle.rule": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "英数字と_のみ、3〜15文字"
-          }
-        }
-      }
+    "エンジニアのための\n作業記録プラットフォーム" : {
+
     },
-    "auth.handle.confirm": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このハンドルで決定"
-          }
-        }
-      }
+    "オフライン" : {
+
     },
-    "auth.handle.available": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このハンドルは使えます"
-          }
-        }
-      }
+    "カテゴリ別" : {
+
     },
-    "auth.handle.taken": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このハンドルは既に使われています"
-          }
-        }
-      }
+    "カメラへのアクセスが必要です" : {
+
     },
-    "profile.edit": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プロフィールを編集"
-          }
-        }
-      }
+    "キャンセル" : {
+
     },
-    "profile.view": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プロフィールを見る"
+    "このハンドルで決定" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use this handle"
           }
         }
       }
     },
-    "profile.share": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プロフィールをシェア"
+    "このハンドルは使えます" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This handle is available"
           }
         }
       }
     },
-    "profile.displayName": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "表示名"
+    "このハンドルは既に使われています" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This handle is already taken"
           }
         }
       }
     },
-    "profile.handle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ユーザー名"
-          }
-        }
-      }
+    "この操作は取り消せません。確認のため「削除」と入力してください。" : {
+
     },
-    "profile.bio.placeholder": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "自己紹介を入力..."
-          }
-        }
-      }
+    "コピーしました!" : {
+
     },
-    "profile.skills": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "スキル"
-          }
-        }
-      }
+    "コメントを追加..." : {
+
     },
-    "profile.skills.add": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "スキルを追加..."
-          }
-        }
-      }
+    "これらの機能は今後のアップデートで公開予定です。" : {
+
     },
-    "profile.experience": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "経験年数"
-          }
-        }
-      }
+    "サービス名を入力" : {
+
     },
-    "profile.occupation": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "職業"
-          }
-        }
-      }
+    "シェアする" : {
+
     },
-    "profile.links": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "外部リンク"
-          }
-        }
-      }
+    "スキップ（サービスなし）" : {
+
     },
-    "profile.links.add": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "リンクを追加"
-          }
-        }
-      }
+    "スキル" : {
+
     },
-    "profile.myProducts": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "マイプロダクト"
-          }
-        }
-      }
+    "スキルを追加..." : {
+
     },
-    "profile.myProducts.empty": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "マイプロダクトはまだ登録されていません"
+    "スタートアップ" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Startup"
           }
         }
       }
     },
-    "profile.myProducts.add": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "新しいサービスを追加"
-          }
-        }
-      }
+    "ステータス" : {
+
     },
-    "profile.myProducts.register": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プロジェクト登録"
+    "その他" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other"
           }
         }
       }
     },
-    "profile.interests": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "興味カテゴリ"
+    "タイマーや手入力で開発時間を記録" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Track dev time with timer or manual entry"
           }
         }
       }
     },
-    "profile.follow": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フォロー"
+    "タイムラインに追加される" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added to your timeline"
           }
         }
       }
     },
-    "profile.followAction": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フォローする"
-          }
-        }
-      }
+    "タグを入力" : {
+
     },
-    "profile.following": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フォロー中"
-          }
-        }
-      }
+    "タップで色を変更" : {
+
     },
-    "profile.unfollow": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フォロー解除"
+    "つくろぐ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CreateLog"
           }
         }
       }
     },
-    "profile.unfollow.confirm %@": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@のフォローを解除しますか？"
+    "つくろぐへようこそ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to CreateLog"
           }
         }
       }
     },
-    "profile.block": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ブロックする"
+    "デザイン" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Design"
           }
         }
       }
     },
-    "profile.unblock": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ブロックを解除"
+    "どんなプロダクトですか?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What kind of product is it?"
           }
         }
       }
     },
-    "profile.block.description": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ブロックすると相手はあなたのプロフィール、投稿、フォロワーリストを見ることができなくなります。相手には通知されません。"
+    "どんな開発をしていますか" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What do you develop?"
           }
         }
       }
     },
-    "profile.block.title %@": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "@%@ をブロック"
+    "バックエンド" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backend"
           }
         }
       }
     },
-    "profile.users": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ユーザー"
+    "ハンドルを決めよう" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a handle"
           }
         }
       }
     },
-    "profile.search.placeholder": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ユーザー、タグ、プロジェクトを検索"
-          }
-        }
-      }
+    "ハンドルを設定" : {
+
     },
-    "recording.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "記録"
+    "ひとこと自己紹介" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One-line intro"
           }
         }
       }
     },
-    "recording.action": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "記録する"
-          }
-        }
-      }
+    "フォロー" : {
+
     },
-    "recording.saved": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "記録しました"
-          }
-        }
-      }
+    "フォローする" : {
+
     },
-    "recording.today": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今日"
-          }
-        }
-      }
+    "フォロー中" : {
+
     },
-    "recording.thisWeek": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今週"
-          }
-        }
-      }
+    "フォロー解除" : {
+
     },
-    "recording.thisMonth": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今月"
-          }
-        }
-      }
+    "プラットフォーム" : {
+
     },
-    "recording.total": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "累計"
+    "フレームワーク" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frameworks"
           }
         }
       }
     },
-    "recording.total.hours %lld": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "累計 %lldh"
-          }
-        }
-      }
+    "プレミアム" : {
+
     },
-    "recording.vsLastWeek": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "先週比"
-          }
-        }
-      }
+    "プレミアム機能は今後のアップデートで公開予定です" : {
+
     },
-    "recording.todayRecords": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今日の記録"
+    "プロジェクトの名前は?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's your project's name?"
           }
         }
       }
     },
-    "recording.recentRecords": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最近の記録"
+    "プロジェクトの名前は？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's your project's name?"
           }
         }
       }
     },
-    "recording.empty": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "まだ記録がありません"
-          }
-        }
-      }
+    "プロジェクト登録" : {
+
     },
-    "recording.bestDay": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ベストデイ"
+    "プロダクトのアイコン" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Product icon"
           }
         }
       }
     },
-    "recording.totalTime": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "合計時間"
-          }
-        }
-      }
+    "ブロックする" : {
+
     },
-    "recording.thisMonth.category": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今月のカテゴリ"
-          }
-        }
-      }
+    "ブロックすると相手はあなたのプロフィール、投稿、フォロワーリストを見ることができなくなります。相手には通知されません。" : {
+
     },
-    "recording.byCategory": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "カテゴリ別"
-          }
-        }
-      }
+    "ブロックを解除" : {
+
     },
-    "recording.topCategory": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最多カテゴリ"
+    "プロフィール URL とメンションに使われます" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Used for your profile URL and mentions"
           }
         }
       }
     },
-    "recording.weeklyTrend": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "週間推移"
+    "プロフィールにバッジで表示されます" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shown as a badge on your profile"
           }
         }
       }
     },
-    "recording.weeklyTrend.long": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "週間の推移"
+    "プロフィールに表示されます" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shown on your profile"
           }
         }
       }
     },
-    "recording.tag.input": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "タグを入力"
-          }
-        }
-      }
+    "プロフィールをシェア" : {
+
     },
-    "recording.duration": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "期間"
-          }
-        }
-      }
+    "プロフィールを編集" : {
+
     },
-    "recording.status": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ステータス"
-          }
-        }
-      }
+    "プロフィールを見る" : {
+
     },
-    "recording.detail.optional": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "詳細（任意）"
+    "プロフィールを設定しましょう" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Let's set up your profile"
           }
         }
       }
     },
-    "recording.monthSummary %lld": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld月のサマリー"
-          }
-        }
-      }
+    "ベストデイ" : {
+
     },
-    "recording.report.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CreateLog レポート"
+    "ポートフォリオ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portfolio"
           }
         }
       }
     },
-    "recording.report": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "レポート"
-          }
-        }
-      }
+    "マイプロダクト" : {
+
     },
-    "recording.report.share": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "レポートをシェア"
-          }
-        }
-      }
+    "マイプロダクトはまだ登録されていません" : {
+
     },
-    "category.learn": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "学習"
-          }
-        }
-      }
+    "まだいいねした投稿がありません" : {
+
     },
-    "category.plan": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "設計"
-          }
-        }
-      }
+    "まだブックマークした投稿がありません" : {
+
     },
-    "category.dev": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "開発"
-          }
-        }
-      }
+    "まだ投稿がありません" : {
+
     },
-    "compose.placeholder": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "いまなにしてる?"
+    "まだ決めていない" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not decided yet"
           }
         }
       }
     },
-    "compose.comment.placeholder": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "コメントを追加..."
-          }
-        }
-      }
+    "まだ記録がありません" : {
+
     },
-    "compose.reply.placeholder %@": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "@%@ に返信..."
-          }
-        }
-      }
+    "ユーザー" : {
+
     },
-    "compose.reply.replyingTo %@": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "@%@ に返信中"
-          }
-        }
-      }
+    "ユーザー、タグ、プロジェクトを検索" : {
+
     },
-    "compose.reply": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "返信"
-          }
-        }
-      }
+    "ユーザー名" : {
+
     },
-    "post.empty": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "まだ投稿がありません"
-          }
-        }
-      }
+    "よくやる作業をタグとして登録すると\nタップ+時間入力だけで記録できます" : {
+
     },
-    "post.empty.liked": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "まだいいねした投稿がありません"
-          }
-        }
-      }
+    "より深い分析と快適な体験を" : {
+
     },
-    "post.empty.bookmarked": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "まだブックマークした投稿がありません"
-          }
-        }
-      }
+    "リンクを追加" : {
+
     },
-    "post.likes %lld": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "いいね %lld"
-          }
-        }
-      }
+    "レビューを依頼する" : {
+
+    },
+    "レポート" : {
+
+    },
+    "レポートをシェア" : {
+
+    },
+    "ログアウト" : {
+
+    },
+    "ログアウトしますか？" : {
+
     },
-    "post.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "投稿"
+    "今のリリース状況は?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's the current release status?"
           }
         }
       }
     },
-    "post.empty.following": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "他の開発者をフォローすると、ここに投稿が流れます"
+    "今後追加" : {
+
+    },
+    "今後追加予定" : {
+
+    },
+    "今日" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
           }
         }
       }
     },
-    "post.timestampExample": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "14:30 ・ 2026年3月28日"
+    "今日の記録" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today's Records"
           }
         }
       }
     },
-    "post.devReply": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "開発者の返信"
+    "今月" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This month"
           }
         }
       }
     },
-    "discover.empty": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "探索するものがまだありません"
+    "今月のカテゴリ" : {
+
+    },
+    "今週" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This week"
           }
         }
       }
+    },
+    "他の開発者をフォローすると、ここに投稿が流れます" : {
+
+    },
+    "任意" : {
+
     },
-    "notification.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "通知"
+    "何をしている人ですか?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What do you do?"
           }
         }
       }
     },
-    "notification.empty": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "通知はありません"
+    "作成" : {
+
+    },
+    "作業を記録する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record your work"
           }
         }
       }
     },
-    "notification.empty.description": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "いいね、フォロー、コメントなどの\n通知がここに表示されます"
+    "使用している技術は?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Which technologies do you use?"
           }
         }
       }
     },
-    "notification.settings.description": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "いいね・コメント・フォロー・メンション・リポストの通知がすべて送信されます。"
+    "使用している技術は？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Which technologies do you use?"
           }
         }
       }
     },
-    "notification.permission.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "通知の許可設定"
+    "例 つくろぐ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e.g. CreateLog"
           }
         }
       }
     },
-    "notification.permission.hint": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "端末の設定アプリで管理します"
+    "例: SwiftUI で個人開発中。毎日コツコツ記録" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e.g. Building solo with SwiftUI. Daily steady logs"
           }
         }
       }
     },
-    "settings.account.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アカウント"
+    "例: つくろぐ太郎" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e.g. Jane Doe"
           }
         }
       }
     },
-    "settings.account.delete": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アカウントの削除"
+    "例: 集中時間を記録するポモドーロタイマー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e.g. A Pomodoro timer for focus time"
           }
         }
       }
     },
-    "settings.account.delete.action": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アカウントを削除"
+    "保存" : {
+
+    },
+    "保存した" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved"
           }
         }
       }
     },
-    "settings.account.delete.description": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アカウントを削除すると、全てのデータが完全に削除されます。この操作は取り消せません。"
+    "保存中" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saving"
           }
         }
       }
+    },
+    "保存中..." : {
+
     },
-    "settings.account.delete.confirmPrompt": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "「削除」と入力"
+    "個人開発" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo dev"
           }
         }
       }
     },
-    "settings.account.delete.confirmDescription": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "この操作は取り消せません。確認のため「削除」と入力してください。"
+    "先週比" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vs last week"
           }
         }
       }
     },
-    "settings.logout": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ログアウト"
+    "公開" : {
+
+    },
+    "公開 URL はありますか?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do you have a public URL?"
           }
         }
       }
+    },
+    "内容を確認の上、対応いたします。\nご協力ありがとうございます。" : {
+
+    },
+    "最多カテゴリ" : {
+
     },
-    "settings.logout.confirm": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ログアウトしますか？"
+    "最近の記録" : {
+
+    },
+    "利用可否を確認" : {
+
+    },
+    "利用可能です" : {
+
+    },
+    "削除する" : {
+
+    },
+    "合計時間" : {
+
+    },
+    "土" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sat"
           }
         }
       }
+    },
+    "報告" : {
+
+    },
+    "報告する" : {
+
+    },
+    "報告を受け付けました" : {
+
+    },
+    "報告を送信" : {
+
+    },
+    "報告内容の詳細を入力" : {
+
     },
-    "settings.premium.comingSoon": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プレミアム機能は今後のアップデートで公開予定です"
+    "外部リンク" : {
+
+    },
+    "学生" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Student"
           }
         }
       }
     },
-    "settings.premium.freeForNow": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "現在はすべての機能を無料でご利用いただけます。公開時に改めてアプリ内でご案内します。"
+    "開発中" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Development"
           }
         }
       }
     },
-    "settings.premium.tagline": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "より深い分析と快適な体験を"
+    "公開中" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Published"
           }
         }
       }
     },
-    "report.title": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "報告"
+    "停止" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archived"
           }
         }
       }
     },
-    "report.action": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "報告する"
+    "学習" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learn"
           }
         }
       }
+    },
+    "投稿" : {
+
+    },
+    "探索するものがまだありません" : {
+
+    },
+    "新しいサービスを追加" : {
+
+    },
+    "既に使われています" : {
+
     },
-    "report.submit": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "報告を送信"
+    "日" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sun"
           }
         }
       }
     },
-    "report.received": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "報告を受け付けました"
+    "月" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mon"
           }
         }
       }
     },
-    "report.detail.input": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "報告内容の詳細を入力"
+    "期間" : {
+
+    },
+    "木" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thu"
           }
         }
       }
+    },
+    "未評価" : {
+
+    },
+    "検索" : {
+
     },
-    "report.reason.prompt %@": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "「%@」を報告する理由を選択してください"
+    "水" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wed"
           }
         }
       }
     },
-    "report.acknowledgment": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "内容を確認の上、対応いたします。\nご協力ありがとうございます。"
+    "準備完了!" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All set!"
           }
         }
       }
     },
-    "rating.count %lld": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld件のレビュー"
+    "火" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tue"
           }
         }
       }
     },
-    "rating.unrated": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "未評価"
+    "現在はすべての機能を無料でご利用いただけます。公開時に改めてアプリ内でご案内します。" : {
+
+    },
+    "現在製作中、制作予定の\nプラットフォームは?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What platforms\nare you building for?"
           }
         }
       }
     },
-    "share.connectCallout": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CreateLogで繋がろう!"
+    "現在製作中、制作予定の\nプラットフォームは？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What platforms\nare you building for?"
           }
         }
       }
+    },
+    "確認中..." : {
+
+    },
+    "端末の設定アプリで管理します" : {
+
     },
-    "share.qr.instruction": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CreateLogユーザーのQRコードを\nカメラに映してください"
+    "累計" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
           }
         }
       }
     },
-    "share.qr.scanTitle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "QRコードをスキャン"
+    "累計 %lldh" : {
+
+    },
+    "経験年数" : {
+
+    },
+    "続ける" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
           }
         }
       }
+    },
+    "職業" : {
+
+    },
+    "自己紹介を入力..." : {
+
+    },
+    "興味カテゴリ" : {
+
     },
-    "share.camera.permissionTitle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "カメラへのアクセスが必要です"
+    "英数字と_のみ、3〜15文字" : {
+
+    },
+    "英数字とアンダースコア、3-15文字" : {
+
+    },
+    "表示名" : {
+
+    },
+    "複数選択できます" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can choose multiple"
           }
         }
       }
     },
-    "share.camera.permissionBody": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "設定からカメラへのアクセスを\n許可してください"
+    "言語" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Languages"
           }
         }
       }
     },
-    "brand.wordmark.ja": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "つくろぐ"
+    "記録" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record"
           }
         }
       }
     },
-    "action.saved": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "保存した"
+    "記録しました" : {
+
+    },
+    "記録する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record"
           }
         }
       }
+    },
+    "記録する項目を作ろう" : {
+
+    },
+    "設定からカメラへのアクセスを\n許可してください" : {
+
     },
-    "action.saving": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "保存中"
+    "設定を開く" : {
+
+    },
+    "設計" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plan"
           }
         }
       }
+    },
+    "詳細（任意）" : {
+
+    },
+    "返信" : {
+
+    },
+    "追加" : {
+
+    },
+    "通知" : {
+
     },
-    "visibility.public": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "公開"
+    "通知の許可設定" : {
+
+    },
+    "通知はありません" : {
+
+    },
+    "週間の推移" : {
+
+    },
+    "週間推移" : {
+
+    },
+    "金" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fri"
           }
         }
       }
     },
-    "project.platform.label": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プラットフォーム"
+    "閉じる" : {
+
+    },
+    "開発" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dev"
           }
         }
       }
+    },
+    "開発者の返信" : {
+
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }

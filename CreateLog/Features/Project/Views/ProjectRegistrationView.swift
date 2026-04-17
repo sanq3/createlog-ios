@@ -43,18 +43,18 @@ struct ProjectRegistrationView: View {
                 .padding(.vertical, 24)
             }
             .background(Color.clBackground)
-            .navigationTitle("profile.myProducts.register")
+            .navigationTitle("プロジェクト登録")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("common.cancel") {
+                    Button("キャンセル") {
                         HapticManager.light()
                         dismiss()
                     }
                     .foregroundStyle(Color.clTextSecondary)
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("visibility.public") {
+                    Button("公開") {
                         HapticManager.success()
                         dismiss()
                     }
@@ -112,7 +112,7 @@ struct ProjectRegistrationView: View {
 
         // Hint
         .overlay(alignment: .bottom) {
-            Text("onboarding.project.icon.hint")
+            Text("タップで色を変更")
                 .font(.caption2)
                 .foregroundStyle(Color.clTextTertiary)
                 .offset(y: 24)
@@ -126,7 +126,7 @@ struct ProjectRegistrationView: View {
         formCard {
             VStack(alignment: .leading, spacing: 8) {
                 formLabel("アプリ名")
-                TextField("onboarding.project.name.input", text: $name)
+                TextField("アプリ名を入力", text: $name)
                     .font(.body)
                     .foregroundStyle(Color.clTextPrimary)
             }
@@ -139,7 +139,7 @@ struct ProjectRegistrationView: View {
         formCard {
             VStack(alignment: .leading, spacing: 8) {
                 formLabel("説明")
-                TextField("onboarding.project.desc.input", text: $description, axis: .vertical)
+                TextField("アプリの説明を入力", text: $description, axis: .vertical)
                     .font(.body)
                     .foregroundStyle(Color.clTextPrimary)
                     .lineLimit(3...6)
@@ -152,8 +152,8 @@ struct ProjectRegistrationView: View {
     private var platformSection: some View {
         formCard {
             VStack(alignment: .leading, spacing: 12) {
-                formLabel("project.platform.label")
-                Picker("project.platform.label", selection: $platform) {
+                formLabel("プラットフォーム")
+                Picker("プラットフォーム", selection: $platform) {
                     ForEach(ProjectPlatform.allCases, id: \.self) { p in
                         Text(p.rawValue).tag(p)
                     }
@@ -284,7 +284,7 @@ struct ProjectRegistrationView: View {
                     VStack(spacing: 8) {
                         Image(systemName: "plus.circle")
                             .font(.system(size: 28, weight: .light))
-                        Text("common.add")
+                        Text("追加")
                             .font(.caption)
                     }
                     .foregroundStyle(Color.clTextTertiary)
@@ -316,7 +316,7 @@ struct ProjectRegistrationView: View {
 
                 if tags.count < maxTags {
                     HStack(spacing: 8) {
-                        TextField("recording.tag.input", text: $tagInput)
+                        TextField("タグを入力", text: $tagInput)
                             .font(.body)
                             .foregroundStyle(Color.clTextPrimary)
                             .onSubmit {
@@ -387,8 +387,8 @@ struct ProjectRegistrationView: View {
     private var statusSection: some View {
         formCard {
             VStack(alignment: .leading, spacing: 12) {
-                formLabel("recording.status")
-                Picker("recording.status", selection: $status) {
+                formLabel("ステータス")
+                Picker("ステータス", selection: $status) {
                     ForEach(ProjectStatus.allCases, id: \.self) { s in
                         Text(s.rawValue).tag(s)
                     }
@@ -408,7 +408,7 @@ struct ProjectRegistrationView: View {
     }
 
     private var optionalBadge: some View {
-        Text("common.optional")
+        Text("任意")
             .font(.caption2)
             .foregroundStyle(Color.clTextTertiary)
             .padding(.horizontal, 6)

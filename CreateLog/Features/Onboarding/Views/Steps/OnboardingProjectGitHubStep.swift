@@ -9,8 +9,8 @@ struct OnboardingProjectGitHubStep: View {
 
     var body: some View {
         OnboardingQuestionShell(
-            title: "onboarding.project.github.title",
-            subtitle: "onboarding.project.github.subtitle",
+            title: "GitHub リポジトリは?",
+            subtitle: "OSS なら公開しておくと反応がもらえます",
             isOptional: true,
             canAdvance: true,
             isSaving: false,

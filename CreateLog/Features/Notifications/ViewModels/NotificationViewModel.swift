@@ -17,7 +17,7 @@ final class NotificationViewModel {
             switch self {
             case .all: "すべて"
             case .like: "いいね"
-            case .follow: "profile.follow"
+            case .follow: "フォロー"
             case .mention: "メンション"
             case .system: "システム"
             }

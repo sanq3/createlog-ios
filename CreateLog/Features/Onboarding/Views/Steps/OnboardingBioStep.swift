@@ -9,8 +9,8 @@ struct OnboardingBioStep: View {
 
     var body: some View {
         OnboardingQuestionShell(
-            title: "onboarding.bio.title",
-            subtitle: "onboarding.platform.subtitle",
+            title: "ひとこと自己紹介",
+            subtitle: "どんな開発をしていますか",
             isOptional: true,
             canAdvance: true,
             isSaving: viewModel.isSavingProfile,
@@ -27,7 +27,7 @@ struct OnboardingBioStep: View {
             },
             input: {
                 OnboardingLabeledInput(label: nil) {
-                    TextField("onboarding.bio.placeholder", text: $viewModel.bio, axis: .vertical)
+                    TextField("例: SwiftUI で個人開発中。毎日コツコツ記録", text: $viewModel.bio, axis: .vertical)
                         .lineLimit(3...5)
                         .submitLabel(.done)
                         .focused($focused)

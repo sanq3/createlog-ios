@@ -48,19 +48,19 @@ struct UserProfileView: View {
                     Button(role: .destructive) {
                         showReportSheet = true
                     } label: {
-                        Label("report.action", systemImage: "exclamationmark.triangle")
+                        Label("報告する", systemImage: "exclamationmark.triangle")
                     }
                     if isBlocked {
                         Button {
                             Task { await unblock() }
                         } label: {
-                            Label("profile.unblock", systemImage: "slash.circle")
+                            Label("ブロックを解除", systemImage: "slash.circle")
                         }
                     } else {
                         Button(role: .destructive) {
                             showBlockConfirmation = true
                         } label: {
-                            Label("profile.block", systemImage: "slash.circle")
+                            Label("ブロックする", systemImage: "slash.circle")
                         }
                     }
                 } label: {
@@ -76,10 +76,10 @@ struct UserProfileView: View {
             isPresented: $showUnfollowConfirmation,
             titleVisibility: .visible
         ) {
-            Button("profile.unfollow", role: .destructive) {
+            Button("フォロー解除", role: .destructive) {
                 toggleFollow()
             }
-            Button("common.cancel", role: .cancel) {}
+            Button("キャンセル", role: .cancel) {}
         }
         .sheet(isPresented: $showBlockConfirmation) {
             BlockConfirmSheet(userName: user.name, userHandle: user.handle) {
@@ -91,7 +91,7 @@ struct UserProfileView: View {
                 Task { await submitReport(reason: reason, detail: detail) }
             }
         }
-        .alert("common.error", isPresented: Binding(
+        .alert("エラー", isPresented: Binding(
             get: { blockErrorMessage != nil },
             set: { if !$0 { blockErrorMessage = nil } }
         )) {
@@ -140,7 +140,7 @@ struct UserProfileView: View {
     /// WeeklyStats を WeeklyChart 用に曜日ラベル付き配列に変換。
     /// ProfileViewModel.buildWeeklyHours と同ロジック。
     private static func buildWeeklyHours(from weekly: WeeklyStats?) -> [(day: String, hours: Double)] {
-        let labels = ["weekday.mon", "weekday.tue", "weekday.wed", "weekday.thu", "weekday.fri", "weekday.sat", "weekday.sun"]
+        let labels = ["月", "火", "水", "木", "金", "土", "日"]
         guard let weekly else {
             return labels.map { ($0, 0) }
         }
@@ -232,11 +232,11 @@ struct UserProfileView: View {
                 Spacer()
 
                 HStack(spacing: 0) {
-                    profileStat(value: "\(remotePosts.count)", label: "post.title")
+                    profileStat(value: "\(remotePosts.count)", label: "投稿")
                     Spacer()
                     profileStat(value: "\(user.followerCount)", label: "フォロワー")
                     Spacer()
-                    profileStat(value: "\(user.followingCount)", label: "profile.following")
+                    profileStat(value: "\(user.followingCount)", label: "フォロー中")
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.leading, 28)
@@ -285,7 +285,7 @@ struct UserProfileView: View {
                     toggleFollow()
                 }
             } label: {
-                Text(user.isFollowing ? "profile.following" : "profile.followAction")
+                Text(user.isFollowing ? "フォロー中" : "フォローする")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(user.isFollowing ? Color.clTextPrimary : .white)
                     .frame(maxWidth: .infinity)
@@ -313,13 +313,13 @@ struct UserProfileView: View {
 
     private var servicesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("profile.myProducts")
+            Text("マイプロダクト")
                 .font(.clHeadline)
                 .foregroundStyle(Color.clTextSecondary)
                 .padding(.horizontal, 16)
 
             if remoteProjects.isEmpty {
-                Text("profile.myProducts.empty")
+                Text("マイプロダクトはまだ登録されていません")
                     .font(.clCaption)
                     .foregroundStyle(Color.clTextTertiary)
                     .padding(.horizontal, 16)
@@ -336,14 +336,14 @@ struct UserProfileView: View {
 
     private var postsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("post.title")
+            Text("投稿")
                 .font(.clHeadline)
                 .foregroundStyle(Color.clTextSecondary)
                 .padding(.horizontal, 16)
 
             LazyVStack(spacing: 12) {
                 if remotePosts.isEmpty {
-                    Text("post.empty")
+                    Text("まだ投稿がありません")
                         .font(.clCaption)
                         .foregroundStyle(Color.clTextTertiary)
                         .padding(.horizontal, 16)
@@ -461,7 +461,7 @@ struct UserProfileView: View {
                     .foregroundStyle(Color.clTextTertiary)
             }
         } else {
-            Text("rating.unrated")
+            Text("未評価")
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(Color.clTextTertiary)
         }

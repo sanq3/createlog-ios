@@ -17,10 +17,10 @@ final class ReportViewModel {
 
         var label: String {
             switch self {
-            case .today: "recording.today"
-            case .week: "recording.thisWeek"
-            case .month: "recording.thisMonth"
-            case .total: "recording.total"
+            case .today: "今日"
+            case .week: "今週"
+            case .month: "今月"
+            case .total: "累計"
             }
         }
     }
@@ -88,7 +88,7 @@ final class ReportViewModel {
             // 週間日別
             if selectedPeriod == .week || selectedPeriod == .today {
                 let weekStart = calendar.dateInterval(of: .weekOfYear, for: now)?.start ?? now
-                let dayLabels = ["weekday.mon", "weekday.tue", "weekday.wed", "weekday.thu", "weekday.fri", "weekday.sat", "weekday.sun"]
+                let dayLabels = ["月", "火", "水", "木", "金", "土", "日"]
                 weeklyTotals = (0..<7).map { offset in
                     let day = calendar.date(byAdding: .day, value: offset, to: weekStart) ?? now
                     let dayEntries = allEntries.filter { calendar.isDate($0.startDate, inSameDayAs: day) }
@@ -116,7 +116,7 @@ final class ReportViewModel {
             let weeklyStats = try await repo.fetchWeeklyStats(containing: Date())
             // リモートデータがあればローカルを更新
             if weeklyStats.totalMinutes > 0 {
-                let dayLabels = ["weekday.mon", "weekday.tue", "weekday.wed", "weekday.thu", "weekday.fri", "weekday.sat", "weekday.sun"]
+                let dayLabels = ["月", "火", "水", "木", "金", "土", "日"]
                 weeklyTotals = weeklyStats.dailyTotals.enumerated().map { index, stats in
                     let label = index < dayLabels.count ? dayLabels[index] : "\(index)"
                     return (label, stats.totalMinutes)

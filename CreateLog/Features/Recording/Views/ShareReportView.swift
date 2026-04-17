@@ -14,7 +14,7 @@ struct ShareReportView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 // Period selector
-                Picker("recording.duration", selection: $selectedPeriod) {
+                Picker("期間", selection: $selectedPeriod) {
                     ForEach(SharePeriod.allCases) { period in
                         Text(period.label).tag(period)
                     }
@@ -38,14 +38,14 @@ struct ShareReportView: View {
                 ShareLink(
                     item: renderedImage ?? Image(systemName: "square"),
                     preview: SharePreview(
-                        "recording.report.title",
+                        "CreateLog レポート",
                         image: renderedImage ?? Image(systemName: "square")
                     )
                 ) {
                     HStack(spacing: 8) {
                         Image(systemName: "square.and.arrow.up")
                             .font(.system(size: 15, weight: .semibold))
-                        Text("common.share")
+                        Text("シェアする")
                             .font(.system(size: 16, weight: .bold))
                     }
                     .foregroundStyle(.white)
@@ -58,7 +58,7 @@ struct ShareReportView: View {
                 .padding(.bottom, 20)
             }
             .background(Color.clBackground)
-            .navigationTitle("recording.report.share")
+            .navigationTitle("レポートをシェア")
             .navigationBarTitleDisplayMode(.inline)
             .task {
                 if let dto = try? await dependencies.profileRepository.fetchMyProfile() {
@@ -105,7 +105,7 @@ struct ShareReportView: View {
                 Spacer()
                 // App logo watermark
                 VStack(spacing: 2) {
-                    Text("brand.wordmark.ja")
+                    Text("つくろぐ")
                         .font(.system(size: 11, weight: .heavy))
                     Text("CreateLog")
                         .font(.system(size: 9, weight: .bold))
@@ -357,9 +357,9 @@ enum SharePeriod: String, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .week: "recording.thisWeek"
-        case .month: "recording.thisMonth"
-        case .total: "recording.total"
+        case .week: "今週"
+        case .month: "今月"
+        case .total: "累計"
         }
     }
 }

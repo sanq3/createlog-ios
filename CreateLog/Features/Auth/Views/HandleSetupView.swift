@@ -19,11 +19,11 @@ struct HandleSetupView: View {
         VStack(spacing: 32) {
             // Header
             VStack(spacing: 8) {
-                Text("auth.handle.setup.title")
+                Text("ハンドルを設定")
                     .font(.title2.bold())
                     .foregroundStyle(Color.clTextPrimary)
 
-                Text("auth.handle.setup.subtitle")
+                Text("あなたを見つけるための一意のIDです")
                     .font(.subheadline)
                     .foregroundStyle(Color.clTextSecondary)
             }
@@ -56,7 +56,7 @@ struct HandleSetupView: View {
                     if isChecking {
                         ProgressView()
                             .controlSize(.small)
-                        Text("auth.handle.checking")
+                        Text("確認中...")
                             .font(.caption)
                             .foregroundStyle(Color.clTextSecondary)
                     } else if let available = isAvailable {
@@ -64,7 +64,7 @@ struct HandleSetupView: View {
                         Circle()
                             .fill(available ? Color.green : Color.red)
                             .frame(width: 8, height: 8)
-                        Text(available ? "onboarding.handle.available" : "onboarding.handle.taken")
+                        Text(available ? "利用可能です" : "既に使われています")
                             .font(.caption)
                             .foregroundStyle(available ? .green : .red)
                     } else if let error = errorMessage {
@@ -72,7 +72,7 @@ struct HandleSetupView: View {
                             .font(.caption)
                             .foregroundStyle(.red)
                     } else {
-                        Text("onboarding.handle.rule")
+                        Text("英数字とアンダースコア、3-15文字")
                             .font(.caption)
                             .foregroundStyle(Color.clTextTertiary)
                     }
@@ -85,7 +85,7 @@ struct HandleSetupView: View {
             Button {
                 Task { await checkAvailability() }
             } label: {
-                Text("auth.handle.check")
+                Text("利用可否を確認")
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(Color.clTextPrimary)
                     .padding(.horizontal, 20)
@@ -101,7 +101,7 @@ struct HandleSetupView: View {
             Button {
                 onComplete(handle)
             } label: {
-                Text("common.continue")
+                Text("続ける")
                     .font(.body.weight(.semibold))
                     .foregroundStyle(Color.clBackground)
                     .frame(maxWidth: .infinity)

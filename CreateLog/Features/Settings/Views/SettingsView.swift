@@ -24,7 +24,6 @@ enum AppearanceMode: String, CaseIterable {
 
 struct SettingsView: View {
     @Environment(\.dependencies) private var dependencies
-    @Environment(\.modelContext) private var modelContext
     @Environment(LocalizationManager.self) private var localizationManager
     @AppStorage("appearanceMode") private var appearanceMode: String = AppearanceMode.system.rawValue
     @AppStorage("durationFormat") private var durationFormat: String = DurationFormat.system.rawValue
@@ -210,13 +209,7 @@ struct SettingsView: View {
         .fullScreenCover(isPresented: $showOnboarding) {
             OnboardingView(
                 isPresented: $showOnboarding,
-                authViewModel: AuthViewModel(authService: dependencies.authService),
-                viewModel: OnboardingViewModel(
-                    modelContext: modelContext,
-                    profileRepository: dependencies.profileRepository,
-                    appRepository: dependencies.appRepository,
-                    authService: dependencies.authService
-                )
+                authViewModel: AuthViewModel(authService: dependencies.authService)
             )
         }
     }

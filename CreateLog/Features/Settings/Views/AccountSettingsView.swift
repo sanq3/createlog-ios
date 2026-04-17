@@ -21,7 +21,7 @@ struct AccountSettingsView: View {
                     HapticManager.medium()
                     showLogoutConfirm = true
                 } label: {
-                    Text("settings.logout")
+                    Text("ログアウト")
                         .font(.clBody)
                         .foregroundStyle(Color.clError)
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -34,13 +34,13 @@ struct AccountSettingsView: View {
                     HapticManager.medium()
                     showDeleteConfirm = true
                 } label: {
-                    Text("settings.account.delete.action")
+                    Text("アカウントを削除")
                         .font(.clBody)
                         .foregroundStyle(Color.clError)
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
             } footer: {
-                Text("settings.account.delete.description")
+                Text("アカウントを削除すると、全てのデータが完全に削除されます。この操作は取り消せません。")
                     .font(.clCaption)
             }
 
@@ -54,23 +54,23 @@ struct AccountSettingsView: View {
         }
         .scrollContentBackground(.hidden)
         .background(Color.clBackground)
-        .navigationTitle("settings.account.title")
+        .navigationTitle("アカウント")
         .navigationBarTitleDisplayMode(.inline)
         .task {
             if viewModel == nil {
                 viewModel = AuthViewModel(authService: dependencies.authService)
             }
         }
-        .confirmationDialog("settings.logout.confirm", isPresented: $showLogoutConfirm, titleVisibility: .visible) {
-            Button("settings.logout", role: .destructive) {
+        .confirmationDialog("ログアウトしますか？", isPresented: $showLogoutConfirm, titleVisibility: .visible) {
+            Button("ログアウト", role: .destructive) {
                 HapticManager.medium()
                 Task { await viewModel?.signOut() }
             }
-            Button("common.cancel", role: .cancel) {}
+            Button("キャンセル", role: .cancel) {}
         }
-        .alert("settings.account.delete", isPresented: $showDeleteConfirm) {
-            TextField("settings.account.delete.confirmPrompt", text: $deleteText)
-            Button("common.delete", role: .destructive) {
+        .alert("アカウントの削除", isPresented: $showDeleteConfirm) {
+            TextField("「削除」と入力", text: $deleteText)
+            Button("削除する", role: .destructive) {
                 HapticManager.error()
                 Task {
                     await viewModel?.deleteAccount()
@@ -78,11 +78,11 @@ struct AccountSettingsView: View {
                 }
             }
             .disabled(deleteText != "削除")
-            Button("common.cancel", role: .cancel) {
+            Button("キャンセル", role: .cancel) {
                 deleteText = ""
             }
         } message: {
-            Text("settings.account.delete.confirmDescription")
+            Text("この操作は取り消せません。確認のため「削除」と入力してください。")
         }
     }
 }

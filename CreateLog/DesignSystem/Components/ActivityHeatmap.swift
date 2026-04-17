@@ -6,7 +6,7 @@ struct ActivityHeatmap: View {
     private let dotSize: CGFloat = 10
     private let dotSpacing: CGFloat = 4
 
-    private let dayLabels = ["weekday.mon", "weekday.tue", "weekday.wed", "weekday.thu", "weekday.fri", "weekday.sat", "weekday.sun"]
+    private let dayLabels = ["月", "火", "水", "木", "金", "土", "日"]
 
     // Mock: 4 weeks x 7 days of activity hours
     private let data: [[Double]] = [

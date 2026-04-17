@@ -192,7 +192,7 @@ final class ProfileViewModel {
     /// `WeeklyStats.dailyTotals` を曜日ラベル付き時間に変換。
     /// locale 依存せず固定ラベル (月〜日) を返す。チャートの縦軸は時間単位。
     private static func buildWeeklyHours(from weekly: WeeklyStats) -> [(day: String, hours: Double)] {
-        let labels = ["weekday.mon", "weekday.tue", "weekday.wed", "weekday.thu", "weekday.fri", "weekday.sat", "weekday.sun"]
+        let labels = ["月", "火", "水", "木", "金", "土", "日"]
         var calendar = Calendar(identifier: .gregorian)
         calendar.firstWeekday = 2  // Monday
         let sorted = weekly.dailyTotals.sorted { $0.date < $1.date }

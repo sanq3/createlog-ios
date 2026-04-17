@@ -42,8 +42,8 @@ struct TodayHeroView: View {
 
     private var kpiRow: some View {
         HStack(spacing: 0) {
-            kpiItem(minutes: displayedTodayMinutes, referenceMinutes: targetTodayMinutes, label: "recording.today")
-            kpiItem(minutes: displayedCumulativeMinutes, referenceMinutes: targetCumulativeMinutes, label: "recording.total")
+            kpiItem(minutes: displayedTodayMinutes, referenceMinutes: targetTodayMinutes, label: "今日")
+            kpiItem(minutes: displayedCumulativeMinutes, referenceMinutes: targetCumulativeMinutes, label: "累計")
             weekChangeItem
         }
     }
@@ -83,7 +83,7 @@ struct TodayHeroView: View {
             }
             .foregroundStyle(isPositive ? Color.clSuccess : Color.clTextTertiary)
 
-            Text("recording.vsLastWeek")
+            Text("先週比")
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(Color.clTextTertiary)
                 .offset(y: animateIn ? 0 : -14)

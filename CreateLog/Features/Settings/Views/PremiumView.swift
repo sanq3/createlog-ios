@@ -21,7 +21,7 @@ struct PremiumView: View {
         }
         .scrollIndicators(.hidden)
         .background(Color.clBackground)
-        .navigationTitle("settings.premium")
+        .navigationTitle("プレミアム")
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -50,7 +50,7 @@ struct PremiumView: View {
                 .font(.clTitle)
                 .foregroundStyle(Color.clTextPrimary)
 
-            Text("settings.premium.tagline")
+            Text("より深い分析と快適な体験を")
                 .font(.clBody)
                 .foregroundStyle(Color.clTextSecondary)
         }
@@ -139,12 +139,12 @@ struct PremiumView: View {
                 .font(.system(size: 22))
                 .foregroundStyle(Color.clAccent)
 
-            Text("settings.premium.comingSoon")
+            Text("プレミアム機能は今後のアップデートで公開予定です")
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(Color.clTextPrimary)
                 .multilineTextAlignment(.center)
 
-            Text("settings.premium.freeForNow")
+            Text("現在はすべての機能を無料でご利用いただけます。公開時に改めてアプリ内でご案内します。")
                 .font(.clCaption)
                 .foregroundStyle(Color.clTextSecondary)
                 .multilineTextAlignment(.center)
