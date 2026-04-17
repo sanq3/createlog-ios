@@ -40,10 +40,28 @@ final class LocalizationManager {
 
     init() {
         let raw = UserDefaults.standard.string(forKey: Self.storageKey) ?? AppLanguage.system.rawValue
-        self.appLanguage = AppLanguage(rawValue: raw) ?? .system
+        let lang = AppLanguage(rawValue: raw) ?? .system
+        self.appLanguage = lang
+        Self.applyAppleLanguages(lang)
     }
 
     func setLanguage(_ lang: AppLanguage) {
         appLanguage = lang
+        Self.applyAppleLanguages(lang)
+    }
+
+    /// AppleLanguages UserDefaults を書き換えることで Bundle の localization lookup を切替える。
+    /// `.environment(\.locale)` だけでは LocalizedStringKey の Bundle lookup には効かないため、
+    /// 業界標準 (LINE/Twitter/Mercari 等) の in-app 言語切替パターンとして AppleLanguages を使う。
+    /// 完全反映には app restart が必要 (UI には「再起動してください」案内を出す想定)。
+    private static func applyAppleLanguages(_ lang: AppLanguage) {
+        switch lang {
+        case .system:
+            UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+        case .japanese:
+            UserDefaults.standard.set(["ja"], forKey: "AppleLanguages")
+        case .english:
+            UserDefaults.standard.set(["en"], forKey: "AppleLanguages")
+        }
     }
 }

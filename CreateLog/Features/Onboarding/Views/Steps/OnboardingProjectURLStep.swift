@@ -9,8 +9,8 @@ struct OnboardingProjectURLStep: View {
 
     var body: some View {
         OnboardingQuestionShell(
-            title: "公開 URL はありますか?",
-            subtitle: "App Store / Google Play / Web サイト など",
+            title: "onboarding.project.url.title",
+            subtitle: "onboarding.project.url.subtitle",
             isOptional: true,
             canAdvance: true,
             isSaving: false,

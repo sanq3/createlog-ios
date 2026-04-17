@@ -7,8 +7,8 @@ struct OnboardingProjectStatusStep: View {
 
     var body: some View {
         OnboardingQuestionShell(
-            title: "今のリリース状況は?",
-            subtitle: "プロフィールにバッジで表示されます",
+            title: "onboarding.project.status.title",
+            subtitle: "onboarding.role.subtitle",
             isOptional: true,
             canAdvance: true,
             isSaving: false,

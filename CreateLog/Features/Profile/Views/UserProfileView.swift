@@ -72,7 +72,7 @@ struct UserProfileView: View {
             }
         }
         .confirmationDialog(
-            "\(user.name)のフォローを解除しますか？",
+            "profile.unfollow.confirm \(user.name)",
             isPresented: $showUnfollowConfirmation,
             titleVisibility: .visible
         ) {
@@ -140,7 +140,7 @@ struct UserProfileView: View {
     /// WeeklyStats を WeeklyChart 用に曜日ラベル付き配列に変換。
     /// ProfileViewModel.buildWeeklyHours と同ロジック。
     private static func buildWeeklyHours(from weekly: WeeklyStats?) -> [(day: String, hours: Double)] {
-        let labels = ["月", "火", "水", "木", "金", "土", "日"]
+        let labels = ["weekday.mon", "weekday.tue", "weekday.wed", "weekday.thu", "weekday.fri", "weekday.sat", "weekday.sun"]
         guard let weekly else {
             return labels.map { ($0, 0) }
         }
@@ -232,11 +232,11 @@ struct UserProfileView: View {
                 Spacer()
 
                 HStack(spacing: 0) {
-                    profileStat(value: "\(remotePosts.count)", label: "投稿")
+                    profileStat(value: "\(remotePosts.count)", label: "post.title")
                     Spacer()
-                    profileStat(value: "\(user.followerCount)", label: "フォロワー")
+                    profileStat(value: "\(user.followerCount)", label: "profile.followers")
                     Spacer()
-                    profileStat(value: "\(user.followingCount)", label: "フォロー中")
+                    profileStat(value: "\(user.followingCount)", label: "profile.following")
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.leading, 28)

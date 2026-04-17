@@ -27,10 +27,10 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         SUPABASE_URL: $(SUPABASE_URL)
         SUPABASE_ANON_KEY: $(SUPABASE_ANON_KEY)
-        CFBundleDevelopmentRegion: ja
+        CFBundleDevelopmentRegion: en
         CFBundleLocalizations:
-          - ja
           - en
+          - ja
         LSApplicationQueriesSchemes:
           - line
           - instagram

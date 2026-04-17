@@ -9,7 +9,7 @@ struct OnboardingPlatformStep: View {
     @State private var appeared = false
     @State private var chipsAppeared = false
 
-    private static let platforms = ["iOS", "Android", "Web", "Desktop", "その他"]
+    private static let platforms = ["iOS", "Android", "Web", "Desktop", "common.other"]
 
     private var canAdvance: Bool { !selectedPlatforms.isEmpty }
 
@@ -44,7 +44,7 @@ struct OnboardingPlatformStep: View {
                 Spacer()
 
                 OnboardingPrimaryCTA(
-                    title: "続ける",
+                    title: "common.continue",
                     isEnabled: canAdvance,
                     disabledStyle: .dimmed,
                     action: onAdvance

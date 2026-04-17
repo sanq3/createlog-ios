@@ -42,8 +42,8 @@ struct TodayHeroView: View {
 
     private var kpiRow: some View {
         HStack(spacing: 0) {
-            kpiItem(minutes: displayedTodayMinutes, referenceMinutes: targetTodayMinutes, label: "今日")
-            kpiItem(minutes: displayedCumulativeMinutes, referenceMinutes: targetCumulativeMinutes, label: "累計")
+            kpiItem(minutes: displayedTodayMinutes, referenceMinutes: targetTodayMinutes, label: "recording.today")
+            kpiItem(minutes: displayedCumulativeMinutes, referenceMinutes: targetCumulativeMinutes, label: "recording.total")
             weekChangeItem
         }
     }

@@ -66,8 +66,8 @@ struct OnboardingTechStackStep: View {
                        "Django", "Rails", "Laravel", "Spring Boot", "Unity"]
 
         return [
-            Section(title: "言語", items: langOrder.filter { langs.contains($0) }),
-            Section(title: "フレームワーク", items: fwOrder.filter { fws.contains($0) }),
+            Section(title: "onboarding.tech.languages", items: langOrder.filter { langs.contains($0) }),
+            Section(title: "onboarding.tech.frameworks", items: fwOrder.filter { fws.contains($0) }),
         ]
     }
 
@@ -107,7 +107,7 @@ struct OnboardingTechStackStep: View {
                 Spacer().frame(height: 8)
 
                 OnboardingPrimaryCTA(
-                    title: "続ける",
+                    title: "common.continue",
                     isEnabled: canAdvance,
                     disabledStyle: .dimmed,
                     action: onAdvance

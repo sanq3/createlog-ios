@@ -123,11 +123,11 @@ struct ShareReportView: View {
 
             // Stats
             HStack(spacing: 0) {
-                statColumn(value: cardContent.totalTime, label: "合計")
+                statColumn(value: cardContent.totalTime, label: "stats.total")
                 statDivider
-                statColumn(value: cardContent.dailyAvg, label: "日平均")
+                statColumn(value: cardContent.dailyAvg, label: "stats.dailyAverage")
                 statDivider
-                statColumn(value: "\(cardContent.activeDays)日", label: "稼働日")
+                statColumn(value: "\(cardContent.activeDays)日", label: "stats.activeDays")
             }
             .padding(.vertical, 20)
             .background(Color(.systemBackground))
@@ -268,7 +268,7 @@ struct ShareReportView: View {
         let categories = aggregateCategories(from: sorted)
 
         return ShareCardContent(
-            title: "週間レポート",
+            title: "recording.weeklyReport",
             dateRange: range,
             totalTime: DurationFormatter.formatHM(hours: totalHours),
             dailyAvg: DurationFormatter.formatHM(hours: avg),
@@ -294,7 +294,7 @@ struct ShareReportView: View {
         let categories = aggregateCategories(from: monthly)
 
         return ShareCardContent(
-            title: "月間レポート",
+            title: "recording.monthlyReport",
             dateRange: range,
             totalTime: DurationFormatter.formatHM(hours: totalHours),
             dailyAvg: DurationFormatter.formatHM(hours: avg),
@@ -312,7 +312,7 @@ struct ShareReportView: View {
         let avg: Double = activeDays > 0 ? (Double(recentMonthly.reduce(0) { $0 + $1.totalMinutes }) / 60.0 / Double(activeDays)) : 0
 
         return ShareCardContent(
-            title: "累計レポート",
+            title: "recording.cumulativeReport",
             dateRange: "全期間",
             totalTime: DurationFormatter.formatHM(hours: totalHours),
             dailyAvg: DurationFormatter.formatHM(hours: avg),

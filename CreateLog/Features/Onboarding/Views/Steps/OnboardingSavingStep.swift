@@ -45,7 +45,7 @@ struct OnboardingSavingStep: View {
                 Spacer()
 
                 OnboardingPrimaryCTA(
-                    title: "続ける",
+                    title: "common.continue",
                     disabledStyle: .dimmed,
                     action: onAdvance
                 )

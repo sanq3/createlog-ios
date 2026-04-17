@@ -153,7 +153,7 @@ struct ProjectDetailView: View {
     private var screenshotSection: some View {
         if !project.screenshotColors.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
-                sectionTitle("スクリーンショット")
+                sectionTitle("project.section.screenshots")
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
@@ -190,14 +190,14 @@ struct ProjectDetailView: View {
     private var linkSection: some View {
         if project.storeURL != nil || project.githubURL != nil {
             VStack(alignment: .leading, spacing: 12) {
-                sectionTitle("リンク")
+                sectionTitle("project.section.links")
 
                 detailCard {
                     VStack(spacing: 12) {
                         if let storeURL = project.storeURL {
                             linkRow(
                                 icon: "arrow.up.right.square",
-                                title: "ストアページ",
+                                title: "project.storePage",
                                 url: storeURL,
                                 color: Color.clAccent
                             )
@@ -270,7 +270,7 @@ struct ProjectDetailView: View {
 
     private var reviewSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            sectionTitle("レビュー")
+            sectionTitle("project.section.reviews")
 
             // Rating summary
             detailCard {
@@ -424,7 +424,7 @@ struct ProjectDetailView: View {
     private var tagSection: some View {
         if !project.tags.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
-                sectionTitle("タグ")
+                sectionTitle("project.section.tags")
 
                 FlowLayout(spacing: 8) {
                     ForEach(project.tags, id: \.self) { tag in

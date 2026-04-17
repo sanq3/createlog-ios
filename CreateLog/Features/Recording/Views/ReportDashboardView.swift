@@ -208,9 +208,9 @@ struct ReportDashboardView: View {
 
     private var kpiRow: some View {
         HStack(spacing: 0) {
-            kpiItem(hours: animateIn ? todayHours : 0, label: "今日")
-            kpiItem(hours: animateIn ? weekHours : 0, label: "今週")
-            kpiItem(hours: animateIn ? monthHours : 0, label: "今月")
+            kpiItem(hours: animateIn ? todayHours : 0, label: "recording.today")
+            kpiItem(hours: animateIn ? weekHours : 0, label: "recording.thisWeek")
+            kpiItem(hours: animateIn ? monthHours : 0, label: "recording.thisMonth")
         }
     }
 

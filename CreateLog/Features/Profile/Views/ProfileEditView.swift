@@ -104,7 +104,7 @@ struct ProfileEditView: View {
 
     private var formSection: some View {
         VStack(spacing: 20) {
-            fieldContainer(label: "表示名") {
+            fieldContainer(label: "profile.displayName") {
                 HStack {
                     TextField("profile.displayName", text: $viewModel.displayName)
                         .font(.system(size: 15))
@@ -122,7 +122,7 @@ struct ProfileEditView: View {
                 }
             }
 
-            fieldContainer(label: "ユーザー名") {
+            fieldContainer(label: "profile.handle") {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 0) {
                         Text("@")
@@ -149,7 +149,7 @@ struct ProfileEditView: View {
                 }
             }
 
-            fieldContainer(label: "自己紹介") {
+            fieldContainer(label: "profile.bio.label") {
                 VStack(alignment: .trailing, spacing: 4) {
                     TextField("profile.bio.placeholder", text: $viewModel.bio, axis: .vertical)
                         .font(.system(size: 15))
@@ -168,13 +168,13 @@ struct ProfileEditView: View {
                 }
             }
 
-            fieldContainer(label: "職業") {
+            fieldContainer(label: "profile.occupation") {
                 TextField("profile.occupation", text: $viewModel.occupation)
                     .font(.system(size: 15))
                     .foregroundStyle(Color.clTextPrimary)
             }
 
-            fieldContainer(label: "経験年数") {
+            fieldContainer(label: "profile.experience") {
                 Picker("profile.experience", selection: $viewModel.experienceLevel) {
                     ForEach(ExperienceLevel.allCases, id: \.self) { level in
                         Text(level.label).tag(level)

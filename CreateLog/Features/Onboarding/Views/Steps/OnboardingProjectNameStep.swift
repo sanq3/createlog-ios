@@ -59,7 +59,7 @@ struct OnboardingProjectNameStep: View {
 
                 // 続けるボタン (入力があれば spring-up)
                 OnboardingPrimaryCTA(
-                    title: "続ける",
+                    title: "common.continue",
                     isEnabled: canAdvance,
                     disabledStyle: .hidden,
                     action: { advance() }

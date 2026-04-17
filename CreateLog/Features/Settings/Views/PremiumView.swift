@@ -62,27 +62,27 @@ struct PremiumView: View {
         VStack(spacing: 0) {
             featureRow(
                 icon: "chart.bar.fill",
-                title: "詳細分析",
+                title: "settings.premium.analytics",
                 description: "カテゴリ別トレンド、他ユーザーとの比較"
             )
             featureRow(
                 icon: "eye.slash.fill",
-                title: "広告なし",
+                title: "settings.premium.noAds",
                 description: "フィード・検索画面の広告を完全に削除"
             )
             featureRow(
                 icon: "clock.arrow.circlepath",
-                title: "無制限の履歴",
+                title: "settings.premium.unlimitedHistory",
                 description: "過去全期間のログを閲覧・エクスポート"
             )
             featureRow(
                 icon: "paintbrush.fill",
-                title: "テーマカスタマイズ",
+                title: "settings.premium.themes",
                 description: "アクセントカラーの変更"
             )
             featureRow(
                 icon: "star.fill",
-                title: "プレミアムバッジ",
+                title: "settings.premium.badge",
                 description: "プロフィールにバッジを表示",
                 isLast: true
             )

@@ -334,8 +334,8 @@ struct PostDetailView: View {
 
     private var statsRow: some View {
         HStack(spacing: 20) {
-            statItem(count: post.reposts, label: "リポスト")
-            statItem(count: post.likes, label: "いいね")
+            statItem(count: post.reposts, label: "post.repost.action")
+            statItem(count: post.likes, label: "post.like.action")
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 14)

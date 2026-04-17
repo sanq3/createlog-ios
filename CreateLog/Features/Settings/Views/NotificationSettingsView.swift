@@ -46,13 +46,13 @@ struct NotificationSettingsView: View {
             Section {
                 comingSoonRow(
                     icon: "slider.horizontal.3",
-                    title: "通知の種類別フィルタ",
-                    subtitle: "受け取る通知の種類を個別に選択"
+                    title: "settings.notification.typeFilter",
+                    subtitle: "settings.notification.typeFilter.description"
                 )
                 comingSoonRow(
                     icon: "moon.fill",
-                    title: "おやすみモード",
-                    subtitle: "指定した時間帯は通知を停止"
+                    title: "settings.notification.dnd.title",
+                    subtitle: "settings.notification.dnd.description"
                 )
             } header: {
                 Text("common.comingSoonLong")

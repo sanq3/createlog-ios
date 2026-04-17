@@ -127,11 +127,11 @@ struct DiscoverFeedCard: View {
             guard let media = post.media else { return nil }
             switch media {
             case .images: return nil
-            case .video: return AnyView(badgeView(icon: "play.fill", label: "動画"))
+            case .video: return AnyView(badgeView(icon: "play.fill", label: "media.video"))
             case .code: return AnyView(badgeView(icon: "chevron.left.forwardslash.chevron.right", label: "Code"))
             }
         case .project:
-            return AnyView(badgeView(icon: "arrow.up.right", label: "プロジェクト"))
+            return AnyView(badgeView(icon: "arrow.up.right", label: "project.title"))
         }
     }
 

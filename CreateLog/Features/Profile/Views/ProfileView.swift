@@ -84,19 +84,19 @@ struct ProfileView: View {
                     Spacer()
 
                     HStack(spacing: 0) {
-                        profileStat(value: "\(userPosts.count)", label: "投稿")
+                        profileStat(value: "\(userPosts.count)", label: "post.title")
                         Spacer()
                         NavigationLink {
                             FollowListView(initialTab: .followers)
                         } label: {
-                            profileStat(value: "\(user.followerCount)", label: "フォロワー")
+                            profileStat(value: "\(user.followerCount)", label: "profile.followers")
                         }
                         .buttonStyle(.plain)
                         Spacer()
                         NavigationLink {
                             FollowListView(initialTab: .following)
                         } label: {
-                            profileStat(value: "\(user.followingCount)", label: "フォロー中")
+                            profileStat(value: "\(user.followingCount)", label: "profile.following")
                         }
                         .buttonStyle(.plain)
                     }
@@ -952,13 +952,13 @@ struct ProfileShareSheet: View {
                 urlScheme: nil, shareURL: { _ in "" }
             ),
             ShareDestination(
-                id: "messages", label: "メッセージ",
+                id: "messages", label: "profile.contact.message",
                 assetIcon: nil, systemIcon: "message.fill",
                 platform: .messages,
                 urlScheme: nil, shareURL: { "sms:&body=\($0.encodedForURL)" }
             ),
             ShareDestination(
-                id: "mail", label: "メール",
+                id: "mail", label: "profile.contact.email",
                 assetIcon: nil, systemIcon: "envelope.fill",
                 platform: .mail,
                 urlScheme: nil, shareURL: { "mailto:?subject=CreateLog&body=\($0.encodedForURL)" }

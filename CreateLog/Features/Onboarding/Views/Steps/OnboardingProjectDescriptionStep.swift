@@ -9,8 +9,8 @@ struct OnboardingProjectDescriptionStep: View {
 
     var body: some View {
         OnboardingQuestionShell(
-            title: "どんなプロダクトですか?",
-            subtitle: "1-2 行で簡潔に",
+            title: "onboarding.product.title",
+            subtitle: "onboarding.bio.subtitle",
             isOptional: true,
             canAdvance: true,
             isSaving: false,

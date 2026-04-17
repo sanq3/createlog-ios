@@ -10,8 +10,8 @@ struct OnboardingDisplayNameStep: View {
 
     var body: some View {
         OnboardingQuestionShell(
-            title: "あなたの名前は?",
-            subtitle: "プロフィールに表示されます",
+            title: "onboarding.displayName.title",
+            subtitle: "onboarding.displayName.subtitle",
             isOptional: false,
             canAdvance: canAdvance,
             isSaving: viewModel.isSavingProfile,

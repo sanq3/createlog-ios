@@ -9,8 +9,8 @@ struct OnboardingBioStep: View {
 
     var body: some View {
         OnboardingQuestionShell(
-            title: "ひとこと自己紹介",
-            subtitle: "どんな開発をしていますか",
+            title: "onboarding.bio.title",
+            subtitle: "onboarding.platform.subtitle",
             isOptional: true,
             canAdvance: true,
             isSaving: viewModel.isSavingProfile,
