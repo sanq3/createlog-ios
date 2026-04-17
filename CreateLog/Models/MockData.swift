@@ -6,47 +6,47 @@ enum MockData {
     // MARK: - Charts
 
     static let weeklyHours: [(day: String, hours: Double)] = [
-        ("月", 3.2), ("火", 4.8), ("水", 3.5),
-        ("木", 6.2), ("金", 5.1), ("土", 2.8), ("日", 4.5)
+        ("weekday.mon", 3.2), ("weekday.tue", 4.8), ("weekday.wed", 3.5),
+        ("weekday.thu", 6.2), ("weekday.fri", 5.1), ("weekday.sat", 2.8), ("weekday.sun", 4.5)
     ]
 
     static let weeklyStackedHours: [WeeklyStackedEntry] = [
         // 月 (3.2h)
-        WeeklyStackedEntry(day: "月", category: "iOS開発", hours: 1.5),
-        WeeklyStackedEntry(day: "月", category: "学習", hours: 1.0),
-        WeeklyStackedEntry(day: "月", category: "バグ修正", hours: 0.7),
+        WeeklyStackedEntry(day: "weekday.mon", category: "iOS開発", hours: 1.5),
+        WeeklyStackedEntry(day: "weekday.mon", category: "category.learn", hours: 1.0),
+        WeeklyStackedEntry(day: "weekday.mon", category: "バグ修正", hours: 0.7),
         // 火 (4.8h)
-        WeeklyStackedEntry(day: "火", category: "iOS開発", hours: 2.5),
-        WeeklyStackedEntry(day: "火", category: "学習", hours: 0.8),
-        WeeklyStackedEntry(day: "火", category: "Web開発", hours: 1.5),
+        WeeklyStackedEntry(day: "weekday.tue", category: "iOS開発", hours: 2.5),
+        WeeklyStackedEntry(day: "weekday.tue", category: "category.learn", hours: 0.8),
+        WeeklyStackedEntry(day: "weekday.tue", category: "Web開発", hours: 1.5),
         // 水 (3.5h)
-        WeeklyStackedEntry(day: "水", category: "iOS開発", hours: 1.8),
-        WeeklyStackedEntry(day: "水", category: "バグ修正", hours: 1.0),
-        WeeklyStackedEntry(day: "水", category: "デザイン", hours: 0.7),
+        WeeklyStackedEntry(day: "weekday.wed", category: "iOS開発", hours: 1.8),
+        WeeklyStackedEntry(day: "weekday.wed", category: "バグ修正", hours: 1.0),
+        WeeklyStackedEntry(day: "weekday.wed", category: "onboarding.role.design", hours: 0.7),
         // 木 (6.2h)
-        WeeklyStackedEntry(day: "木", category: "iOS開発", hours: 3.0),
-        WeeklyStackedEntry(day: "木", category: "学習", hours: 1.5),
-        WeeklyStackedEntry(day: "木", category: "Web開発", hours: 1.2),
-        WeeklyStackedEntry(day: "木", category: "デザイン", hours: 0.5),
+        WeeklyStackedEntry(day: "weekday.thu", category: "iOS開発", hours: 3.0),
+        WeeklyStackedEntry(day: "weekday.thu", category: "category.learn", hours: 1.5),
+        WeeklyStackedEntry(day: "weekday.thu", category: "Web開発", hours: 1.2),
+        WeeklyStackedEntry(day: "weekday.thu", category: "onboarding.role.design", hours: 0.5),
         // 金 (5.1h)
-        WeeklyStackedEntry(day: "金", category: "iOS開発", hours: 2.8),
-        WeeklyStackedEntry(day: "金", category: "学習", hours: 1.0),
-        WeeklyStackedEntry(day: "金", category: "バグ修正", hours: 1.3),
+        WeeklyStackedEntry(day: "weekday.fri", category: "iOS開発", hours: 2.8),
+        WeeklyStackedEntry(day: "weekday.fri", category: "category.learn", hours: 1.0),
+        WeeklyStackedEntry(day: "weekday.fri", category: "バグ修正", hours: 1.3),
         // 土 (2.8h)
-        WeeklyStackedEntry(day: "土", category: "iOS開発", hours: 1.3),
-        WeeklyStackedEntry(day: "土", category: "学習", hours: 1.5),
+        WeeklyStackedEntry(day: "weekday.sat", category: "iOS開発", hours: 1.3),
+        WeeklyStackedEntry(day: "weekday.sat", category: "category.learn", hours: 1.5),
         // 日 (4.5h)
-        WeeklyStackedEntry(day: "日", category: "iOS開発", hours: 2.5),
-        WeeklyStackedEntry(day: "日", category: "学習", hours: 0.5),
-        WeeklyStackedEntry(day: "日", category: "Web開発", hours: 1.0),
-        WeeklyStackedEntry(day: "日", category: "デザイン", hours: 0.5),
+        WeeklyStackedEntry(day: "weekday.sun", category: "iOS開発", hours: 2.5),
+        WeeklyStackedEntry(day: "weekday.sun", category: "category.learn", hours: 0.5),
+        WeeklyStackedEntry(day: "weekday.sun", category: "Web開発", hours: 1.0),
+        WeeklyStackedEntry(day: "weekday.sun", category: "onboarding.role.design", hours: 0.5),
     ]
 
     static let categoryItems: [CategoryItem] = [
         CategoryItem(name: "iOS開発", hours: 12.5, percentage: 44),
         CategoryItem(name: "Web開発", hours: 8.25, percentage: 29),
-        CategoryItem(name: "学習", hours: 5.0, percentage: 18),
-        CategoryItem(name: "デザイン", hours: 2.75, percentage: 9)
+        CategoryItem(name: "category.learn", hours: 5.0, percentage: 18),
+        CategoryItem(name: "onboarding.role.design", hours: 2.75, percentage: 9)
     ]
 
     // MARK: - Discover
@@ -68,7 +68,7 @@ enum MockData {
         ),
         LogEntry(
             title: "Swift Concurrency勉強",
-            categoryName: "学習",
+            categoryName: "category.learn",
             startHour: 11.0,
             endHour: 12.0,
             isAutoTracked: true

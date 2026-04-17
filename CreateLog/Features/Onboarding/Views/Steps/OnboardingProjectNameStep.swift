@@ -19,7 +19,7 @@ struct OnboardingProjectNameStep: View {
             VStack(alignment: .leading, spacing: 0) {
                 Spacer().frame(height: 120)
 
-                Text("プロジェクトの名前は？")
+                Text("onboarding.project.name.title")
                     .font(.system(size: 32, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary)
                     .tracking(-0.5)
@@ -31,7 +31,7 @@ struct OnboardingProjectNameStep: View {
 
                 VStack(alignment: .leading, spacing: 14) {
                     TextField("", text: $projectName, prompt:
-                        Text("例 つくろぐ")
+                        Text("onboarding.project.name.placeholder")
                             .foregroundStyle(Color.clTextPrimary.opacity(0.3))
                     )
                     .font(.system(size: 24, weight: .semibold))
@@ -59,7 +59,7 @@ struct OnboardingProjectNameStep: View {
 
                 // 続けるボタン (入力があれば spring-up)
                 OnboardingPrimaryCTA(
-                    title: "続ける",
+                    title: "common.continue",
                     isEnabled: canAdvance,
                     disabledStyle: .hidden,
                     action: { advance() }

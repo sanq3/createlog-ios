@@ -8,7 +8,7 @@ struct WeeklyChart: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                Text("週間推移")
+                Text("recording.weeklyTrend")
                     .font(.clHeadline)
                     .foregroundStyle(Color.clTextSecondary)
 

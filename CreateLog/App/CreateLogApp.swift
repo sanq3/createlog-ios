@@ -18,6 +18,10 @@ struct CreateLogApp: App {
     @State private var pushService: PushNotificationService
     @State private var localizationManager = LocalizationManager()
     @State private var splashFinished = false
+    // auth state 遷移 (.unauthenticated ↔ .authenticated) で OnboardingView が再 mount されても
+    // currentStep / 入力値 を保持するため、ViewModel は App 層で単一 instance として保持する。
+    // View 内部 @State に持たせると branch 切替で reset される (SwiftUI identity 仕様)。
+    @State private var onboardingViewModel: OnboardingViewModel
 
     init() {
         let schema = Schema([
@@ -54,6 +58,12 @@ struct CreateLogApp: App {
         // PushNotificationService は init 内で NotificationCenter を observe するので
         // AppDelegateAdapter への明示的な参照設定は不要 (疎結合)。
         _pushService = State(initialValue: PushNotificationService(client: deps.supabaseClient))
+        _onboardingViewModel = State(initialValue: OnboardingViewModel(
+            modelContext: modelContainer.mainContext,
+            profileRepository: deps.profileRepository,
+            appRepository: deps.appRepository,
+            authService: deps.authService
+        ))
     }
 
     var body: some Scene {
@@ -141,7 +151,8 @@ struct CreateLogApp: App {
                 get: { !onboardingCompleted },
                 set: { if !$0 { onboardingCompleted = true } }
             ),
-            authViewModel: authViewModel
+            authViewModel: authViewModel,
+            viewModel: onboardingViewModel
         )
         .modelContainer(modelContainer)
         .environment(\.dependencies, dependencies)
@@ -158,7 +169,7 @@ struct CreateLogApp: App {
         guard count == 0 else { return }
 
         let defaults: [(String, Int)] = [
-            ("開発", 1), ("デザイン", 2), ("学習", 3),
+            ("category.dev", 1), ("onboarding.role.design", 2), ("category.learn", 3),
             ("ミーティング", 4), ("ライティング", 5),
             ("マーケティング", 6), ("事務", 7),
         ]

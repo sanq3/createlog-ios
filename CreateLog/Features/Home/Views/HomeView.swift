@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HomeView: View {
     @Environment(\.dependencies) private var deps
+    @Environment(\.modelContext) private var modelContext
     @State private var viewModel: FeedViewModel?
     @State private var segmentIndex = 0
 
@@ -134,7 +135,13 @@ struct HomeView: View {
         .fullScreenCover(isPresented: $showOnboarding) {
             OnboardingView(
                 isPresented: $showOnboarding,
-                authViewModel: AuthViewModel(authService: deps.authService)
+                authViewModel: AuthViewModel(authService: deps.authService),
+                viewModel: OnboardingViewModel(
+                    modelContext: modelContext,
+                    profileRepository: deps.profileRepository,
+                    appRepository: deps.appRepository,
+                    authService: deps.authService
+                )
             )
         }
         .errorBanner(Binding(
@@ -284,7 +291,7 @@ struct HomeView: View {
                 .font(.clBody)
                 .foregroundStyle(Color.clTextSecondary)
             if segmentIndex == 1 {
-                Text("他の開発者をフォローすると、ここに投稿が流れます")
+                Text("post.empty.following")
                     .font(.clCaption)
                     .foregroundStyle(Color.clTextTertiary)
                     .multilineTextAlignment(.center)

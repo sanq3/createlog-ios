@@ -8,8 +8,8 @@ extension LogEntry {
     static func color(for categoryName: String) -> Color {
         switch categoryName {
         case "iOS開発": return Color("clCat01")     // Blue
-        case "デザイン": return Color("clCat02")     // Pink
-        case "学習": return Color("clCat03")         // Indigo
+        case "onboarding.role.design": return Color("clCat02")     // Pink
+        case "category.learn": return Color("clCat03")         // Indigo
         case "バグ修正": return Color("clCat04")     // Orange
         case "Web開発": return Color("clCat05")      // Teal
         case "ミーティング": return Color("clCat06") // Green
@@ -24,9 +24,9 @@ extension LogEntry {
         switch categoryName {
         case "iOS開発": return "chevron.left.forwardslash.chevron.right"
         case "Web開発": return "globe"
-        case "学習": return "book.fill"
+        case "category.learn": return "book.fill"
         case "バグ修正": return "ladybug.fill"
-        case "デザイン": return "paintbrush.fill"
+        case "onboarding.role.design": return "paintbrush.fill"
         default: return "folder.fill"
         }
     }

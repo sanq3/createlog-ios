@@ -68,16 +68,16 @@ struct OnboardingPrimaryCTA: View {
 }
 
 #Preview("enabled") {
-    OnboardingPrimaryCTA(title: "続ける", action: {})
+    OnboardingPrimaryCTA(title: "common.continue", action: {})
         .padding()
 }
 
 #Preview("disabled (dimmed)") {
-    OnboardingPrimaryCTA(title: "続ける", isEnabled: false, action: {})
+    OnboardingPrimaryCTA(title: "common.continue", isEnabled: false, action: {})
         .padding()
 }
 
 #Preview("loading") {
-    OnboardingPrimaryCTA(title: "続ける", isLoading: true, action: {})
+    OnboardingPrimaryCTA(title: "common.continue", isLoading: true, action: {})
         .padding()
 }

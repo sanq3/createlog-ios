@@ -25,18 +25,18 @@ struct ProfileEditView: View {
             }
             .scrollIndicators(.hidden)
             .background(Color.clBackground)
-            .navigationTitle("プロフィールを編集")
+            .navigationTitle("profile.edit")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("キャンセル") {
+                    Button("common.cancel") {
                         dismiss()
                     }
                     .foregroundStyle(Color.clTextPrimary)
                     .disabled(viewModel.isSaving)
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("保存") {
+                    Button("common.save") {
                         HapticManager.light()
                         Task { await viewModel.save() }
                     }
@@ -104,9 +104,9 @@ struct ProfileEditView: View {
 
     private var formSection: some View {
         VStack(spacing: 20) {
-            fieldContainer(label: "表示名") {
+            fieldContainer(label: "profile.displayName") {
                 HStack {
-                    TextField("表示名", text: $viewModel.displayName)
+                    TextField("profile.displayName", text: $viewModel.displayName)
                         .font(.system(size: 15))
                         .foregroundStyle(Color.clTextPrimary)
                         .onChange(of: viewModel.displayName) { _, newValue in
@@ -122,14 +122,14 @@ struct ProfileEditView: View {
                 }
             }
 
-            fieldContainer(label: "ユーザー名") {
+            fieldContainer(label: "profile.handle") {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 0) {
                         Text("@")
                             .font(.system(size: 15))
                             .foregroundStyle(Color.clTextTertiary)
 
-                        TextField("ユーザー名", text: $viewModel.handle)
+                        TextField("profile.handle", text: $viewModel.handle)
                             .font(.system(size: 15))
                             .foregroundStyle(Color.clTextPrimary)
                             .textInputAutocapitalization(.never)
@@ -142,7 +142,7 @@ struct ProfileEditView: View {
                     }
 
                     if !viewModel.handle.isEmpty && !viewModel.isHandleValid {
-                        Text("英数字と_のみ、3〜15文字")
+                        Text("auth.handle.rule")
                             .font(.system(size: 12))
                             .foregroundStyle(Color.clError)
                     }
@@ -151,7 +151,7 @@ struct ProfileEditView: View {
 
             fieldContainer(label: "自己紹介") {
                 VStack(alignment: .trailing, spacing: 4) {
-                    TextField("自己紹介を入力...", text: $viewModel.bio, axis: .vertical)
+                    TextField("profile.bio.placeholder", text: $viewModel.bio, axis: .vertical)
                         .font(.system(size: 15))
                         .foregroundStyle(Color.clTextPrimary)
                         .lineLimit(4, reservesSpace: true)
@@ -168,14 +168,14 @@ struct ProfileEditView: View {
                 }
             }
 
-            fieldContainer(label: "職業") {
-                TextField("職業", text: $viewModel.occupation)
+            fieldContainer(label: "profile.occupation") {
+                TextField("profile.occupation", text: $viewModel.occupation)
                     .font(.system(size: 15))
                     .foregroundStyle(Color.clTextPrimary)
             }
 
-            fieldContainer(label: "経験年数") {
-                Picker("経験年数", selection: $viewModel.experienceLevel) {
+            fieldContainer(label: "profile.experience") {
+                Picker("profile.experience", selection: $viewModel.experienceLevel) {
                     ForEach(ExperienceLevel.allCases, id: \.self) { level in
                         Text(level.label).tag(level)
                     }
@@ -195,7 +195,7 @@ struct ProfileEditView: View {
 
     private var skillsEditSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("スキル")
+            Text("profile.skills")
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(Color.clTextSecondary)
 
@@ -227,7 +227,7 @@ struct ProfileEditView: View {
             }
 
             HStack(spacing: 8) {
-                TextField("スキルを追加...", text: $viewModel.newSkill)
+                TextField("profile.skills.add", text: $viewModel.newSkill)
                     .font(.system(size: 15))
                     .foregroundStyle(Color.clTextPrimary)
                     .textInputAutocapitalization(.never)
@@ -265,7 +265,7 @@ struct ProfileEditView: View {
 
     private var interestsEditSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("興味カテゴリ")
+            Text("profile.interests")
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(Color.clTextSecondary)
 
@@ -282,7 +282,7 @@ struct ProfileEditView: View {
 
     private var linksEditSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("外部リンク")
+            Text("profile.links")
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(Color.clTextSecondary)
 
@@ -327,7 +327,7 @@ struct ProfileEditView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "plus.circle.fill")
                         .font(.system(size: 16))
-                    Text("リンクを追加")
+                    Text("profile.links.add")
                         .font(.system(size: 14, weight: .medium))
                 }
                 .foregroundStyle(Color.clAccent)

@@ -53,7 +53,7 @@ struct OnboardingTechStackStep: View {
         }
 
         // その他 / Desktop → 全部表示
-        if selectedPlatforms.contains("その他") || selectedPlatforms.isEmpty {
+        if selectedPlatforms.contains("common.other") || selectedPlatforms.isEmpty {
             for values in Self.platformLanguages.values { langs.formUnion(values) }
             for values in Self.platformFrameworks.values { fws.formUnion(values) }
         }
@@ -66,8 +66,8 @@ struct OnboardingTechStackStep: View {
                        "Django", "Rails", "Laravel", "Spring Boot", "Unity"]
 
         return [
-            Section(title: "言語", items: langOrder.filter { langs.contains($0) }),
-            Section(title: "フレームワーク", items: fwOrder.filter { fws.contains($0) }),
+            Section(title: "onboarding.tech.languages", items: langOrder.filter { langs.contains($0) }),
+            Section(title: "onboarding.tech.frameworks", items: fwOrder.filter { fws.contains($0) }),
         ]
     }
 
@@ -80,7 +80,7 @@ struct OnboardingTechStackStep: View {
             VStack(spacing: 0) {
                 Spacer().frame(height: 90)
 
-                Text("使用している技術は？")
+                Text("onboarding.tech.title")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary)
                     .tracking(-0.5)
@@ -96,8 +96,8 @@ struct OnboardingTechStackStep: View {
                         }
 
                         HStack(spacing: 10) {
-                            specialChip("その他")
-                            specialChip("まだ決めていない")
+                            specialChip("common.other")
+                            specialChip("onboarding.project.status.undecided")
                         }
                         .padding(.horizontal, 32)
                     }
@@ -107,7 +107,7 @@ struct OnboardingTechStackStep: View {
                 Spacer().frame(height: 8)
 
                 OnboardingPrimaryCTA(
-                    title: "続ける",
+                    title: "common.continue",
                     isEnabled: canAdvance,
                     disabledStyle: .dimmed,
                     action: onAdvance
@@ -158,8 +158,8 @@ struct OnboardingTechStackStep: View {
                 if selected {
                     selectedStack.remove(item)
                 } else {
-                    if selectedStack.contains("まだ決めていない") {
-                        selectedStack.remove("まだ決めていない")
+                    if selectedStack.contains("onboarding.project.status.undecided") {
+                        selectedStack.remove("onboarding.project.status.undecided")
                     }
                     selectedStack.insert(item)
                 }
@@ -195,7 +195,7 @@ struct OnboardingTechStackStep: View {
                 if selected {
                     selectedStack.remove(item)
                 } else {
-                    if item == "まだ決めていない" {
+                    if item == "onboarding.project.status.undecided" {
                         selectedStack.removeAll()
                     }
                     selectedStack.insert(item)

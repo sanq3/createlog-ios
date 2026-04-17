@@ -25,7 +25,7 @@ struct ProfileView: View {
     @State private var selectedPostTab: PostTab = .posts
 
     private enum PostTab: String, CaseIterable {
-        case posts = "投稿"
+        case posts = "post.title"
         case likes = "いいね"
         case bookmarks = "ブックマーク"
     }
@@ -84,7 +84,7 @@ struct ProfileView: View {
                     Spacer()
 
                     HStack(spacing: 0) {
-                        profileStat(value: "\(userPosts.count)", label: "投稿")
+                        profileStat(value: "\(userPosts.count)", label: "post.title")
                         Spacer()
                         NavigationLink {
                             FollowListView(initialTab: .followers)
@@ -96,7 +96,7 @@ struct ProfileView: View {
                         NavigationLink {
                             FollowListView(initialTab: .following)
                         } label: {
-                            profileStat(value: "\(user.followingCount)", label: "フォロー中")
+                            profileStat(value: "\(user.followingCount)", label: "profile.following")
                         }
                         .buttonStyle(.plain)
                     }
@@ -155,7 +155,7 @@ struct ProfileView: View {
                 // Action buttons
                 HStack(spacing: 6) {
                     Button { showEditProfile = true } label: {
-                        Text("プロフィールを編集")
+                        Text("profile.edit")
                             .profileActionButton()
                     }
 
@@ -164,7 +164,7 @@ struct ProfileView: View {
                         HapticManager.light()
                         showShareSheet = true
                     } label: {
-                        Text("プロフィールをシェア")
+                        Text("profile.share")
                             .profileActionButton()
                     }
                 }
@@ -178,7 +178,7 @@ struct ProfileView: View {
 
                 // マイプロダクト (ローカル SDProject + リモート Project)
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("マイプロダクト")
+                    Text("profile.myProducts")
                         .font(.clHeadline)
                         .foregroundStyle(Color.clTextSecondary)
                         .padding(.horizontal, 16)
@@ -284,7 +284,7 @@ struct ProfileView: View {
         case .posts:
             postsListSection(
                 items: userPosts,
-                emptyMessage: "まだ投稿がありません"
+                emptyMessage: "post.empty"
             )
         case .likes:
             likedListSection
@@ -319,7 +319,7 @@ struct ProfileView: View {
                 .padding(.top, 24)
                 .frame(maxWidth: .infinity)
         } else if viewModel.likedPosts.isEmpty {
-            Text("まだいいねした投稿がありません")
+            Text("post.empty.liked")
                 .font(.clCaption)
                 .foregroundStyle(Color.clTextTertiary)
                 .padding(.horizontal, 16)
@@ -353,7 +353,7 @@ struct ProfileView: View {
                 .padding(.top, 24)
                 .frame(maxWidth: .infinity)
         } else if viewModel.bookmarkedPosts.isEmpty {
-            Text("まだブックマークした投稿がありません")
+            Text("post.empty.bookmarked")
                 .font(.clCaption)
                 .foregroundStyle(Color.clTextTertiary)
                 .padding(.horizontal, 16)
@@ -495,7 +495,7 @@ struct ProfileView: View {
                     .foregroundStyle(Color.clTextTertiary)
             }
         } else {
-            Text("未評価")
+            Text("rating.unrated")
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(Color.clTextTertiary)
         }
@@ -833,7 +833,7 @@ struct ProfileShareSheet: View {
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundStyle(.green)
-                        Text("コピーしました!")
+                        Text("common.copied")
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(bottomTextColor)
                     }
@@ -875,7 +875,7 @@ struct ProfileShareSheet: View {
 
                         ShareLink(
                             item: URL(string: profileURL)!,
-                            message: Text("CreateLogで繋がろう!")
+                            message: Text("share.connectCallout")
                         ) {
                             VStack(spacing: 6) {
                                 Image(systemName: "ellipsis")
@@ -884,7 +884,7 @@ struct ProfileShareSheet: View {
                                     .frame(width: 56, height: 56)
                                     .background(overlayButtonBg, in: Circle())
 
-                                Text("その他")
+                                Text("common.other")
                                     .font(.system(size: 11))
                                     .foregroundStyle(bottomTextColor)
                             }

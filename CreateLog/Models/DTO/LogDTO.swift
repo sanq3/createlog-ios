@@ -30,7 +30,7 @@ struct LogDTO: Codable, Sendable, Identifiable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(UUID.self, forKey: .id)
         userId = try container.decode(UUID.self, forKey: .userId)
-        title = try container.decodeIfPresent(String.self, forKey: .title) ?? "その他"
+        title = try container.decodeIfPresent(String.self, forKey: .title) ?? "common.other"
         categoryId = try container.decode(UUID.self, forKey: .categoryId)
         startedAt = try container.decode(Date.self, forKey: .startedAt)
         endedAt = try container.decode(Date.self, forKey: .endedAt)

@@ -7,14 +7,14 @@ struct OnboardingRoleTagStep: View {
     let onAdvance: () -> Void
 
     private static let availableRoles = [
-        "iOS 開発", "Android 開発", "Web 開発", "バックエンド",
-        "デザイン", "個人開発", "スタートアップ", "学生",
+        "onboarding.platform.ios", "onboarding.platform.android", "onboarding.platform.web", "onboarding.platform.backend",
+        "onboarding.role.design", "onboarding.role.soloDev", "onboarding.role.startup", "onboarding.role.student",
     ]
 
     var body: some View {
         OnboardingQuestionShell(
-            title: "何をしている人ですか?",
-            subtitle: "複数選択できます",
+            title: "onboarding.role.title",
+            subtitle: "onboarding.tech.subtitle",
             isOptional: true,
             canAdvance: true,
             isSaving: viewModel.isSavingProfile,

@@ -11,8 +11,8 @@ enum NotificationType: CaseIterable {
 
 enum NotificationTimeSection: String {
     case new = "新着"
-    case today = "今日"
-    case thisWeek = "今週"
+    case today = "recording.today"
+    case thisWeek = "recording.thisWeek"
     case earlier = "それ以前"
 }
 

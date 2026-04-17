@@ -78,7 +78,7 @@ enum ProjectPlatform: String, CaseIterable {
     case ios = "iOS"
     case android = "Android"
     case web = "Web"
-    case other = "その他"
+    case other = "common.other"
 
     var iconName: String {
         switch self {
@@ -92,6 +92,6 @@ enum ProjectPlatform: String, CaseIterable {
 
 enum ProjectStatus: String, CaseIterable {
     case draft = "下書き"
-    case published = "公開"
+    case published = "visibility.public"
     case archived = "アーカイブ"
 }

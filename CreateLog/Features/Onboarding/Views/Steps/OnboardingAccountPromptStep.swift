@@ -232,7 +232,7 @@ extension OnboardingAccountPromptStep {
 
 #Preview {
     OnboardingAccountPromptStep(
-        projectName: "つくろぐ",
+        projectName: "brand.wordmark.ja",
         platform: "iOS",
         isLoginMode: false,
         authViewModel: AuthViewModel(authService: NoOpAuthService()),

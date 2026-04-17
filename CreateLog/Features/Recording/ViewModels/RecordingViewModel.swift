@@ -45,9 +45,9 @@ final class RecordingViewModel {
     // MARK: - Constants
 
     static let genres: [(name: String, activities: [String])] = [
-        ("プログラミング", ["iOS開発", "Android開発", "Web開発", "バックエンド", "インフラ", "バグ修正"]),
-        ("デザイン", ["UIデザイン", "UXデザイン", "グラフィック", "ロゴ制作"]),
-        ("学習", ["プログラミング学習", "語学", "読書", "資格勉強"]),
+        ("プログラミング", ["iOS開発", "Android開発", "Web開発", "onboarding.platform.backend", "インフラ", "バグ修正"]),
+        ("onboarding.role.design", ["UIデザイン", "UXデザイン", "グラフィック", "ロゴ制作"]),
+        ("category.learn", ["プログラミング学習", "語学", "読書", "資格勉強"]),
         ("クリエイティブ", ["動画制作", "音楽制作", "ライティング", "ブログ"]),
         ("ビジネス", ["マーケティング", "営業", "企画", "事務", "経理"]),
         ("コミュニケーション", ["ミーティング", "1on1", "レビュー", "メール対応"]),
@@ -93,12 +93,12 @@ final class RecordingViewModel {
     /// 一致しない場合は「その他」にフォールバックし、それも無ければ nil。
     private func resolveRemoteCategoryId(for categoryName: String?) -> UUID? {
         guard let name = categoryName else {
-            return remoteCategoryCache["その他"]
+            return remoteCategoryCache["common.other"]
         }
         if let id = remoteCategoryCache[name] {
             return id
         }
-        return remoteCategoryCache["その他"]
+        return remoteCategoryCache["common.other"]
     }
 
     private func loadTags() {
@@ -233,14 +233,14 @@ final class RecordingViewModel {
             endDate: endDate,
             durationMinutes: minutes,
             projectName: resolvedTag?.name ?? "その���",
-            categoryName: resolvedTag?.category?.name ?? "その他"
+            categoryName: resolvedTag?.category?.name ?? "common.other"
         )
         modelContext.insert(entry)
         HapticManager.success()
         loadEntries()
 
         // T7b: OfflineFirstLogRepository 経由で remote 同期 (失敗時は OfflineQueue に enqueue)
-        let title = resolvedTag?.name ?? "その他"
+        let title = resolvedTag?.name ?? "common.other"
         let categoryName = resolvedTag?.category?.name
         let remoteCategoryId = resolveRemoteCategoryId(for: categoryName)
         if let resolvedCategoryId = remoteCategoryId {
@@ -374,13 +374,13 @@ final class RecordingViewModel {
 
     nonisolated static func detectCategory(_ genre: String, activity: String) -> String {
         switch genre {
-        case "プログラミング": return "開発"
-        case "デザイン": return "デザイン"
-        case "学習": return "学習"
+        case "プログラミング": return "category.dev"
+        case "onboarding.role.design": return "onboarding.role.design"
+        case "category.learn": return "category.learn"
         case "クリエイティブ": return "ライティング"
         case "ビジネス": return "マーケティング"
         case "コミュニケーション": return "ミーティング"
-        default: return "その他"
+        default: return "common.other"
         }
     }
 

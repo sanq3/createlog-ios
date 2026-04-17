@@ -10,8 +10,8 @@ struct OnboardingAvatarStep: View {
 
     var body: some View {
         OnboardingQuestionShell(
-            title: "アイコンを選びましょう",
-            subtitle: "あとで変更できます",
+            title: "onboarding.project.icon.title",
+            subtitle: "onboarding.profileIntro.subtitle",
             isOptional: true,
             canAdvance: true,
             isSaving: viewModel.isSavingProfile,

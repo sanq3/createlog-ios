@@ -10,8 +10,8 @@ struct OnboardingDisplayNameStep: View {
 
     var body: some View {
         OnboardingQuestionShell(
-            title: "あなたの名前は?",
-            subtitle: "プロフィールに表示されます",
+            title: "onboarding.displayName.title",
+            subtitle: "onboarding.displayName.subtitle",
             isOptional: false,
             canAdvance: canAdvance,
             isSaving: viewModel.isSavingProfile,
@@ -26,7 +26,7 @@ struct OnboardingDisplayNameStep: View {
             onSkip: nil,
             input: {
                 OnboardingLabeledInput(label: nil) {
-                    TextField("例: つくろぐ太郎", text: $viewModel.displayName)
+                    TextField("onboarding.displayName.placeholder", text: $viewModel.displayName)
                         .textInputAutocapitalization(.words)
                         .submitLabel(.done)
                         .focused($focused)

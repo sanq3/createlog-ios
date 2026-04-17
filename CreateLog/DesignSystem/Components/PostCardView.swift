@@ -42,12 +42,12 @@ struct PostCardView: View {
                             Button {
                                 showReport = true
                             } label: {
-                                Label("報告する", systemImage: "exclamationmark.bubble")
+                                Label("report.action", systemImage: "exclamationmark.bubble")
                             }
                             Button(role: .destructive) {
                                 showBlock = true
                             } label: {
-                                Label("ブロックする", systemImage: "nosign")
+                                Label("profile.block", systemImage: "nosign")
                             }
                         } label: {
                             Image(systemName: "ellipsis")

@@ -9,28 +9,14 @@ import SwiftData
 struct OnboardingView: View {
     @Binding var isPresented: Bool
     var authViewModel: AuthViewModel
-    @Environment(\.modelContext) private var modelContext
-    @Environment(\.dependencies) private var dependencies
-
-    @State private var viewModel: OnboardingViewModel?
+    /// App 層 (`CreateLogApp.swift` の `@State`) で保持される単一 instance。
+    /// auth state 遷移時に本 View が再 mount されても currentStep と入力値は失われない。
+    var viewModel: OnboardingViewModel
 
     var body: some View {
         ZStack {
             Color.clBackground.ignoresSafeArea()
-
-            if let viewModel {
-                content(for: viewModel)
-            }
-        }
-        .task {
-            if viewModel == nil {
-                viewModel = OnboardingViewModel(
-                    modelContext: modelContext,
-                    profileRepository: dependencies.profileRepository,
-                    appRepository: dependencies.appRepository,
-                    authService: dependencies.authService
-                )
-            }
+            content(for: viewModel)
         }
     }
 
