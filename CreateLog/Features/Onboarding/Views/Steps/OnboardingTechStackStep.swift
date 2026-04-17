@@ -131,7 +131,7 @@ struct OnboardingTechStackStep: View {
 
     private func sectionView(_ section: Section) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(section.title)
+            Text(LocalizedStringKey(section.title))
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(Color.clTextPrimary.opacity(0.4))
                 .tracking(1)
@@ -165,7 +165,7 @@ struct OnboardingTechStackStep: View {
                 }
             }
         } label: {
-            Text(item)
+            Text(LocalizedStringKey(item))
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(selected ? Color.clBackground : Color.clTextPrimary)
                 .frame(maxWidth: .infinity)
@@ -202,7 +202,7 @@ struct OnboardingTechStackStep: View {
                 }
             }
         } label: {
-            Text(item)
+            Text(LocalizedStringKey(item))
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(selected ? Color.clBackground : Color.clTextPrimary.opacity(0.6))
                 .frame(maxWidth: .infinity)

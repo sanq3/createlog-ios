@@ -41,7 +41,7 @@ struct OnboardingRoleTagStep: View {
                                 viewModel.roleTags.insert(role)
                             }
                         } label: {
-                            Text(role)
+                            Text(LocalizedStringKey(role))
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundStyle(selected ? .white : Color.clTextPrimary)
                                 .padding(.horizontal, 14)

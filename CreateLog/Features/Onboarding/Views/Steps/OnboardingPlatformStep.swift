@@ -88,7 +88,7 @@ struct OnboardingPlatformStep: View {
             }
         } label: {
             HStack(spacing: 6) {
-                Text(platform)
+                Text(LocalizedStringKey(platform))
                     .font(.system(size: 16, weight: .semibold))
                 if selected {
                     Image(systemName: "checkmark")

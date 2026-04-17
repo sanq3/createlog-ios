@@ -33,7 +33,7 @@ struct OnboardingProjectStatusStep: View {
                                     .font(.system(size: 20, weight: .semibold))
                                     .foregroundStyle(viewModel.releaseStatus == status ? Color.clAccent : Color.clTextPrimary.opacity(0.3))
 
-                                Text(status.displayName)
+                                Text(LocalizedStringKey(status.displayName))
                                     .font(.system(size: 16, weight: .medium))
                                     .foregroundStyle(Color.clTextPrimary)
 

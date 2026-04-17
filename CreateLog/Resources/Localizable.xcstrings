@@ -1,6 +1,120 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    "" : {
+
+    },
+    " " : {
+
+    },
+    "-" : {
+
+    },
+    "(%lld)" : {
+
+    },
+    "「%@」を報告する理由を選択してください" : {
+
+    },
+    "「削除」と入力" : {
+
+    },
+    "@" : {
+
+    },
+    "@%@" : {
+
+    },
+    "@%@ に返信..." : {
+
+    },
+    "@%@ に返信中" : {
+
+    },
+    "@%@ をブロック" : {
+
+    },
+    "%@" : {
+
+    },
+    "%@ / %@" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ / %2$@"
+          }
+        }
+      }
+    },
+    "%@のフォローを解除しますか？" : {
+
+    },
+    "%lld" : {
+
+    },
+    "%lld/%lld" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld/%2$lld"
+          }
+        }
+      }
+    },
+    "%lld%%" : {
+
+    },
+    "%lld件のレビュー" : {
+
+    },
+    "%lld月のサマリー" : {
+
+    },
+    "1-2 行で簡潔に" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep it to 1-2 lines"
+          }
+        }
+      }
+    },
+    "14:30 ・ 2026年3月28日" : {
+
+    },
+    "Android 開発" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android dev"
+          }
+        }
+      }
+    },
+    "App Store / Google Play / Web サイト など" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store / Google Play / website, etc."
+          }
+        }
+      }
+    },
+    "Category" : {
+
+    },
+    "CL" : {
+
+    },
+    "Coming Soon" : {
+
+    },
     "common.continue" : {
       "localizations" : {
         "en" : {
@@ -49,21 +163,39 @@
         }
       }
     },
-    "onboarding.action.skip" : {
+    "CreateLog" : {
+
+    },
+    "CreateLog Premium" : {
+
+    },
+    "CreateLog レポート" : {
+
+    },
+    "createlog.app" : {
+
+    },
+    "CreateLogで繋がろう!" : {
+
+    },
+    "CreateLogユーザーのQRコードを\nカメラに映してください" : {
+
+    },
+    "Day" : {
+
+    },
+    "GitHub リポジトリは?" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Set up later"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "あとで設定する"
+            "value" : "GitHub repository?"
           }
         }
       }
+    },
+    "h" : {
+
     },
     "home.empty.following" : {
       "localizations" : {
@@ -129,6 +261,21 @@
         }
       }
     },
+    "Hours" : {
+
+    },
+    "https://" : {
+
+    },
+    "https://..." : {
+
+    },
+    "https://apps.apple.com/..." : {
+
+    },
+    "https://github.com/..." : {
+
+    },
     "integration.comingSoon" : {
       "localizations" : {
         "en" : {
@@ -193,6 +340,17 @@
         }
       }
     },
+    "iOS 開発" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS dev"
+          }
+        }
+      }
+    },
     "legal.lastUpdated" : {
       "localizations" : {
         "en" : {
@@ -240,6 +398,12 @@
           }
         }
       }
+    },
+    "m" : {
+
+    },
+    "OK" : {
+
     },
     "onboarding.account.button.login %@" : {
       "localizations" : {
@@ -333,6 +497,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アカウントを作成"
+          }
+        }
+      }
+    },
+    "onboarding.action.skip" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set up later"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "あとで設定する"
           }
         }
       }
@@ -432,6 +612,19 @@
           }
         }
       }
+    },
+    "OSS なら公開しておくと反応がもらえます" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Publishing OSS helps get feedback"
+          }
+        }
+      }
+    },
+    "QRコードをスキャン" : {
+
     },
     "settings.account" : {
       "localizations" : {
@@ -769,22 +962,6 @@
         }
       }
     },
-    "support.categoryLabel" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Category"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "カテゴリ"
-          }
-        }
-      }
-    },
     "support.category.account" : {
       "localizations" : {
         "en" : {
@@ -845,6 +1022,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "その他"
+          }
+        }
+      }
+    },
+    "support.categoryLabel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Category"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カテゴリ"
           }
         }
       }
@@ -929,6 +1122,16 @@
         }
       }
     },
+    "Swift学習" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swift Learning"
+          }
+        }
+      }
+    },
     "tab.discover" : {
       "localizations" : {
         "en" : {
@@ -1009,42 +1212,58 @@
         }
       }
     },
-    "1-2 行で簡潔に" : {
+    "username" : {
+
+    },
+    "Web 開発" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keep it to 1-2 lines"
+            "value" : "Web dev"
           }
         }
       }
     },
-    "App Store / Google Play / Web サイト など" : {
+    "アイコンを選びましょう" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App Store / Google Play / website, etc."
+            "value" : "Choose an icon"
           }
         }
       }
     },
-    "GitHub リポジトリは?" : {
+    "アカウント" : {
+
+    },
+    "アカウントの削除" : {
+
+    },
+    "アカウントを削除" : {
+
+    },
+    "アカウントを削除すると、全てのデータが完全に削除されます。この操作は取り消せません。" : {
+
+    },
+    "アカウント作成完了!" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "GitHub repository?"
+            "value" : "Account created!"
           }
         }
       }
     },
-    "OSS なら公開しておくと反応がもらえます" : {
+    "アカウント作成後に詳細を設定できます" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Publishing OSS helps get feedback"
+            "value" : "You can configure details after creating an account"
           }
         }
       }
@@ -1069,12 +1288,191 @@
         }
       }
     },
-    "アイコンを選びましょう" : {
+    "あなたを見つけるための一意のIDです" : {
+
+    },
+    "アプリの説明を入力" : {
+
+    },
+    "アプリ名を入力" : {
+
+    },
+    "いいね %lld" : {
+
+    },
+    "いいね・コメント・フォロー・メンション・リポストの通知がすべて送信されます。" : {
+
+    },
+    "いいね、フォロー、コメントなどの\n通知がここに表示されます" : {
+
+    },
+    "いつでも見返せる作業の記録" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Choose an icon"
+            "value" : "A work log you can always revisit"
+          }
+        }
+      }
+    },
+    "いまなにしてる?" : {
+
+    },
+    "エラー" : {
+
+    },
+    "エンジニアのための\n作業記録プラットフォーム" : {
+
+    },
+    "オフライン" : {
+
+    },
+    "カテゴリ別" : {
+
+    },
+    "カメラへのアクセスが必要です" : {
+
+    },
+    "キャンセル" : {
+
+    },
+    "このハンドルで決定" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use this handle"
+          }
+        }
+      }
+    },
+    "このハンドルは使えます" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This handle is available"
+          }
+        }
+      }
+    },
+    "このハンドルは既に使われています" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This handle is already taken"
+          }
+        }
+      }
+    },
+    "この操作は取り消せません。確認のため「削除」と入力してください。" : {
+
+    },
+    "コピーしました!" : {
+
+    },
+    "コメントを追加..." : {
+
+    },
+    "これらの機能は今後のアップデートで公開予定です。" : {
+
+    },
+    "サービス名を入力" : {
+
+    },
+    "シェアする" : {
+
+    },
+    "スキップ（サービスなし）" : {
+
+    },
+    "スキル" : {
+
+    },
+    "スキルを追加..." : {
+
+    },
+    "スタートアップ" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Startup"
+          }
+        }
+      }
+    },
+    "ステータス" : {
+
+    },
+    "その他" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other"
+          }
+        }
+      }
+    },
+    "タイマーや手入力で開発時間を記録" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Track dev time with timer or manual entry"
+          }
+        }
+      }
+    },
+    "タイムラインに追加される" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added to your timeline"
+          }
+        }
+      }
+    },
+    "タグを入力" : {
+
+    },
+    "タップで色を変更" : {
+
+    },
+    "つくろぐ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CreateLog"
+          }
+        }
+      }
+    },
+    "つくろぐへようこそ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to CreateLog"
+          }
+        }
+      }
+    },
+    "デザイン" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Design"
           }
         }
       }
@@ -1099,12 +1497,13 @@
         }
       }
     },
-    "ひとこと自己紹介" : {
+    "バックエンド" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "One-line intro"
+            "value" : "Backend"
           }
         }
       }
@@ -1119,7 +1518,53 @@
         }
       }
     },
+    "ハンドルを設定" : {
+
+    },
+    "ひとこと自己紹介" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One-line intro"
+          }
+        }
+      }
+    },
+    "フォロー" : {
+
+    },
+    "フォローする" : {
+
+    },
+    "フォロー中" : {
+
+    },
+    "フォロー解除" : {
+
+    },
+    "プラットフォーム" : {
+
+    },
+    "フレームワーク" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frameworks"
+          }
+        }
+      }
+    },
+    "プレミアム" : {
+
+    },
+    "プレミアム機能は今後のアップデートで公開予定です" : {
+
+    },
     "プロジェクトの名前は?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1128,6 +1573,19 @@
           }
         }
       }
+    },
+    "プロジェクトの名前は？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's your project's name?"
+          }
+        }
+      }
+    },
+    "プロジェクト登録" : {
+
     },
     "プロダクトのアイコン" : {
       "localizations" : {
@@ -1139,22 +1597,21 @@
         }
       }
     },
+    "ブロックする" : {
+
+    },
+    "ブロックすると相手はあなたのプロフィール、投稿、フォロワーリストを見ることができなくなります。相手には通知されません。" : {
+
+    },
+    "ブロックを解除" : {
+
+    },
     "プロフィール URL とメンションに使われます" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Used for your profile URL and mentions"
-          }
-        }
-      }
-    },
-    "プロフィールに表示されます" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shown on your profile"
           }
         }
       }
@@ -1169,235 +1626,37 @@
         }
       }
     },
-    "今のリリース状況は?" : {
+    "プロフィールに表示されます" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "What's the current release status?"
+            "value" : "Shown on your profile"
           }
         }
       }
     },
-    "何をしている人ですか?" : {
+    "プロフィールをシェア" : {
+
+    },
+    "プロフィールを編集" : {
+
+    },
+    "プロフィールを見る" : {
+
+    },
+    "プロフィールを設定しましょう" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "What do you do?"
+            "value" : "Let's set up your profile"
           }
         }
       }
     },
-    "使用している技術は?" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Which technologies do you use?"
-          }
-        }
-      }
-    },
-    "公開 URL はありますか?" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Do you have a public URL?"
-          }
-        }
-      }
-    },
-    "現在製作中、制作予定の\nプラットフォームは?" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "What platforms\nare you building for?"
-          }
-        }
-      }
-    },
-    "作業を記録する" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Record your work"
-          }
-        }
-      }
-    },
-    "タイムラインに追加される" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Added to your timeline"
-          }
-        }
-      }
-    },
-    "タイマーや手入力で開発時間を記録" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Track dev time with timer or manual entry"
-          }
-        }
-      }
-    },
-    "いつでも見返せる作業の記録" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A work log you can always revisit"
-          }
-        }
-      }
-    },
-    "記録" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Record"
-          }
-        }
-      }
-    },
-    "記録する" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Record"
-          }
-        }
-      }
-    },
-    "続ける" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continue"
-          }
-        }
-      }
-    },
-    "複数選択できます" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can choose multiple"
-          }
-        }
-      }
-    },
-    "今日" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Today"
-          }
-        }
-      }
-    },
-    "累計" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Total"
-          }
-        }
-      }
-    },
-    "先週比" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "vs last week"
-          }
-        }
-      }
-    },
-    "今週" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This week"
-          }
-        }
-      }
-    },
-    "今月" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This month"
-          }
-        }
-      }
-    },
-    "開発" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dev"
-          }
-        }
-      }
-    },
-    "デザイン" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Design"
-          }
-        }
-      }
-    },
-    "学習" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Learn"
-          }
-        }
-      }
-    },
-    "設計" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Plan"
-          }
-        }
-      }
-    },
-    "つくろぐ" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CreateLog"
-          }
-        }
-      }
+    "ベストデイ" : {
+
     },
     "ポートフォリオ" : {
       "localizations" : {
@@ -1409,82 +1668,90 @@
         }
       }
     },
-    "Swift学習" : {
+    "マイプロダクト" : {
+
+    },
+    "マイプロダクトはまだ登録されていません" : {
+
+    },
+    "まだいいねした投稿がありません" : {
+
+    },
+    "まだブックマークした投稿がありません" : {
+
+    },
+    "まだ投稿がありません" : {
+
+    },
+    "まだ決めていない" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Swift Learning"
+            "value" : "Not decided yet"
           }
         }
       }
     },
-    "月" : {
+    "まだ記録がありません" : {
+
+    },
+    "ユーザー" : {
+
+    },
+    "ユーザー、タグ、プロジェクトを検索" : {
+
+    },
+    "ユーザー名" : {
+
+    },
+    "よくやる作業をタグとして登録すると\nタップ+時間入力だけで記録できます" : {
+
+    },
+    "より深い分析と快適な体験を" : {
+
+    },
+    "リンクを追加" : {
+
+    },
+    "レビューを依頼する" : {
+
+    },
+    "レポート" : {
+
+    },
+    "レポートをシェア" : {
+
+    },
+    "ログアウト" : {
+
+    },
+    "ログアウトしますか？" : {
+
+    },
+    "今のリリース状況は?" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mon"
+            "value" : "What's the current release status?"
           }
         }
       }
     },
-    "火" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tue"
-          }
-        }
-      }
+    "今後追加" : {
+
     },
-    "水" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wed"
-          }
-        }
-      }
+    "今後追加予定" : {
+
     },
-    "木" : {
+    "今日" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Thu"
-          }
-        }
-      }
-    },
-    "金" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fri"
-          }
-        }
-      }
-    },
-    "土" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sat"
-          }
-        }
-      }
-    },
-    "日" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sun"
+            "value" : "Today"
           }
         }
       }
@@ -1499,72 +1766,85 @@
         }
       }
     },
-    "アカウント作成完了!" : {
+    "今月" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Account created!"
+            "value" : "This month"
           }
         }
       }
     },
-    "プロフィールを設定しましょう" : {
+    "今月のカテゴリ" : {
+
+    },
+    "今週" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Let's set up your profile"
+            "value" : "This week"
           }
         }
       }
     },
-    "準備完了!" : {
+    "他の開発者をフォローすると、ここに投稿が流れます" : {
+
+    },
+    "任意" : {
+
+    },
+    "何をしている人ですか?" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "All set!"
+            "value" : "What do you do?"
           }
         }
       }
     },
-    "つくろぐへようこそ" : {
+    "作成" : {
+
+    },
+    "作業を記録する" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Welcome to CreateLog"
+            "value" : "Record your work"
           }
         }
       }
     },
-    "保存中" : {
+    "使用している技術は?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saving"
+            "value" : "Which technologies do you use?"
           }
         }
       }
     },
-    "保存した" : {
+    "使用している技術は？" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saved"
+            "value" : "Which technologies do you use?"
           }
         }
       }
     },
-    "アカウント作成後に詳細を設定できます" : {
+    "例 つくろぐ" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can configure details after creating an account"
+            "value" : "e.g. CreateLog"
           }
         }
       }
@@ -1589,16 +1869,6 @@
         }
       }
     },
-    "例 つくろぐ" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "e.g. CreateLog"
-          }
-        }
-      }
-    },
     "例: 集中時間を記録するポモドーロタイマー" : {
       "localizations" : {
         "en" : {
@@ -1609,62 +1879,258 @@
         }
       }
     },
-    "ハンドルを決めよう" : {
+    "保存" : {
+
+    },
+    "保存した" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Choose your handle"
+            "value" : "Saved"
           }
         }
       }
     },
-    "このハンドルで決定" : {
+    "保存中" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use this handle"
+            "value" : "Saving"
           }
         }
       }
     },
-    "このハンドルは使えます" : {
+    "保存中..." : {
+
+    },
+    "個人開発" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This handle is available"
+            "value" : "Solo dev"
           }
         }
       }
     },
-    "このハンドルは既に使われています" : {
+    "先週比" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This handle is already taken"
+            "value" : "vs last week"
           }
         }
       }
     },
-    "プロジェクトの名前は？" : {
+    "公開" : {
+
+    },
+    "公開 URL はありますか?" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "What's your project's name?"
+            "value" : "Do you have a public URL?"
           }
         }
       }
     },
-    "使用している技術は？" : {
+    "内容を確認の上、対応いたします。\nご協力ありがとうございます。" : {
+
+    },
+    "最多カテゴリ" : {
+
+    },
+    "最近の記録" : {
+
+    },
+    "利用可否を確認" : {
+
+    },
+    "利用可能です" : {
+
+    },
+    "削除する" : {
+
+    },
+    "合計時間" : {
+
+    },
+    "土" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Which technologies do you use?"
+            "value" : "Sat"
+          }
+        }
+      }
+    },
+    "報告" : {
+
+    },
+    "報告する" : {
+
+    },
+    "報告を受け付けました" : {
+
+    },
+    "報告を送信" : {
+
+    },
+    "報告内容の詳細を入力" : {
+
+    },
+    "外部リンク" : {
+
+    },
+    "学生" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Student"
+          }
+        }
+      }
+    },
+    "開発中" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Development"
+          }
+        }
+      }
+    },
+    "公開中" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Published"
+          }
+        }
+      }
+    },
+    "停止" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archived"
+          }
+        }
+      }
+    },
+    "学習" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learn"
+          }
+        }
+      }
+    },
+    "投稿" : {
+
+    },
+    "探索するものがまだありません" : {
+
+    },
+    "新しいサービスを追加" : {
+
+    },
+    "既に使われています" : {
+
+    },
+    "日" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sun"
+          }
+        }
+      }
+    },
+    "月" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mon"
+          }
+        }
+      }
+    },
+    "期間" : {
+
+    },
+    "木" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thu"
+          }
+        }
+      }
+    },
+    "未評価" : {
+
+    },
+    "検索" : {
+
+    },
+    "水" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wed"
+          }
+        }
+      }
+    },
+    "準備完了!" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All set!"
+          }
+        }
+      }
+    },
+    "火" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tue"
+          }
+        }
+      }
+    },
+    "現在はすべての機能を無料でご利用いただけます。公開時に改めてアプリ内でご案内します。" : {
+
+    },
+    "現在製作中、制作予定の\nプラットフォームは?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What platforms\nare you building for?"
           }
         }
       }
@@ -1679,7 +2145,68 @@
         }
       }
     },
+    "確認中..." : {
+
+    },
+    "端末の設定アプリで管理します" : {
+
+    },
+    "累計" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
+          }
+        }
+      }
+    },
+    "累計 %lldh" : {
+
+    },
+    "経験年数" : {
+
+    },
+    "続ける" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        }
+      }
+    },
+    "職業" : {
+
+    },
+    "自己紹介を入力..." : {
+
+    },
+    "興味カテゴリ" : {
+
+    },
+    "英数字と_のみ、3〜15文字" : {
+
+    },
+    "英数字とアンダースコア、3-15文字" : {
+
+    },
+    "表示名" : {
+
+    },
+    "複数選択できます" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can choose multiple"
+          }
+        }
+      }
+    },
     "言語" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1689,105 +2216,99 @@
         }
       }
     },
-    "フレームワーク" : {
+    "記録" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Frameworks"
+            "value" : "Record"
           }
         }
       }
     },
-    "その他" : {
+    "記録しました" : {
+
+    },
+    "記録する" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Other"
+            "value" : "Record"
           }
         }
       }
     },
-    "まだ決めていない" : {
+    "記録する項目を作ろう" : {
+
+    },
+    "設定からカメラへのアクセスを\n許可してください" : {
+
+    },
+    "設定を開く" : {
+
+    },
+    "設計" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Not decided yet"
+            "value" : "Plan"
           }
         }
       }
     },
-    "iOS 開発" : {
+    "詳細（任意）" : {
+
+    },
+    "返信" : {
+
+    },
+    "追加" : {
+
+    },
+    "通知" : {
+
+    },
+    "通知の許可設定" : {
+
+    },
+    "通知はありません" : {
+
+    },
+    "週間の推移" : {
+
+    },
+    "週間推移" : {
+
+    },
+    "金" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iOS dev"
+            "value" : "Fri"
           }
         }
       }
     },
-    "Android 開発" : {
+    "閉じる" : {
+
+    },
+    "開発" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Android dev"
+            "value" : "Dev"
           }
         }
       }
     },
-    "Web 開発" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Web dev"
-          }
-        }
-      }
-    },
-    "バックエンド" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Backend"
-          }
-        }
-      }
-    },
-    "個人開発" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Solo dev"
-          }
-        }
-      }
-    },
-    "スタートアップ" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Startup"
-          }
-        }
-      }
-    },
-    "学生" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Student"
-          }
-        }
-      }
+    "開発者の返信" : {
+
     }
   },
   "version" : "1.0"
