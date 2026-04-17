@@ -31,7 +31,7 @@ struct OnboardingPlatformStep: View {
 
                 Spacer().frame(height: 8)
 
-                Text("複数選択できます")
+                Text("onboarding.tech.subtitle")
                     .font(.system(size: 14))
                     .foregroundStyle(Color.clTextPrimary.opacity(0.5))
                     .opacity(appeared ? 1 : 0)

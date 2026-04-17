@@ -203,7 +203,7 @@ struct TagCreationWizard: View {
             // New project input
             if showNewProjectInput {
                 HStack(spacing: 8) {
-                    TextField("サービス名を入力", text: $viewModel.projectName)
+                    TextField("onboarding.project.service.input", text: $viewModel.projectName)
                         .font(.system(size: 14))
                         .foregroundStyle(Color.clTextPrimary)
                         .focused($isProjectNameFocused)
@@ -222,7 +222,7 @@ struct TagCreationWizard: View {
                         viewModel.saveTag(withProjectName: viewModel.projectName.isEmpty ? nil : viewModel.projectName)
                         dismiss()
                     } label: {
-                        Text("作成")
+                        Text("common.create")
                             .font(.system(size: 13, weight: .bold))
                             .foregroundStyle(.white)
                             .padding(.horizontal, 16)
@@ -245,7 +245,7 @@ struct TagCreationWizard: View {
                     HStack(spacing: 4) {
                         Image(systemName: "plus")
                             .font(.system(size: 11, weight: .medium))
-                        Text("新しいサービスを追加")
+                        Text("profile.myProducts.add")
                             .font(.system(size: 13, weight: .medium))
                     }
                     .foregroundStyle(Color.clTextTertiary)
@@ -264,7 +264,7 @@ struct TagCreationWizard: View {
                 viewModel.saveTag(withProjectName: nil)
                 dismiss()
             } label: {
-                Text("スキップ（サービスなし）")
+                Text("common.skipNoProduct")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(Color.clTextTertiary)
                     .padding(.top, 4)

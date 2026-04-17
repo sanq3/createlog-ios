@@ -21,13 +21,13 @@ struct OnboardingSavingStep: View {
                 Spacer()
 
                 ZStack {
-                    Text("保存中")
+                    Text("action.saving")
                         .font(.system(size: 34, weight: .bold))
                         .foregroundStyle(Color.clTextPrimary.opacity(0.4))
                         .opacity(showSaving && !savedText ? 1 : 0)
                         .blur(radius: savedText ? 6 : 0)
 
-                    Text("保存した")
+                    Text("action.saved")
                         .font(.system(size: 34, weight: .bold))
                         .foregroundStyle(Color.clTextPrimary)
                         .opacity(savedText ? 1 : 0)
@@ -108,7 +108,7 @@ struct OnboardingSavingStep: View {
                         .lineLimit(1)
                 }
 
-                Text("アカウント作成後に詳細を設定できます")
+                Text("onboarding.profileIntro.hint")
                     .font(.system(size: 11))
                     .foregroundStyle(Color.clTextPrimary.opacity(0.3))
                     .lineLimit(1)

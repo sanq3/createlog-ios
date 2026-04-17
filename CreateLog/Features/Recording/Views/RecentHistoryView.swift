@@ -7,7 +7,7 @@ struct RecentHistoryView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("最近の記録")
+            Text("recording.recentRecords")
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(Color.clTextTertiary)
                 .textCase(.uppercase)
@@ -26,7 +26,7 @@ struct RecentHistoryView: View {
     }
 
     private var emptyState: some View {
-        Text("まだ記録がありません")
+        Text("recording.empty")
             .font(.system(size: 13))
             .foregroundStyle(Color.clTextTertiary)
             .frame(maxWidth: .infinity)

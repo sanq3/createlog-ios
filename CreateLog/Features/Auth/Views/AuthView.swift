@@ -11,7 +11,7 @@ struct AuthView: View {
 
             // Logo + Title (タイポグラフィのみ、記号・アイコン不使用)
             VStack(spacing: 12) {
-                Text("つくろぐ")
+                Text("brand.wordmark.ja")
                     .font(.system(size: 40, weight: .bold, design: .rounded))
                     .foregroundStyle(Color.clTextPrimary)
                     .tracking(2)

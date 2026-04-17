@@ -31,7 +31,7 @@ struct TimePickerSection: View {
                     }
                     .transition(.opacity.combined(with: .scale(scale: 0.9)))
                 } else {
-                    Text("その他")
+                    Text("common.other")
                         .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(Color.clTextTertiary)
                 }
@@ -41,7 +41,7 @@ struct TimePickerSection: View {
                 Button {
                     save()
                 } label: {
-                    Text("記録")
+                    Text("recording.title")
                         .font(.system(size: 14, weight: .bold))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 24)
@@ -84,7 +84,7 @@ struct TimePickerSection: View {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 32))
                 .foregroundStyle(tagColor)
-            Text("記録しました")
+            Text("recording.saved")
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(Color.clTextPrimary)
         }

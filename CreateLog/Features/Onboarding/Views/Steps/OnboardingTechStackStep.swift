@@ -80,7 +80,7 @@ struct OnboardingTechStackStep: View {
             VStack(spacing: 0) {
                 Spacer().frame(height: 90)
 
-                Text("使用している技術は？")
+                Text("onboarding.tech.title")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary)
                     .tracking(-0.5)

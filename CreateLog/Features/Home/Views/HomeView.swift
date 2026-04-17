@@ -284,7 +284,7 @@ struct HomeView: View {
                 .font(.clBody)
                 .foregroundStyle(Color.clTextSecondary)
             if segmentIndex == 1 {
-                Text("他の開発者をフォローすると、ここに投稿が流れます")
+                Text("post.empty.following")
                     .font(.clCaption)
                     .foregroundStyle(Color.clTextTertiary)
                     .multilineTextAlignment(.center)

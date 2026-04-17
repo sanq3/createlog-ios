@@ -26,7 +26,7 @@ struct OnboardingDisplayNameStep: View {
             onSkip: nil,
             input: {
                 OnboardingLabeledInput(label: nil) {
-                    TextField("例: つくろぐ太郎", text: $viewModel.displayName)
+                    TextField("onboarding.displayName.placeholder", text: $viewModel.displayName)
                         .textInputAutocapitalization(.words)
                         .submitLabel(.done)
                         .focused($focused)

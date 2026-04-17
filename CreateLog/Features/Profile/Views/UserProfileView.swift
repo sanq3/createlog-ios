@@ -48,19 +48,19 @@ struct UserProfileView: View {
                     Button(role: .destructive) {
                         showReportSheet = true
                     } label: {
-                        Label("報告する", systemImage: "exclamationmark.triangle")
+                        Label("report.action", systemImage: "exclamationmark.triangle")
                     }
                     if isBlocked {
                         Button {
                             Task { await unblock() }
                         } label: {
-                            Label("ブロックを解除", systemImage: "slash.circle")
+                            Label("profile.unblock", systemImage: "slash.circle")
                         }
                     } else {
                         Button(role: .destructive) {
                             showBlockConfirmation = true
                         } label: {
-                            Label("ブロックする", systemImage: "slash.circle")
+                            Label("profile.block", systemImage: "slash.circle")
                         }
                     }
                 } label: {
@@ -76,10 +76,10 @@ struct UserProfileView: View {
             isPresented: $showUnfollowConfirmation,
             titleVisibility: .visible
         ) {
-            Button("フォロー解除", role: .destructive) {
+            Button("profile.unfollow", role: .destructive) {
                 toggleFollow()
             }
-            Button("キャンセル", role: .cancel) {}
+            Button("common.cancel", role: .cancel) {}
         }
         .sheet(isPresented: $showBlockConfirmation) {
             BlockConfirmSheet(userName: user.name, userHandle: user.handle) {
@@ -91,7 +91,7 @@ struct UserProfileView: View {
                 Task { await submitReport(reason: reason, detail: detail) }
             }
         }
-        .alert("エラー", isPresented: Binding(
+        .alert("common.error", isPresented: Binding(
             get: { blockErrorMessage != nil },
             set: { if !$0 { blockErrorMessage = nil } }
         )) {
@@ -313,13 +313,13 @@ struct UserProfileView: View {
 
     private var servicesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("マイプロダクト")
+            Text("profile.myProducts")
                 .font(.clHeadline)
                 .foregroundStyle(Color.clTextSecondary)
                 .padding(.horizontal, 16)
 
             if remoteProjects.isEmpty {
-                Text("マイプロダクトはまだ登録されていません")
+                Text("profile.myProducts.empty")
                     .font(.clCaption)
                     .foregroundStyle(Color.clTextTertiary)
                     .padding(.horizontal, 16)
@@ -336,14 +336,14 @@ struct UserProfileView: View {
 
     private var postsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("投稿")
+            Text("post.title")
                 .font(.clHeadline)
                 .foregroundStyle(Color.clTextSecondary)
                 .padding(.horizontal, 16)
 
             LazyVStack(spacing: 12) {
                 if remotePosts.isEmpty {
-                    Text("まだ投稿がありません")
+                    Text("post.empty")
                         .font(.clCaption)
                         .foregroundStyle(Color.clTextTertiary)
                         .padding(.horizontal, 16)
@@ -461,7 +461,7 @@ struct UserProfileView: View {
                     .foregroundStyle(Color.clTextTertiary)
             }
         } else {
-            Text("未評価")
+            Text("rating.unrated")
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(Color.clTextTertiary)
         }

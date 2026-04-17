@@ -229,7 +229,7 @@ struct OnboardingAppShowcaseStep: View {
         ZStack {
             VStack(spacing: 0) {
                 Spacer().frame(height: 46)
-                Text("記録")
+                Text("recording.title")
                     .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary)
                 Spacer().frame(height: 14)
@@ -286,7 +286,7 @@ struct OnboardingAppShowcaseStep: View {
                             newRecordAppeared = true
                         }
                     } label: {
-                        Text("記録する")
+                        Text("recording.action")
                             .font(.system(size: 10, weight: .bold))
                             .foregroundStyle(Color.clBackground)
                             .padding(.horizontal, 20)
@@ -329,7 +329,7 @@ struct OnboardingAppShowcaseStep: View {
     private var timelineScreenView: some View {
         VStack(spacing: 0) {
             Spacer().frame(height: 46)
-            Text("記録")
+            Text("recording.title")
                 .font(.system(size: 13, weight: .bold))
                 .foregroundStyle(Color.clTextPrimary)
             Spacer().frame(height: 12)
@@ -343,7 +343,7 @@ struct OnboardingAppShowcaseStep: View {
                         .contentTransition(.numericText(countsDown: false))
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
-                    Text("今日")
+                    Text("recording.today")
                         .font(.system(size: 7, weight: .medium))
                         .foregroundStyle(Color.clTextPrimary.opacity(0.5))
                 }
@@ -376,7 +376,7 @@ struct OnboardingAppShowcaseStep: View {
 
             // タイムラインセクション
             HStack {
-                Text("今日の記録")
+                Text("recording.todayRecords")
                     .font(.system(size: 9, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary.opacity(0.5))
                 Spacer()

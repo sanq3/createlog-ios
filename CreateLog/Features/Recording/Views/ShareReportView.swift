@@ -14,7 +14,7 @@ struct ShareReportView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 // Period selector
-                Picker("期間", selection: $selectedPeriod) {
+                Picker("recording.duration", selection: $selectedPeriod) {
                     ForEach(SharePeriod.allCases) { period in
                         Text(period.label).tag(period)
                     }
@@ -45,7 +45,7 @@ struct ShareReportView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "square.and.arrow.up")
                             .font(.system(size: 15, weight: .semibold))
-                        Text("シェアする")
+                        Text("common.share")
                             .font(.system(size: 16, weight: .bold))
                     }
                     .foregroundStyle(.white)
@@ -58,7 +58,7 @@ struct ShareReportView: View {
                 .padding(.bottom, 20)
             }
             .background(Color.clBackground)
-            .navigationTitle("レポートをシェア")
+            .navigationTitle("recording.report.share")
             .navigationBarTitleDisplayMode(.inline)
             .task {
                 if let dto = try? await dependencies.profileRepository.fetchMyProfile() {
@@ -105,7 +105,7 @@ struct ShareReportView: View {
                 Spacer()
                 // App logo watermark
                 VStack(spacing: 2) {
-                    Text("つくろぐ")
+                    Text("brand.wordmark.ja")
                         .font(.system(size: 11, weight: .heavy))
                     Text("CreateLog")
                         .font(.system(size: 9, weight: .bold))

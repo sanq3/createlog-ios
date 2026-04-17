@@ -143,7 +143,7 @@ struct CalendarView: View {
                         Text(String(format: "%.1fh", Double(viewModel.monthTotalMinutes) / 60.0))
                             .font(.clNumber)
                             .foregroundStyle(Color.clTextPrimary)
-                        Text("合計時間")
+                        Text("recording.totalTime")
                             .font(.clCaption)
                             .foregroundStyle(Color.clTextTertiary)
                     }
@@ -154,7 +154,7 @@ struct CalendarView: View {
                             .foregroundStyle(Color.clTextPrimary)
                             .lineLimit(1)
                             .minimumScaleFactor(0.5)
-                        Text("最多カテゴリ")
+                        Text("recording.topCategory")
                             .font(.clCaption)
                             .foregroundStyle(Color.clTextTertiary)
                     }
@@ -163,7 +163,7 @@ struct CalendarView: View {
                         Text(viewModel.bestDay > 0 ? "\(viewModel.displayMonth)/\(viewModel.bestDay)" : "-")
                             .font(.clNumber)
                             .foregroundStyle(Color.clTextPrimary)
-                        Text("ベストデイ")
+                        Text("recording.bestDay")
                             .font(.clCaption)
                             .foregroundStyle(Color.clTextTertiary)
                     }

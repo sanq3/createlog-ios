@@ -55,7 +55,7 @@ struct NotificationsView: View {
         }
         .scrollIndicators(.hidden)
         .background(Color.clBackground)
-        .navigationTitle("通知")
+        .navigationTitle("notification.title")
         .refreshable {
             await viewModel?.loadNotifications()
         }
@@ -208,7 +208,7 @@ struct NotificationsView: View {
                 .font(.system(size: 40, weight: .light))
                 .foregroundStyle(Color.clTextTertiary)
 
-            Text("通知はありません")
+            Text("notification.empty")
                 .font(.clHeadline)
                 .foregroundStyle(Color.clTextSecondary)
 

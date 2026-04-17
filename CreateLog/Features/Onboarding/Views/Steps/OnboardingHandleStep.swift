@@ -21,7 +21,7 @@ struct OnboardingHandleStep: View {
             VStack(spacing: 0) {
                 Spacer().frame(height: 100)
 
-                Text("ハンドルを決めよう")
+                Text("onboarding.handle.title")
                     .font(.system(size: 26, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary)
                     .tracking(-0.5)
@@ -30,7 +30,7 @@ struct OnboardingHandleStep: View {
 
                 Spacer().frame(height: 12)
 
-                Text("プロフィール URL とメンションに使われます")
+                Text("onboarding.handle.subtitle")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(Color.clTextPrimary.opacity(0.55))
                     .multilineTextAlignment(.center)

@@ -124,7 +124,7 @@ struct DiscoverView: View {
                 } else {
                     if !results.users.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("ユーザー")
+                            Text("profile.users")
                                 .font(.clHeadline)
                                 .padding(.horizontal, 20)
                             ForEach(results.users, id: \.id) { profile in
@@ -134,7 +134,7 @@ struct DiscoverView: View {
                     }
                     if !results.posts.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("投稿")
+                            Text("post.title")
                                 .font(.clHeadline)
                                 .padding(.horizontal, 20)
                             ForEach(results.posts, id: \.id) { postDto in
@@ -182,7 +182,7 @@ struct DiscoverView: View {
             Image(systemName: "sparkles")
                 .font(.system(size: 44, weight: .light))
                 .foregroundStyle(Color.clTextTertiary)
-            Text("探索するものがまだありません")
+            Text("discover.empty")
                 .font(.clBody)
                 .foregroundStyle(Color.clTextSecondary)
         }
@@ -200,7 +200,7 @@ struct DiscoverView: View {
                 .foregroundStyle(Color.clTextTertiary)
 
             TextField(
-                "ユーザー、タグ、プロジェクトを検索",
+                "profile.search.placeholder",
                 text: Binding(
                     get: { viewModel?.searchQuery ?? "" },
                     set: { viewModel?.searchQuery = $0 }

@@ -49,7 +49,7 @@ struct PostDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("投稿")
+                Text("post.title")
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(Color.clTextPrimary)
             }
@@ -58,12 +58,12 @@ struct PostDetailView: View {
                     Button {
                         showReport = true
                     } label: {
-                        Label("報告する", systemImage: "exclamationmark.bubble")
+                        Label("report.action", systemImage: "exclamationmark.bubble")
                     }
                     Button(role: .destructive) {
                         showBlock = true
                     } label: {
-                        Label("ブロックする", systemImage: "nosign")
+                        Label("profile.block", systemImage: "nosign")
                     }
                 } label: {
                     Image(systemName: "ellipsis")
@@ -521,7 +521,7 @@ struct PostDetailView: View {
             }
 
             Button(action: onReply) {
-                Text("返信")
+                Text("compose.reply")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(Color.clTextTertiary)
             }

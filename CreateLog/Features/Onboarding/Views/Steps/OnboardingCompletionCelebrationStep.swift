@@ -35,13 +35,13 @@ struct OnboardingCompletionCelebrationStep: View {
                 .frame(width: 180, height: 180)
 
                 VStack(spacing: 10) {
-                    Text("準備完了!")
+                    Text("onboarding.ready.title")
                         .font(.system(size: 30, weight: .bold))
                         .foregroundStyle(Color.clTextPrimary)
                         .tracking(-0.5)
                         .opacity(titleOpacity)
 
-                    Text("つくろぐへようこそ")
+                    Text("onboarding.welcome.title")
                         .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(Color.clTextPrimary.opacity(0.6))
                         .opacity(subtitleOpacity)

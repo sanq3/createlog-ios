@@ -63,7 +63,7 @@ struct ReportDashboardView: View {
                     .padding(.bottom, 20)
 
                 HStack {
-                    Text("今月のカテゴリ")
+                    Text("recording.thisMonth.category")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Color.clTextTertiary)
                     Spacer()
@@ -81,7 +81,7 @@ struct ReportDashboardView: View {
                     .padding(.bottom, 14)
 
                 HStack {
-                    Text("週間の推移")
+                    Text("recording.weeklyTrend.long")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Color.clTextTertiary)
                     Spacer()
@@ -96,7 +96,7 @@ struct ReportDashboardView: View {
         }
         .scrollIndicators(.hidden)
         .background(Color.clBackground)
-        .navigationTitle("レポート")
+        .navigationTitle("recording.report")
         .toolbarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {

@@ -6,7 +6,7 @@ struct CategoryBreakdown: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
-                Text("カテゴリ別")
+                Text("recording.byCategory")
                     .font(.clHeadline)
                     .foregroundStyle(Color.clTextSecondary)
 

@@ -137,6 +137,26 @@ final class OnboardingViewModel {
     @ObservationIgnored private let authService: (any AuthServiceProtocol)?
     @ObservationIgnored private var availabilityCheckTask: Task<Void, Never>?
 
+    // MARK: - UserDefaults persistence (2026-04-17)
+    // onboarding 途中離脱 → 再起動で同じ step/入力値から再開する (Instagram/X 業界標準)。
+    // `@State` だけだと app kill で消えるため UserDefaults に text 系を保存する。
+    // image (avatar/icon) は Data が大きいので再選択してもらう。
+    private enum DefaultsKey {
+        static let currentStep = "onboarding.currentStep"
+        static let isLoginMode = "onboarding.isLoginMode"
+        static let selectedPlatforms = "onboarding.selectedPlatforms"
+        static let selectedTechStack = "onboarding.selectedTechStack"
+        static let projectName = "onboarding.projectName"
+        static let displayName = "onboarding.displayName"
+        static let bio = "onboarding.bio"
+        static let handleInput = "onboarding.handleInput"
+        static let roleTags = "onboarding.roleTags"
+        static let appDescription = "onboarding.appDescription"
+        static let storeURL = "onboarding.storeURL"
+        static let githubURL = "onboarding.githubURL"
+        static let releaseStatus = "onboarding.releaseStatus"
+    }
+
     init(
         modelContext: ModelContext,
         profileRepository: any ProfileRepositoryProtocol,
@@ -147,21 +167,103 @@ final class OnboardingViewModel {
         self.profileRepository = profileRepository
         self.appRepository = appRepository
         self.authService = authService
-        purgeUnconfirmedProjects()
+        restoreFromDefaults()
+        purgeUnconfirmedProjectsIfNeeded()
     }
 
-    /// onboarding 未完了で残った SDProject を全削除する。
-    /// OnboardingView が出る = `onboardingCompleted == false` (CreateLogApp で分岐済) なので、
-    /// 残存分は「前回 onboarding 途中離脱の仮データ」と判断できる。
-    /// アカウント作成まで到達しなければ毎回リセットし、マイサービスが無限に積み上がるのを防ぐ。
-    private func purgeUnconfirmedProjects() {
+    /// onboarding 未完了で残った SDProject を削除する。
+    /// 案 D 以降 OnboardingViewModel は App init で常時生成されるため、毎回無条件に purge すると
+    /// MainTab 利用中の既存 user の SDProject まで消してしまう。
+    /// - onboardingCompleted=true → 既存 user の SDProject は触らない
+    /// - currentStep != .welcome → 途中離脱からの再開なので saving で作った仮 SDProject は保持
+    /// - それ以外 (初回起動や明示 reset) のみ既存 SDProject を clean
+    private func purgeUnconfirmedProjectsIfNeeded() {
+        if UserDefaults.standard.bool(forKey: "onboardingCompleted") { return }
+        if currentStep != .welcome { return }
         let descriptor = FetchDescriptor<SDProject>()
         if let existing = try? modelContext.fetch(descriptor) {
-            for project in existing {
-                modelContext.delete(project)
-            }
+            for project in existing { modelContext.delete(project) }
             try? modelContext.save()
         }
+    }
+
+    // MARK: - Persistence
+
+    /// UserDefaults から onboarding state を復元する。
+    /// app kill → relaunch 時に currentStep と text 入力値を取り戻して同じ step から再開できるようにする。
+    private func restoreFromDefaults() {
+        let d = UserDefaults.standard
+        if let raw = d.object(forKey: DefaultsKey.currentStep) as? Int,
+           let step = Step(rawValue: raw) {
+            currentStep = step
+        }
+        isLoginMode = d.bool(forKey: DefaultsKey.isLoginMode)
+        if let arr = d.array(forKey: DefaultsKey.selectedPlatforms) as? [String] {
+            selectedPlatforms = Set(arr)
+        }
+        if let arr = d.array(forKey: DefaultsKey.selectedTechStack) as? [String] {
+            selectedTechStack = Set(arr)
+        }
+        projectName = d.string(forKey: DefaultsKey.projectName) ?? ""
+        displayName = d.string(forKey: DefaultsKey.displayName) ?? ""
+        bio = d.string(forKey: DefaultsKey.bio) ?? ""
+        handleInput = d.string(forKey: DefaultsKey.handleInput) ?? ""
+        if let arr = d.array(forKey: DefaultsKey.roleTags) as? [String] {
+            roleTags = Set(arr)
+        }
+        appDescription = d.string(forKey: DefaultsKey.appDescription) ?? ""
+        storeURL = d.string(forKey: DefaultsKey.storeURL) ?? ""
+        githubURL = d.string(forKey: DefaultsKey.githubURL) ?? ""
+        if let raw = d.string(forKey: DefaultsKey.releaseStatus),
+           let status = ProjectStatus(rawValue: raw) {
+            releaseStatus = status
+        }
+    }
+
+    /// 現在の state を UserDefaults に保存する。
+    /// advance/goBack/jump/backToWelcome など currentStep が変わる関数で呼ぶ。
+    private func persist() {
+        let d = UserDefaults.standard
+        d.set(currentStep.rawValue, forKey: DefaultsKey.currentStep)
+        d.set(isLoginMode, forKey: DefaultsKey.isLoginMode)
+        d.set(Array(selectedPlatforms), forKey: DefaultsKey.selectedPlatforms)
+        d.set(Array(selectedTechStack), forKey: DefaultsKey.selectedTechStack)
+        d.set(projectName, forKey: DefaultsKey.projectName)
+        d.set(displayName, forKey: DefaultsKey.displayName)
+        d.set(bio, forKey: DefaultsKey.bio)
+        d.set(handleInput, forKey: DefaultsKey.handleInput)
+        d.set(Array(roleTags), forKey: DefaultsKey.roleTags)
+        d.set(appDescription, forKey: DefaultsKey.appDescription)
+        d.set(storeURL, forKey: DefaultsKey.storeURL)
+        d.set(githubURL, forKey: DefaultsKey.githubURL)
+        d.set(releaseStatus.rawValue, forKey: DefaultsKey.releaseStatus)
+    }
+
+    /// onboarding 完走時に呼ぶ。UserDefaults の全 key を消して次 user のために clean。
+    /// CreateLogApp の isPresented Binding の set closure から呼ぶ。
+    func clearPersistedState() {
+        let d = UserDefaults.standard
+        let keys = [DefaultsKey.currentStep, DefaultsKey.isLoginMode,
+                    DefaultsKey.selectedPlatforms, DefaultsKey.selectedTechStack,
+                    DefaultsKey.projectName, DefaultsKey.displayName, DefaultsKey.bio,
+                    DefaultsKey.handleInput, DefaultsKey.roleTags,
+                    DefaultsKey.appDescription, DefaultsKey.storeURL, DefaultsKey.githubURL,
+                    DefaultsKey.releaseStatus]
+        for key in keys { d.removeObject(forKey: key) }
+        // in-memory state も reset (次に OnboardingView 出た時に fresh)
+        currentStep = .welcome
+        isLoginMode = false
+        selectedPlatforms = []
+        selectedTechStack = []
+        projectName = ""
+        displayName = ""
+        bio = ""
+        handleInput = ""
+        roleTags = []
+        appDescription = ""
+        storeURL = ""
+        githubURL = ""
+        releaseStatus = .draft
     }
 
     // MARK: - Derived
@@ -189,6 +291,7 @@ final class OnboardingViewModel {
         }
         guard let next = Step(rawValue: currentStep.rawValue + 1) else { return }
         currentStep = next
+        persist()
     }
 
     /// edge swipe で戻れる step か。
@@ -210,6 +313,7 @@ final class OnboardingViewModel {
     func goBack() {
         guard canGoBack, let prev = Step(rawValue: currentStep.rawValue - 1) else { return }
         currentStep = prev
+        persist()
     }
 
     /// 既存ユーザー用: Welcome から直接 accountPrompt へジャンプ。
@@ -217,6 +321,7 @@ final class OnboardingViewModel {
     func jumpToAccountPrompt() {
         isLoginMode = true
         currentStep = .accountPrompt
+        persist()
     }
 
     /// ログイン画面から「初めての方はこちら」で Welcome に戻る。
@@ -224,6 +329,7 @@ final class OnboardingViewModel {
     func backToWelcome() {
         isLoginMode = false
         currentStep = .welcome
+        persist()
     }
 
     // MARK: - Save (SDProject = マイプロダクト)

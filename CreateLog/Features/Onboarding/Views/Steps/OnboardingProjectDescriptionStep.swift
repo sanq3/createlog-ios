@@ -25,7 +25,7 @@ struct OnboardingProjectDescriptionStep: View {
             },
             input: {
                 OnboardingLabeledInput(label: nil) {
-                    TextField("例: 集中時間を記録するポモドーロタイマー", text: $viewModel.appDescription, axis: .vertical)
+                    TextField("onboarding.project.desc.placeholder", text: $viewModel.appDescription, axis: .vertical)
                         .lineLimit(3...5)
                         .submitLabel(.done)
                         .focused($focused)

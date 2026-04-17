@@ -19,11 +19,11 @@ struct HandleSetupView: View {
         VStack(spacing: 32) {
             // Header
             VStack(spacing: 8) {
-                Text("ハンドルを設定")
+                Text("auth.handle.setup.title")
                     .font(.title2.bold())
                     .foregroundStyle(Color.clTextPrimary)
 
-                Text("あなたを見つけるための一意のIDです")
+                Text("auth.handle.setup.subtitle")
                     .font(.subheadline)
                     .foregroundStyle(Color.clTextSecondary)
             }
@@ -56,7 +56,7 @@ struct HandleSetupView: View {
                     if isChecking {
                         ProgressView()
                             .controlSize(.small)
-                        Text("確認中...")
+                        Text("auth.handle.checking")
                             .font(.caption)
                             .foregroundStyle(Color.clTextSecondary)
                     } else if let available = isAvailable {
@@ -72,7 +72,7 @@ struct HandleSetupView: View {
                             .font(.caption)
                             .foregroundStyle(.red)
                     } else {
-                        Text("英数字とアンダースコア、3-15文字")
+                        Text("onboarding.handle.rule")
                             .font(.caption)
                             .foregroundStyle(Color.clTextTertiary)
                     }
@@ -85,7 +85,7 @@ struct HandleSetupView: View {
             Button {
                 Task { await checkAvailability() }
             } label: {
-                Text("利用可否を確認")
+                Text("auth.handle.check")
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(Color.clTextPrimary)
                     .padding(.horizontal, 20)
@@ -101,7 +101,7 @@ struct HandleSetupView: View {
             Button {
                 onComplete(handle)
             } label: {
-                Text("続ける")
+                Text("common.continue")
                     .font(.body.weight(.semibold))
                     .foregroundStyle(Color.clBackground)
                     .frame(maxWidth: .infinity)

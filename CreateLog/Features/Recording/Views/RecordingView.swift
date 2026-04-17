@@ -13,7 +13,7 @@ struct RecordingView: View {
             Color.clBackground.ignoresSafeArea()
             mainContent
         }
-        .navigationTitle("記録")
+        .navigationTitle("recording.title")
         .navigationBarTitleDisplayMode(.inline)
         .task {
             if viewModel == nil {
@@ -168,7 +168,7 @@ struct RecordingView: View {
 
     private var emptyTagsHint: some View {
         VStack(spacing: 8) {
-            Text("記録する項目を作ろう")
+            Text("onboarding.tagIntro.title")
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(Color.clTextPrimary)
             Text("よくやる作業をタグとして登録すると\nタップ+時間入力だけで記録できます")

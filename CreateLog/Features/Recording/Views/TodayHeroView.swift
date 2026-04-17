@@ -83,7 +83,7 @@ struct TodayHeroView: View {
             }
             .foregroundStyle(isPositive ? Color.clSuccess : Color.clTextTertiary)
 
-            Text("先週比")
+            Text("recording.vsLastWeek")
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(Color.clTextTertiary)
                 .offset(y: animateIn ? 0 : -14)

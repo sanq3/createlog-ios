@@ -23,10 +23,10 @@ struct NotificationSettingsView: View {
                             .frame(width: 28)
 
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("通知の許可設定")
+                            Text("notification.permission.title")
                                 .font(.clBody)
                                 .foregroundStyle(Color.clTextPrimary)
-                            Text("端末の設定アプリで管理します")
+                            Text("notification.permission.hint")
                                 .font(.clCaption)
                                 .foregroundStyle(Color.clTextTertiary)
                         }
@@ -39,7 +39,7 @@ struct NotificationSettingsView: View {
                     }
                 }
             } footer: {
-                Text("いいね・コメント・フォロー・メンション・リポストの通知がすべて送信されます。")
+                Text("notification.settings.description")
                     .font(.clCaption)
             }
 
@@ -55,15 +55,15 @@ struct NotificationSettingsView: View {
                     subtitle: "指定した時間帯は通知を停止"
                 )
             } header: {
-                Text("今後追加予定")
+                Text("common.comingSoonLong")
             } footer: {
-                Text("これらの機能は今後のアップデートで公開予定です。")
+                Text("common.comingSoon.description")
                     .font(.clCaption)
             }
         }
         .scrollContentBackground(.hidden)
         .background(Color.clBackground)
-        .navigationTitle("通知")
+        .navigationTitle("notification.title")
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -85,7 +85,7 @@ struct NotificationSettingsView: View {
 
             Spacer()
 
-            Text("今後追加")
+            Text("common.comingSoon")
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Color.clTextTertiary)
                 .padding(.horizontal, 8)

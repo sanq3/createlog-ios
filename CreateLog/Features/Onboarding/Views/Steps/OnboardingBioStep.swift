@@ -27,7 +27,7 @@ struct OnboardingBioStep: View {
             },
             input: {
                 OnboardingLabeledInput(label: nil) {
-                    TextField("例: SwiftUI で個人開発中。毎日コツコツ記録", text: $viewModel.bio, axis: .vertical)
+                    TextField("onboarding.bio.placeholder", text: $viewModel.bio, axis: .vertical)
                         .lineLimit(3...5)
                         .submitLabel(.done)
                         .focused($focused)

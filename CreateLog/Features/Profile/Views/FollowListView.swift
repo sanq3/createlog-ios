@@ -134,7 +134,7 @@ struct FollowListView: View {
                 .font(.system(size: 15))
                 .foregroundStyle(Color.clTextTertiary)
 
-            TextField("検索", text: $searchText)
+            TextField("common.search", text: $searchText)
                 .font(.system(size: 15))
                 .foregroundStyle(Color.clTextPrimary)
                 .textInputAutocapitalization(.never)

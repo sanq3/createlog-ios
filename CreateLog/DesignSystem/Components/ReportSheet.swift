@@ -43,11 +43,11 @@ struct ReportSheet: View {
                 }
             }
             .background(Color.clBackground)
-            .navigationTitle("報告")
+            .navigationTitle("report.title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("キャンセル") {
+                    Button("common.cancel") {
                         dismiss()
                     }
                     .foregroundStyle(Color.clTextSecondary)
@@ -78,11 +78,11 @@ struct ReportSheet: View {
 
                     if selectedReason == .other {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("詳細（任意）")
+                            Text("recording.detail.optional")
                                 .font(.clCaption)
                                 .foregroundStyle(Color.clTextTertiary)
 
-                            TextField("報告内容の詳細を入力", text: $detail, axis: .vertical)
+                            TextField("report.detail.input", text: $detail, axis: .vertical)
                                 .font(.clBody)
                                 .lineLimit(3...6)
                                 .padding(12)
@@ -149,7 +149,7 @@ struct ReportSheet: View {
             }
             onSubmit(reason, detail)
         } label: {
-            Text("報告を送信")
+            Text("report.submit")
                 .font(.system(size: 16, weight: .bold))
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
@@ -173,7 +173,7 @@ struct ReportSheet: View {
                 .font(.system(size: 56))
                 .foregroundStyle(Color.clSuccess)
 
-            Text("報告を受け付けました")
+            Text("report.received")
                 .font(.clTitle)
                 .foregroundStyle(Color.clTextPrimary)
 
@@ -187,7 +187,7 @@ struct ReportSheet: View {
             Button {
                 dismiss()
             } label: {
-                Text("閉じる")
+                Text("common.close")
                     .font(.system(size: 16, weight: .bold))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
@@ -231,7 +231,7 @@ struct BlockConfirmSheet: View {
                         .font(.clTitle)
                         .foregroundStyle(Color.clTextPrimary)
 
-                    Text("ブロックすると相手はあなたのプロフィール、投稿、フォロワーリストを見ることができなくなります。相手には通知されません。")
+                    Text("profile.block.description")
                         .font(.clBody)
                         .foregroundStyle(Color.clTextSecondary)
                         .multilineTextAlignment(.center)
@@ -247,7 +247,7 @@ struct BlockConfirmSheet: View {
                         onBlock()
                         dismiss()
                     } label: {
-                        Text("ブロックする")
+                        Text("profile.block")
                             .font(.system(size: 16, weight: .bold))
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
@@ -259,7 +259,7 @@ struct BlockConfirmSheet: View {
                     Button {
                         dismiss()
                     } label: {
-                        Text("キャンセル")
+                        Text("common.cancel")
                             .font(.system(size: 16, weight: .medium))
                             .foregroundStyle(Color.clTextSecondary)
                             .frame(maxWidth: .infinity)

@@ -302,7 +302,7 @@ struct ProjectDetailView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "star.bubble")
                         .font(.system(size: 16))
-                    Text("レビューを依頼する")
+                    Text("common.requestReview")
                         .font(.subheadline)
                         .fontWeight(.medium)
                 }
@@ -376,7 +376,7 @@ struct ProjectDetailView: View {
                         HStack(spacing: 4) {
                             Image(systemName: "arrowshape.turn.up.left.fill")
                                 .font(.system(size: 10))
-                            Text("開発者の返信")
+                            Text("post.devReply")
                                 .font(.caption)
                                 .fontWeight(.semibold)
                         }
