@@ -5241,6 +5241,102 @@
           }
         }
       }
+    },
+    "settings.premium.analytics.description": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カテゴリ別トレンド、他ユーザーとの比較"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Category trends and comparison with other users"
+          }
+        }
+      }
+    },
+    "settings.premium.noAds.description": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フィード・検索画面の広告を完全に削除"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Completely remove ads from feed and search"
+          }
+        }
+      }
+    },
+    "settings.premium.unlimitedHistory.description": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "過去全期間のログを閲覧・エクスポート"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Browse and export logs from all past periods"
+          }
+        }
+      }
+    },
+    "settings.premium.themes.description": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アクセントカラーの変更"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change accent color"
+          }
+        }
+      }
+    },
+    "settings.premium.badge.description": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プロフィールにバッジを表示"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Display a badge on your profile"
+          }
+        }
+      }
+    },
+    "project.description.tagline": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "エンジニア向け作業記録プラットフォーム"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A work log platform for engineers"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

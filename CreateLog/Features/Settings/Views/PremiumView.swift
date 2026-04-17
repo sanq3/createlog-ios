@@ -63,27 +63,27 @@ struct PremiumView: View {
             featureRow(
                 icon: "chart.bar.fill",
                 title: "settings.premium.analytics",
-                description: "カテゴリ別トレンド、他ユーザーとの比較"
+                description: "settings.premium.analytics.description"
             )
             featureRow(
                 icon: "eye.slash.fill",
                 title: "settings.premium.noAds",
-                description: "フィード・検索画面の広告を完全に削除"
+                description: "settings.premium.noAds.description"
             )
             featureRow(
                 icon: "clock.arrow.circlepath",
                 title: "settings.premium.unlimitedHistory",
-                description: "過去全期間のログを閲覧・エクスポート"
+                description: "settings.premium.unlimitedHistory.description"
             )
             featureRow(
                 icon: "paintbrush.fill",
                 title: "settings.premium.themes",
-                description: "アクセントカラーの変更"
+                description: "settings.premium.themes.description"
             )
             featureRow(
                 icon: "star.fill",
                 title: "settings.premium.badge",
-                description: "プロフィールにバッジを表示",
+                description: "settings.premium.badge.description",
                 isLast: true
             )
         }
