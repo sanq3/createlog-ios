@@ -62,7 +62,7 @@ struct ReportSheet: View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("「\(targetName)」を報告する理由を選択してください")
+                    Text("report.reason.prompt \(targetName)")
                         .font(.clBody)
                         .foregroundStyle(Color.clTextSecondary)
                         .padding(.horizontal, 20)
@@ -177,7 +177,7 @@ struct ReportSheet: View {
                 .font(.clTitle)
                 .foregroundStyle(Color.clTextPrimary)
 
-            Text("内容を確認の上、対応いたします。\nご協力ありがとうございます。")
+            Text("report.acknowledgment")
                 .font(.clBody)
                 .foregroundStyle(Color.clTextSecondary)
                 .multilineTextAlignment(.center)
@@ -227,7 +227,7 @@ struct BlockConfirmSheet: View {
 
                 // Text
                 VStack(spacing: 8) {
-                    Text("@\(userHandle) をブロック")
+                    Text("profile.block.title \(userHandle)")
                         .font(.clTitle)
                         .foregroundStyle(Color.clTextPrimary)
 

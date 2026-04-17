@@ -282,7 +282,7 @@ struct ProjectDetailView: View {
 
                         starsView(rating: project.averageRating)
 
-                        Text("\(project.reviewCount)件のレビュー")
+                        Text("rating.count \(project.reviewCount)")
                             .font(.caption)
                             .foregroundStyle(Color.clTextTertiary)
                     }

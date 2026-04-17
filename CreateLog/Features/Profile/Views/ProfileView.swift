@@ -127,7 +127,7 @@ struct ProfileView: View {
                             .padding(.top, 2)
                     }
 
-                    Text("累計 \(Int(user.totalHours))h")
+                    Text("recording.total.hours \(Int(user.totalHours))")
                         .font(.clCaption)
                         .foregroundStyle(Color.clTextTertiary)
                         .padding(.top, 2)

@@ -55,7 +55,7 @@ final class AuthViewModel {
                   let tokenData = credential.identityToken,
                   let idToken = String(data: tokenData, encoding: .utf8),
                   let nonce = currentNonce else {
-                errorMessage = "Apple認証情報の取得に失敗しました"
+                errorMessage = String(localized: "auth.error.appleCredential")
                 return false
             }
             do {
@@ -65,7 +65,7 @@ final class AuthViewModel {
                 guard await verifySessionEstablished(provider: "apple") else {
                     try? await authService.signOut()
                     authState = .unauthenticated
-                    errorMessage = "ログインセッションの確立に失敗しました。もう一度お試しください"
+                    errorMessage = String(localized: "auth.error.sessionFailed")
                     return false
                 }
                 return true
@@ -79,7 +79,7 @@ final class AuthViewModel {
                 return false
             }
             print("[AuthViewModel] ❌ Apple authorization failed: \(error)")
-            errorMessage = "Apple認証に失敗しました"
+            errorMessage = String(localized: "auth.error.appleFailed")
             return false
         }
     }
@@ -118,7 +118,7 @@ final class AuthViewModel {
             guard await verifySessionEstablished(provider: "google") else {
                 try? await authService.signOut()
                 authState = .unauthenticated
-                errorMessage = "ログインセッションの確立に失敗しました。もう一度お試しください"
+                errorMessage = String(localized: "auth.error.sessionFailed")
                 return false
             }
             return true
@@ -147,7 +147,7 @@ final class AuthViewModel {
             guard await verifySessionEstablished(provider: "github") else {
                 try? await authService.signOut()
                 authState = .unauthenticated
-                errorMessage = "ログインセッションの確立に失敗しました。もう一度お試しください"
+                errorMessage = String(localized: "auth.error.sessionFailed")
                 return false
             }
             return true

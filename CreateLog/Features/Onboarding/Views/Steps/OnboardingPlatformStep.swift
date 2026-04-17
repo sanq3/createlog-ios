@@ -20,7 +20,7 @@ struct OnboardingPlatformStep: View {
             VStack(spacing: 0) {
                 Spacer().frame(height: 100)
 
-                Text("現在製作中、制作予定の\nプラットフォームは？")
+                Text("onboarding.platform.title")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundStyle(Color.clTextPrimary)
                     .tracking(-0.5)

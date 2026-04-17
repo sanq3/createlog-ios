@@ -119,11 +119,11 @@ final class ProfileEditViewModel {
             do {
                 let available = try await profileRepository.checkHandleAvailability(handle)
                 guard available else {
-                    errorMessage = "このハンドルは既に使われています"
+                    errorMessage = String(localized: "auth.handle.taken")
                     return
                 }
             } catch {
-                errorMessage = "ハンドルの確認に失敗しました"
+                errorMessage = String(localized: "auth.error.handleCheck")
                 return
             }
         }
@@ -135,7 +135,7 @@ final class ProfileEditViewModel {
                 let url = try await profileRepository.uploadAvatar(imageData: data, contentType: "image/jpeg")
                 avatarUrlString = url.absoluteString
             } catch {
-                errorMessage = "アバターのアップロードに失敗しました"
+                errorMessage = String(localized: "profile.error.avatarUpload")
                 return
             }
         }
@@ -159,7 +159,7 @@ final class ProfileEditViewModel {
             _ = try await profileRepository.updateProfile(updates)
             didSaveSuccessfully = true
         } catch {
-            errorMessage = "プロフィールの保存に失敗しました"
+            errorMessage = String(localized: "profile.error.save")
         }
     }
 

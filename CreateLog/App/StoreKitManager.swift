@@ -44,7 +44,7 @@ final class StoreKitManager {
             products = try await Product.products(for: Self.productIDs)
             await updatePurchasedProducts()
         } catch {
-            errorMessage = "商品情報の取得に失敗しました"
+            errorMessage = String(localized: "premium.error.productFetch")
         }
     }
 
@@ -63,12 +63,12 @@ final class StoreKitManager {
             case .userCancelled:
                 break
             case .pending:
-                errorMessage = "購入の承認待ちです"
+                errorMessage = String(localized: "premium.error.purchasePending")
             @unknown default:
                 break
             }
         } catch {
-            errorMessage = "購入に失敗しました"
+            errorMessage = String(localized: "premium.error.purchase")
         }
     }
 

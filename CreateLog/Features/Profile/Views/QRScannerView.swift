@@ -86,7 +86,7 @@ struct QRScannerView: View {
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(.white)
 
-            Text("CreateLogユーザーのQRコードを\nカメラに映してください")
+            Text("share.qr.instruction")
                 .font(.system(size: 13))
                 .foregroundStyle(.white.opacity(0.6))
                 .multilineTextAlignment(.center)
@@ -141,7 +141,7 @@ struct QRScannerView: View {
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(.white)
 
-            Text("設定からカメラへのアクセスを\n許可してください")
+            Text("share.camera.permissionBody")
                 .font(.system(size: 14))
                 .foregroundStyle(.white.opacity(0.6))
                 .multilineTextAlignment(.center)

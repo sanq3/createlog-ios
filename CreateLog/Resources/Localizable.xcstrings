@@ -15,6 +15,12 @@
             "state": "new",
             "value": "%1$@ / %2$@"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ / %2$@"
+          }
         }
       }
     },
@@ -24,6 +30,12 @@
         "ja": {
           "stringUnit": {
             "state": "new",
+            "value": "%1$lld/%2$lld"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
             "value": "%1$lld/%2$lld"
           }
         }
@@ -40,6 +52,12 @@
             "state": "translated",
             "value": "続ける"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
+          }
         }
       }
     },
@@ -49,6 +67,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "保存中..."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saving..."
           }
         }
       }
@@ -696,6 +720,12 @@
             "state": "translated",
             "value": "プレミアム"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Premium"
+          }
         }
       }
     },
@@ -1043,6 +1073,12 @@
             "state": "translated",
             "value": "閉じる"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
         }
       }
     },
@@ -1052,6 +1088,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "キャンセル"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
           }
         }
       }
@@ -1063,6 +1105,12 @@
             "state": "translated",
             "value": "保存"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save"
+          }
         }
       }
     },
@@ -1072,6 +1120,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "作成"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create"
           }
         }
       }
@@ -1083,6 +1137,12 @@
             "state": "translated",
             "value": "追加"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add"
+          }
         }
       }
     },
@@ -1092,6 +1152,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "削除する"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete"
           }
         }
       }
@@ -1103,6 +1169,12 @@
             "state": "translated",
             "value": "検索"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search"
+          }
         }
       }
     },
@@ -1112,6 +1184,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "任意"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optional"
           }
         }
       }
@@ -1123,6 +1201,12 @@
             "state": "translated",
             "value": "コピーしました!"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copied!"
+          }
         }
       }
     },
@@ -1132,6 +1216,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "エラー"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Error"
           }
         }
       }
@@ -1143,6 +1233,12 @@
             "state": "translated",
             "value": "オフライン"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline"
+          }
         }
       }
     },
@@ -1152,6 +1248,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "今後追加"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coming Soon"
           }
         }
       }
@@ -1163,6 +1265,12 @@
             "state": "translated",
             "value": "今後追加予定"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coming Soon"
+          }
         }
       }
     },
@@ -1172,6 +1280,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "これらの機能は今後のアップデートで公開予定です。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "These features will arrive in future updates."
           }
         }
       }
@@ -1183,6 +1297,12 @@
             "state": "translated",
             "value": "その他"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Other"
+          }
         }
       }
     },
@@ -1192,6 +1312,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "シェアする"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share"
           }
         }
       }
@@ -1203,6 +1329,12 @@
             "state": "translated",
             "value": "レビューを依頼する"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request Review"
+          }
         }
       }
     },
@@ -1212,6 +1344,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "設定を開く"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings"
           }
         }
       }
@@ -1223,6 +1361,12 @@
             "state": "translated",
             "value": "スキップ（サービスなし）"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip (no product)"
+          }
         }
       }
     },
@@ -1232,6 +1376,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "日"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sun"
           }
         }
       }
@@ -1243,6 +1393,12 @@
             "state": "translated",
             "value": "月"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mon"
+          }
         }
       }
     },
@@ -1252,6 +1408,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "火"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tue"
           }
         }
       }
@@ -1263,6 +1425,12 @@
             "state": "translated",
             "value": "水"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wed"
+          }
         }
       }
     },
@@ -1272,6 +1440,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "木"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thu"
           }
         }
       }
@@ -1283,6 +1457,12 @@
             "state": "translated",
             "value": "金"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fri"
+          }
         }
       }
     },
@@ -1292,6 +1472,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "土"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sat"
           }
         }
       }
@@ -1303,6 +1489,12 @@
             "state": "translated",
             "value": "つくろぐへようこそ"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Welcome to CreateLog"
+          }
         }
       }
     },
@@ -1312,6 +1504,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "エンジニアのための\n作業記録プラットフォーム"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A work log platform\nfor engineers"
           }
         }
       }
@@ -1323,6 +1521,12 @@
             "state": "translated",
             "value": "いつでも見返せる作業の記録"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A work log you can always revisit"
+          }
         }
       }
     },
@@ -1332,6 +1536,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "タイマーや手入力で開発時間を記録"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Track dev time with timer or manual entry"
           }
         }
       }
@@ -1343,6 +1553,12 @@
             "state": "translated",
             "value": "作業を記録する"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record your work"
+          }
         }
       }
     },
@@ -1352,6 +1568,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アカウント作成完了!"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account created!"
           }
         }
       }
@@ -1363,6 +1585,12 @@
             "state": "translated",
             "value": "タイムラインに追加される"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Added to your timeline"
+          }
         }
       }
     },
@@ -1372,6 +1600,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "準備完了!"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All set!"
           }
         }
       }
@@ -1383,6 +1617,12 @@
             "state": "translated",
             "value": "プロフィールを設定しましょう"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Let's set up your profile"
+          }
         }
       }
     },
@@ -1392,6 +1632,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "あとで変更できます"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can change this later"
           }
         }
       }
@@ -1403,6 +1649,12 @@
             "state": "translated",
             "value": "アカウント作成後に詳細を設定できます"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can configure details after creating an account"
+          }
         }
       }
     },
@@ -1412,6 +1664,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "あなたの名前は?"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's your name?"
           }
         }
       }
@@ -1423,6 +1681,12 @@
             "state": "translated",
             "value": "プロフィールに表示されます"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shown on your profile"
+          }
         }
       }
     },
@@ -1432,6 +1696,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "例: つくろぐ太郎"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g. Jane Doe"
           }
         }
       }
@@ -1443,6 +1713,12 @@
             "state": "translated",
             "value": "ハンドルを決めよう"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a handle"
+          }
         }
       }
     },
@@ -1452,6 +1728,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "プロフィール URL とメンションに使われます"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Used for your profile URL and mentions"
           }
         }
       }
@@ -1463,6 +1745,12 @@
             "state": "translated",
             "value": "利用可能です"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Available"
+          }
         }
       }
     },
@@ -1472,6 +1760,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "既に使われています"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Already taken"
           }
         }
       }
@@ -1483,6 +1777,12 @@
             "state": "translated",
             "value": "英数字とアンダースコア、3-15文字"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letters, numbers, underscore. 3-15 chars"
+          }
         }
       }
     },
@@ -1492,6 +1792,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ひとこと自己紹介"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One-line intro"
           }
         }
       }
@@ -1503,6 +1809,12 @@
             "state": "translated",
             "value": "1-2 行で簡潔に"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep it to 1-2 lines"
+          }
         }
       }
     },
@@ -1512,6 +1824,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "例: SwiftUI で個人開発中。毎日コツコツ記録"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g. Building solo with SwiftUI. Daily steady logs"
           }
         }
       }
@@ -1523,6 +1841,12 @@
             "state": "translated",
             "value": "何をしている人ですか?"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What do you do?"
+          }
         }
       }
     },
@@ -1532,6 +1856,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "プロフィールにバッジで表示されます"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shown as a badge on your profile"
           }
         }
       }
@@ -1543,6 +1873,12 @@
             "state": "translated",
             "value": "個人開発"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo dev"
+          }
         }
       }
     },
@@ -1552,6 +1888,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "学生"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Student"
           }
         }
       }
@@ -1563,6 +1905,12 @@
             "state": "translated",
             "value": "スタートアップ"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Startup"
+          }
         }
       }
     },
@@ -1572,6 +1920,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "デザイン"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Design"
           }
         }
       }
@@ -1583,6 +1937,12 @@
             "state": "translated",
             "value": "ポートフォリオ"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Portfolio"
+          }
         }
       }
     },
@@ -1592,6 +1952,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "使用している技術は?"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Which technologies do you use?"
           }
         }
       }
@@ -1603,6 +1969,12 @@
             "state": "translated",
             "value": "複数選択できます"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can choose multiple"
+          }
         }
       }
     },
@@ -1612,6 +1984,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "言語"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Languages"
           }
         }
       }
@@ -1623,6 +2001,12 @@
             "state": "translated",
             "value": "フレームワーク"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frameworks"
+          }
         }
       }
     },
@@ -1632,6 +2016,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "現在製作中、制作予定の\nプラットフォームは?"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What platforms\nare you building for?"
           }
         }
       }
@@ -1643,6 +2033,12 @@
             "state": "translated",
             "value": "どんな開発をしていますか"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What do you develop?"
+          }
         }
       }
     },
@@ -1652,6 +2048,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Web 開発"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Web dev"
           }
         }
       }
@@ -1663,6 +2065,12 @@
             "state": "translated",
             "value": "iOS 開発"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS dev"
+          }
         }
       }
     },
@@ -1672,6 +2080,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Android 開発"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Android dev"
           }
         }
       }
@@ -1683,6 +2097,12 @@
             "state": "translated",
             "value": "Swift学習"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Swift Learning"
+          }
         }
       }
     },
@@ -1692,6 +2112,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "バックエンド"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Backend"
           }
         }
       }
@@ -1703,6 +2129,12 @@
             "state": "translated",
             "value": "どんなプロダクトですか?"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What kind of product is it?"
+          }
         }
       }
     },
@@ -1712,6 +2144,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "プロジェクトの名前は?"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's your project's name?"
           }
         }
       }
@@ -1723,6 +2161,12 @@
             "state": "translated",
             "value": "例 つくろぐ"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g. CreateLog"
+          }
         }
       }
     },
@@ -1732,6 +2176,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アプリ名を入力"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter app name"
           }
         }
       }
@@ -1743,6 +2193,12 @@
             "state": "translated",
             "value": "例: 集中時間を記録するポモドーロタイマー"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g. A Pomodoro timer for focus time"
+          }
         }
       }
     },
@@ -1752,6 +2208,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アプリの説明を入力"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Describe your app"
           }
         }
       }
@@ -1763,6 +2225,12 @@
             "state": "translated",
             "value": "サービス名を入力"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter service name"
+          }
         }
       }
     },
@@ -1772,6 +2240,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アイコンを選びましょう"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an icon"
           }
         }
       }
@@ -1783,6 +2257,12 @@
             "state": "translated",
             "value": "タップで色を変更"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap to change color"
+          }
         }
       }
     },
@@ -1792,6 +2272,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "プロダクトのアイコン"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Product icon"
           }
         }
       }
@@ -1803,6 +2289,12 @@
             "state": "translated",
             "value": "今のリリース状況は?"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's the current release status?"
+          }
         }
       }
     },
@@ -1812,6 +2304,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "公開 URL はありますか?"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Do you have a public URL?"
           }
         }
       }
@@ -1823,6 +2321,12 @@
             "state": "translated",
             "value": "GitHub リポジトリは?"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub repository?"
+          }
         }
       }
     },
@@ -1832,6 +2336,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "OSS なら公開しておくと反応がもらえます"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Publishing OSS helps get feedback"
           }
         }
       }
@@ -1843,6 +2353,12 @@
             "state": "translated",
             "value": "App Store / Google Play / Web サイト など"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Store / Google Play / website, etc."
+          }
         }
       }
     },
@@ -1852,6 +2368,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "まだ決めていない"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not decided yet"
           }
         }
       }
@@ -1863,6 +2385,12 @@
             "state": "translated",
             "value": "開発中"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Development"
+          }
         }
       }
     },
@@ -1872,6 +2400,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "公開中"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Published"
           }
         }
       }
@@ -1883,6 +2417,12 @@
             "state": "translated",
             "value": "停止"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archived"
+          }
         }
       }
     },
@@ -1892,6 +2432,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "記録する項目を作ろう"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Let's create items to track"
           }
         }
       }
@@ -1903,6 +2449,12 @@
             "state": "translated",
             "value": "よくやる作業をタグとして登録すると\nタップ+時間入力だけで記録できます"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Register frequent work as tags, then\nrecord with just a tap and time input"
+          }
         }
       }
     },
@@ -1912,6 +2464,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ハンドルを設定"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set your handle"
           }
         }
       }
@@ -1923,6 +2481,12 @@
             "state": "translated",
             "value": "あなたを見つけるための一意のIDです"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A unique ID to identify you"
+          }
         }
       }
     },
@@ -1932,6 +2496,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "利用可否を確認"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check availability"
           }
         }
       }
@@ -1943,6 +2513,12 @@
             "state": "translated",
             "value": "確認中..."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking..."
+          }
         }
       }
     },
@@ -1952,6 +2528,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "英数字と_のみ、3〜15文字"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letters, numbers, underscore only. 3-15 chars"
           }
         }
       }
@@ -1963,6 +2545,12 @@
             "state": "translated",
             "value": "このハンドルで決定"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use this handle"
+          }
         }
       }
     },
@@ -1972,6 +2560,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "このハンドルは使えます"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This handle is available"
           }
         }
       }
@@ -1983,6 +2577,12 @@
             "state": "translated",
             "value": "このハンドルは既に使われています"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This handle is already taken"
+          }
         }
       }
     },
@@ -1992,6 +2592,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "プロフィールを編集"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit Profile"
           }
         }
       }
@@ -2003,6 +2609,12 @@
             "state": "translated",
             "value": "プロフィールを見る"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View profile"
+          }
         }
       }
     },
@@ -2012,6 +2624,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "プロフィールをシェア"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share profile"
           }
         }
       }
@@ -2023,6 +2641,12 @@
             "state": "translated",
             "value": "表示名"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Display name"
+          }
         }
       }
     },
@@ -2032,6 +2656,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ユーザー名"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Username"
           }
         }
       }
@@ -2043,6 +2673,12 @@
             "state": "translated",
             "value": "自己紹介を入力..."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a bio..."
+          }
         }
       }
     },
@@ -2052,6 +2688,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "スキル"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skills"
           }
         }
       }
@@ -2063,6 +2705,12 @@
             "state": "translated",
             "value": "スキルを追加..."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add skill..."
+          }
         }
       }
     },
@@ -2072,6 +2720,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "経験年数"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Experience"
           }
         }
       }
@@ -2083,6 +2737,12 @@
             "state": "translated",
             "value": "職業"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Occupation"
+          }
         }
       }
     },
@@ -2092,6 +2752,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "外部リンク"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Links"
           }
         }
       }
@@ -2103,6 +2769,12 @@
             "state": "translated",
             "value": "リンクを追加"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add link"
+          }
         }
       }
     },
@@ -2112,6 +2784,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "マイプロダクト"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "My Products"
           }
         }
       }
@@ -2123,6 +2801,12 @@
             "state": "translated",
             "value": "マイプロダクトはまだ登録されていません"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No products registered yet"
+          }
         }
       }
     },
@@ -2132,6 +2816,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "新しいサービスを追加"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add new product"
           }
         }
       }
@@ -2143,6 +2833,12 @@
             "state": "translated",
             "value": "プロジェクト登録"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Register project"
+          }
         }
       }
     },
@@ -2152,6 +2848,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "興味カテゴリ"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interests"
           }
         }
       }
@@ -2163,6 +2865,12 @@
             "state": "translated",
             "value": "フォロー"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Follow"
+          }
         }
       }
     },
@@ -2172,6 +2880,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "フォローする"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Follow"
           }
         }
       }
@@ -2183,6 +2897,12 @@
             "state": "translated",
             "value": "フォロー中"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Following"
+          }
         }
       }
     },
@@ -2192,6 +2912,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "フォロー解除"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unfollow"
           }
         }
       }
@@ -2203,6 +2929,12 @@
             "state": "translated",
             "value": "%@のフォローを解除しますか？"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unfollow %@?"
+          }
         }
       }
     },
@@ -2212,6 +2944,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ブロックする"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Block"
           }
         }
       }
@@ -2223,6 +2961,12 @@
             "state": "translated",
             "value": "ブロックを解除"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unblock"
+          }
         }
       }
     },
@@ -2232,6 +2976,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ブロックすると相手はあなたのプロフィール、投稿、フォロワーリストを見ることができなくなります。相手には通知されません。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blocked users can't see your profile, posts, or follower list. They won't be notified."
           }
         }
       }
@@ -2243,6 +2993,12 @@
             "state": "translated",
             "value": "@%@ をブロック"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Block @%@"
+          }
         }
       }
     },
@@ -2252,6 +3008,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ユーザー"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Users"
           }
         }
       }
@@ -2263,6 +3025,12 @@
             "state": "translated",
             "value": "ユーザー、タグ、プロジェクトを検索"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search users, tags, projects"
+          }
         }
       }
     },
@@ -2272,6 +3040,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "記録"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record"
           }
         }
       }
@@ -2283,6 +3057,12 @@
             "state": "translated",
             "value": "記録する"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record"
+          }
         }
       }
     },
@@ -2292,6 +3072,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "記録しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved"
           }
         }
       }
@@ -2303,6 +3089,12 @@
             "state": "translated",
             "value": "今日"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today"
+          }
         }
       }
     },
@@ -2312,6 +3104,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "今週"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This week"
           }
         }
       }
@@ -2323,6 +3121,12 @@
             "state": "translated",
             "value": "今月"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This month"
+          }
         }
       }
     },
@@ -2332,6 +3136,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "累計"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Total"
           }
         }
       }
@@ -2343,6 +3153,12 @@
             "state": "translated",
             "value": "累計 %lldh"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldh total"
+          }
         }
       }
     },
@@ -2352,6 +3168,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "先週比"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "vs last week"
           }
         }
       }
@@ -2363,6 +3185,12 @@
             "state": "translated",
             "value": "今日の記録"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today's Records"
+          }
         }
       }
     },
@@ -2372,6 +3200,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "最近の記録"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recent Records"
           }
         }
       }
@@ -2383,6 +3217,12 @@
             "state": "translated",
             "value": "まだ記録がありません"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No records yet"
+          }
         }
       }
     },
@@ -2392,6 +3232,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ベストデイ"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Best Day"
           }
         }
       }
@@ -2403,6 +3249,12 @@
             "state": "translated",
             "value": "合計時間"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Total time"
+          }
         }
       }
     },
@@ -2412,6 +3264,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "今月のカテゴリ"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This month's category"
           }
         }
       }
@@ -2423,6 +3281,12 @@
             "state": "translated",
             "value": "カテゴリ別"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "By Category"
+          }
         }
       }
     },
@@ -2432,6 +3296,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "最多カテゴリ"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Top Category"
           }
         }
       }
@@ -2443,6 +3313,12 @@
             "state": "translated",
             "value": "週間推移"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weekly Trend"
+          }
         }
       }
     },
@@ -2452,6 +3328,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "週間の推移"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weekly Trend"
           }
         }
       }
@@ -2463,6 +3345,12 @@
             "state": "translated",
             "value": "タグを入力"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter tag"
+          }
         }
       }
     },
@@ -2472,6 +3360,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "期間"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duration"
           }
         }
       }
@@ -2483,6 +3377,12 @@
             "state": "translated",
             "value": "ステータス"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Status"
+          }
         }
       }
     },
@@ -2492,6 +3392,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "詳細（任意）"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Details (optional)"
           }
         }
       }
@@ -2503,6 +3409,12 @@
             "state": "translated",
             "value": "%lld月のサマリー"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Summary"
+          }
         }
       }
     },
@@ -2512,6 +3424,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "CreateLog レポート"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CreateLog Report"
           }
         }
       }
@@ -2523,6 +3441,12 @@
             "state": "translated",
             "value": "レポート"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Report"
+          }
         }
       }
     },
@@ -2532,6 +3456,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "レポートをシェア"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share report"
           }
         }
       }
@@ -2543,6 +3473,12 @@
             "state": "translated",
             "value": "学習"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Learn"
+          }
         }
       }
     },
@@ -2552,6 +3488,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "設計"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plan"
           }
         }
       }
@@ -2563,6 +3505,12 @@
             "state": "translated",
             "value": "開発"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dev"
+          }
         }
       }
     },
@@ -2572,6 +3520,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "いまなにしてる?"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's happening?"
           }
         }
       }
@@ -2583,6 +3537,12 @@
             "state": "translated",
             "value": "コメントを追加..."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a comment..."
+          }
         }
       }
     },
@@ -2592,6 +3552,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "@%@ に返信..."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reply to @%@..."
           }
         }
       }
@@ -2603,6 +3569,12 @@
             "state": "translated",
             "value": "@%@ に返信中"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Replying to @%@"
+          }
         }
       }
     },
@@ -2612,6 +3584,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "返信"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reply"
           }
         }
       }
@@ -2623,6 +3601,12 @@
             "state": "translated",
             "value": "まだ投稿がありません"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No posts yet"
+          }
         }
       }
     },
@@ -2632,6 +3616,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "まだいいねした投稿がありません"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No liked posts yet"
           }
         }
       }
@@ -2643,6 +3633,12 @@
             "state": "translated",
             "value": "まだブックマークした投稿がありません"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No bookmarked posts yet"
+          }
         }
       }
     },
@@ -2652,6 +3648,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "いいね %lld"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld likes"
           }
         }
       }
@@ -2663,6 +3665,12 @@
             "state": "translated",
             "value": "投稿"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posts"
+          }
         }
       }
     },
@@ -2672,6 +3680,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "他の開発者をフォローすると、ここに投稿が流れます"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Follow other devs and their posts will appear here"
           }
         }
       }
@@ -2683,6 +3697,12 @@
             "state": "translated",
             "value": "14:30 ・ 2026年3月28日"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14:30 · March 28, 2026"
+          }
         }
       }
     },
@@ -2692,6 +3712,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "開発者の返信"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Developer reply"
           }
         }
       }
@@ -2703,6 +3729,12 @@
             "state": "translated",
             "value": "探索するものがまだありません"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing to discover yet"
+          }
         }
       }
     },
@@ -2712,6 +3744,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "通知"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notifications"
           }
         }
       }
@@ -2723,6 +3761,12 @@
             "state": "translated",
             "value": "通知はありません"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No notifications"
+          }
         }
       }
     },
@@ -2732,6 +3776,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "いいね、フォロー、コメントなどの\n通知がここに表示されます"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Likes, follows, comments\nand more will appear here"
           }
         }
       }
@@ -2743,6 +3793,12 @@
             "state": "translated",
             "value": "いいね・コメント・フォロー・メンション・リポストの通知がすべて送信されます。"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Likes, comments, follows, mentions, and reposts will all be sent."
+          }
         }
       }
     },
@@ -2752,6 +3808,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "通知の許可設定"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notification permissions"
           }
         }
       }
@@ -2763,6 +3825,12 @@
             "state": "translated",
             "value": "端末の設定アプリで管理します"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Managed in device Settings app"
+          }
         }
       }
     },
@@ -2772,6 +3840,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アカウント"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account"
           }
         }
       }
@@ -2783,6 +3857,12 @@
             "state": "translated",
             "value": "アカウントの削除"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete account"
+          }
         }
       }
     },
@@ -2792,6 +3872,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アカウントを削除"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete Account"
           }
         }
       }
@@ -2803,6 +3889,12 @@
             "state": "translated",
             "value": "アカウントを削除すると、全てのデータが完全に削除されます。この操作は取り消せません。"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deleting your account permanently removes all data. This cannot be undone."
+          }
         }
       }
     },
@@ -2812,6 +3904,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "「削除」と入力"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Type \"delete\""
           }
         }
       }
@@ -2823,6 +3921,12 @@
             "state": "translated",
             "value": "この操作は取り消せません。確認のため「削除」と入力してください。"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This cannot be undone. Type \"delete\" to confirm."
+          }
         }
       }
     },
@@ -2832,6 +3936,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ログアウト"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log out"
           }
         }
       }
@@ -2843,6 +3953,12 @@
             "state": "translated",
             "value": "ログアウトしますか？"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log out?"
+          }
         }
       }
     },
@@ -2852,6 +3968,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "プレミアム機能は今後のアップデートで公開予定です"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Premium features will arrive in future updates"
           }
         }
       }
@@ -2863,6 +3985,12 @@
             "state": "translated",
             "value": "現在はすべての機能を無料でご利用いただけます。公開時に改めてアプリ内でご案内します。"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All features are currently free. We will notify you in-app when we launch premium."
+          }
         }
       }
     },
@@ -2872,6 +4000,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "より深い分析と快適な体験を"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deeper analytics and a better experience"
           }
         }
       }
@@ -2883,6 +4017,12 @@
             "state": "translated",
             "value": "報告"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Report"
+          }
         }
       }
     },
@@ -2892,6 +4032,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "報告する"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Report"
           }
         }
       }
@@ -2903,6 +4049,12 @@
             "state": "translated",
             "value": "報告を送信"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Submit report"
+          }
         }
       }
     },
@@ -2912,6 +4064,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "報告を受け付けました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Report received"
           }
         }
       }
@@ -2923,6 +4081,12 @@
             "state": "translated",
             "value": "報告内容の詳細を入力"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter report details"
+          }
         }
       }
     },
@@ -2932,6 +4096,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "「%@」を報告する理由を選択してください"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a reason to report \"%@\""
           }
         }
       }
@@ -2943,6 +4113,12 @@
             "state": "translated",
             "value": "内容を確認の上、対応いたします。\nご協力ありがとうございます。"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We'll review and respond accordingly.\nThank you for your cooperation."
+          }
         }
       }
     },
@@ -2952,6 +4128,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld件のレビュー"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld reviews"
           }
         }
       }
@@ -2963,6 +4145,12 @@
             "state": "translated",
             "value": "未評価"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unrated"
+          }
         }
       }
     },
@@ -2972,6 +4160,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "CreateLogで繋がろう!"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Let's connect on CreateLog!"
           }
         }
       }
@@ -2983,6 +4177,12 @@
             "state": "translated",
             "value": "CreateLogユーザーのQRコードを\nカメラに映してください"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Point your camera\nat a CreateLog user's QR code"
+          }
         }
       }
     },
@@ -2992,6 +4192,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "QRコードをスキャン"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan QR code"
           }
         }
       }
@@ -3003,6 +4209,12 @@
             "state": "translated",
             "value": "カメラへのアクセスが必要です"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera access required"
+          }
         }
       }
     },
@@ -3012,6 +4224,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "設定からカメラへのアクセスを\n許可してください"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow camera access\nin Settings"
           }
         }
       }
@@ -3023,6 +4241,12 @@
             "state": "translated",
             "value": "つくろぐ"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CreateLog"
+          }
         }
       }
     },
@@ -3032,6 +4256,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "保存した"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved"
           }
         }
       }
@@ -3043,6 +4273,12 @@
             "state": "translated",
             "value": "保存中"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saving"
+          }
         }
       }
     },
@@ -3053,6 +4289,12 @@
             "state": "translated",
             "value": "公開"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Public"
+          }
         }
       }
     },
@@ -3062,6 +4304,492 @@
           "stringUnit": {
             "state": "translated",
             "value": "プラットフォーム"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Platform"
+          }
+        }
+      }
+    },
+    "auth.error.handleMinLength": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3文字以上入力してください"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter at least 3 characters"
+          }
+        }
+      }
+    },
+    "auth.error.appleFailed": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple認証に失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple sign-in failed"
+          }
+        }
+      }
+    },
+    "auth.error.appleCredential": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple認証情報の取得に失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to get Apple credentials"
+          }
+        }
+      }
+    },
+    "auth.error.deleteFailed": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アカウント削除に失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to delete account"
+          }
+        }
+      }
+    },
+    "profile.error.avatarUpload": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アバターのアップロードに失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to upload avatar"
+          }
+        }
+      }
+    },
+    "recording.error.categoryFetch": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カテゴリの取得に失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to fetch categories"
+          }
+        }
+      }
+    },
+    "recording.error.tagLoad": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タグの読み込みに失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to load tags"
+          }
+        }
+      }
+    },
+    "auth.error.handleCheck": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ハンドルの確認に失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to check handle"
+          }
+        }
+      }
+    },
+    "feed.error.load": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フィードの読み込みに失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to load feed"
+          }
+        }
+      }
+    },
+    "profile.error.save": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プロフィールの保存に失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to save profile"
+          }
+        }
+      }
+    },
+    "profile.error.load": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プロフィールの読み込みに失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to load profile"
+          }
+        }
+      }
+    },
+    "auth.error.logout": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ログアウトに失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to log out"
+          }
+        }
+      }
+    },
+    "auth.error.sessionFailed": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ログインセッションの確立に失敗しました。もう一度お試しください"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to establish login session. Please try again"
+          }
+        }
+      }
+    },
+    "premium.error.productFetch": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "商品情報の取得に失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to fetch product info"
+          }
+        }
+      }
+    },
+    "compose.error.post": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "投稿に失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to post"
+          }
+        }
+      }
+    },
+    "discover.error.search": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "検索に失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search failed"
+          }
+        }
+      }
+    },
+    "compose.error.imageUpload": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像のアップロードに失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to upload image"
+          }
+        }
+      }
+    },
+    "compose.error.imageProcess": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像の処理に失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to process image"
+          }
+        }
+      }
+    },
+    "common.error.verify": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "確認に失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verification failed"
+          }
+        }
+      }
+    },
+    "recording.error.entryLoad": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "記��の読み込みに失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to load records"
+          }
+        }
+      }
+    },
+    "premium.error.purchase": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入に失敗しました"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Purchase failed"
+          }
+        }
+      }
+    },
+    "premium.error.purchasePending": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入の承認待ちです"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Purchase pending approval"
+          }
+        }
+      }
+    },
+    "profile.experience.lessThan1": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1年未満"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Less than 1 year"
+          }
+        }
+      }
+    },
+    "profile.experience.1to3": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1-3年"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1-3 years"
+          }
+        }
+      }
+    },
+    "profile.experience.3to5": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3-5年"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3-5 years"
+          }
+        }
+      }
+    },
+    "profile.experience.5to10": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5-10年"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5-10 years"
+          }
+        }
+      }
+    },
+    "profile.experience.over10": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10年以上"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10+ years"
+          }
+        }
+      }
+    },
+    "project.status.inDev": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開発中"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Development"
+          }
+        }
+      }
+    },
+    "project.status.published": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "公開中"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Published"
+          }
+        }
+      }
+    },
+    "project.status.archived": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "停止"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archived"
           }
         }
       }

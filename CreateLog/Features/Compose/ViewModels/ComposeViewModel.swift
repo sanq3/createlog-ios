@@ -88,7 +88,7 @@ final class ComposeViewModel {
             let thumbImage = original.resized(maxDimension: 480)
             guard let fullData = fullImage.jpegData(compressionQuality: 0.85),
                   let thumbData = thumbImage.jpegData(compressionQuality: 0.85) else {
-                errorMessage = "画像の処理に失敗しました"
+                errorMessage = String(localized: "compose.error.imageProcess")
                 HapticManager.error()
                 return
             }
@@ -104,7 +104,7 @@ final class ComposeViewModel {
                     uploadedMedia.append(item)
                 }
             } catch {
-                errorMessage = "画像のアップロードに失敗しました"
+                errorMessage = String(localized: "compose.error.imageUpload")
                 HapticManager.error()
                 return
             }
@@ -121,7 +121,7 @@ final class ComposeViewModel {
             didPost = true
             HapticManager.success()
         } catch {
-            errorMessage = "投稿に失敗しました"
+            errorMessage = String(localized: "compose.error.post")
             HapticManager.error()
         }
     }

@@ -208,7 +208,7 @@ struct OnboardingHandleStep: View {
         case .available:
             return "このハンドルは使えます"
         case .taken:
-            return "このハンドルは既に使われています"
+            return String(localized: "auth.handle.taken")
         case .error(let message):
             return "確認エラー: \(message)"
         case .checking, .unknown:

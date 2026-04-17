@@ -515,7 +515,7 @@ struct PostDetailView: View {
                 .foregroundStyle(Color.clTextTertiary)
 
             if comment.likes > 0 {
-                Text("いいね \(comment.likes)")
+                Text("post.likes \(comment.likes)")
                     .font(.system(size: 12))
                     .foregroundStyle(Color.clTextTertiary)
             }
@@ -549,7 +549,7 @@ struct PostDetailView: View {
 
             if let target = replyingTo {
                 HStack {
-                    Text("@\(target.handle) に返信中")
+                    Text("compose.reply.replyingTo \(target.handle)")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(Color.clAccent)
                     Spacer()

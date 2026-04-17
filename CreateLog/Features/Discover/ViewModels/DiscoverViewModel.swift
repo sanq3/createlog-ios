@@ -100,7 +100,7 @@ final class DiscoverViewModel {
         do {
             searchResults = try await searchRepository.search(query: query, limit: AppConfig.feedPageSize)
         } catch {
-            errorMessage = "検索に失敗しました"
+            errorMessage = String(localized: "discover.error.search")
         }
     }
 

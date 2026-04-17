@@ -53,7 +53,7 @@ final class FeedViewModel {
             oldestCursor = dtos.last?.createdAt
             hasMore = dtos.count >= AppConfig.feedPageSize
         } catch {
-            errorMessage = "フィードの読み込みに失敗しました"
+            errorMessage = String(localized: "feed.error.load")
         }
     }
 

@@ -78,11 +78,11 @@ enum ExperienceLevel: String, CaseIterable, Sendable {
 
     var label: String {
         switch self {
-        case .lessThanOne: "1年未満"
-        case .oneToThree: "1-3年"
-        case .threeToFive: "3-5年"
-        case .fiveToTen: "5-10年"
-        case .moreThanTen: "10年以上"
+        case .lessThanOne: String(localized: "profile.experience.lessThan1")
+        case .oneToThree: String(localized: "profile.experience.1to3")
+        case .threeToFive: String(localized: "profile.experience.3to5")
+        case .fiveToTen: String(localized: "profile.experience.5to10")
+        case .moreThanTen: String(localized: "profile.experience.over10")
         }
     }
 }

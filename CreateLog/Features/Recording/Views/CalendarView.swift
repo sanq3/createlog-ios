@@ -134,7 +134,7 @@ struct CalendarView: View {
     private func monthlySummary(viewModel: CalendarViewModel) -> some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 8) {
-                Text("\(viewModel.displayMonth)月のサマリー")
+                Text("recording.monthSummary \(viewModel.displayMonth)")
                     .font(.clHeadline)
                     .foregroundStyle(Color.clTextSecondary)
 

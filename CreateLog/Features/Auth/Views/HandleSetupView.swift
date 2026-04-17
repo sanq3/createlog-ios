@@ -128,7 +128,7 @@ struct HandleSetupView: View {
     private func checkAvailability() async {
         let trimmed = handle.trimmingCharacters(in: .whitespaces)
         guard trimmed.count >= 3 else {
-            errorMessage = "3文字以上入力してください"
+            errorMessage = String(localized: "auth.error.handleMinLength")
             return
         }
 
@@ -138,7 +138,7 @@ struct HandleSetupView: View {
         do {
             isAvailable = try await dependencies.profileRepository.checkHandleAvailability(trimmed)
         } catch {
-            errorMessage = "確認に失敗しました"
+            errorMessage = String(localized: "common.error.verify")
         }
     }
 }

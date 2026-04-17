@@ -171,7 +171,7 @@ struct RecordingView: View {
             Text("onboarding.tagIntro.title")
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(Color.clTextPrimary)
-            Text("よくやる作業をタグとして登録すると\nタップ+時間入力だけで記録できます")
+            Text("onboarding.tagIntro.subtitle")
                 .font(.system(size: 13))
                 .foregroundStyle(Color.clTextTertiary)
                 .multilineTextAlignment(.center)

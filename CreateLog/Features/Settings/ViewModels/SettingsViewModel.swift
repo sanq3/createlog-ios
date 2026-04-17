@@ -42,7 +42,7 @@ final class SettingsViewModel {
             try await authService.signOut()
             isSignedOut = true
         } catch {
-            errorMessage = "ログアウトに失敗しました"
+            errorMessage = String(localized: "auth.error.logout")
         }
     }
 
@@ -54,7 +54,7 @@ final class SettingsViewModel {
             try await authService.deleteAccount()
             isSignedOut = true
         } catch {
-            errorMessage = "アカウント削除に失敗しました"
+            errorMessage = String(localized: "auth.error.deleteFailed")
         }
     }
 }

@@ -165,9 +165,9 @@ extension ProjectStatus {
     /// rawValue は日本語だが `下書き` は UX 文脈に合わない場面があるため分離。
     var displayName: String {
         switch self {
-        case .draft: "開発中"
-        case .published: "公開中"
-        case .archived: "停止"
+        case .draft: String(localized: "project.status.inDev")
+        case .published: String(localized: "project.status.published")
+        case .archived: String(localized: "project.status.archived")
         }
     }
 

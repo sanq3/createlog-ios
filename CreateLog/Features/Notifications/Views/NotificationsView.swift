@@ -212,7 +212,7 @@ struct NotificationsView: View {
                 .font(.clHeadline)
                 .foregroundStyle(Color.clTextSecondary)
 
-            Text("いいね、フォロー、コメントなどの\n通知がここに表示されます")
+            Text("notification.empty.description")
                 .font(.clCaption)
                 .foregroundStyle(Color.clTextTertiary)
                 .multilineTextAlignment(.center)

@@ -107,7 +107,7 @@ final class RecordingViewModel {
             tags = try modelContext.fetch(descriptor)
         } catch {
             tags = []
-            errorMessage = "タグの読み込みに失敗しました"
+            errorMessage = String(localized: "recording.error.tagLoad")
         }
     }
 
@@ -133,7 +133,7 @@ final class RecordingViewModel {
         } catch {
             recentEntries = []
             heroMetrics = .empty
-            errorMessage = "記��の読み込みに失敗しました"
+            errorMessage = String(localized: "recording.error.entryLoad")
         }
     }
 
@@ -294,7 +294,7 @@ final class RecordingViewModel {
             category = try modelContext.fetch(descriptor).first
         } catch {
             category = nil
-            errorMessage = "カテゴリの取得に失敗しました"
+            errorMessage = String(localized: "recording.error.categoryFetch")
         }
 
         let tag = SDProject(name: tagName, category: category)

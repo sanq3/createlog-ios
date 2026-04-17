@@ -107,7 +107,7 @@ final class ProfileViewModel {
                 apps = try await appRepository.fetchMyApps()
                 totalMinutes = try await statsRepository.fetchCumulativeMinutes()
                 guard let myId = profile?.id else {
-                    errorMessage = "プロフィールの読み込みに失敗しました"
+                    errorMessage = String(localized: "profile.error.load")
                     return
                 }
                 userId = myId
@@ -124,7 +124,7 @@ final class ProfileViewModel {
             posts = p
             weeklyHours = Self.buildWeeklyHours(from: w)
         } catch {
-            errorMessage = "プロフィールの読み込みに失敗しました"
+            errorMessage = String(localized: "profile.error.load")
         }
     }
 

@@ -16,7 +16,7 @@ struct AuthView: View {
                     .foregroundStyle(Color.clTextPrimary)
                     .tracking(2)
 
-                Text("エンジニアのための\n作業記録プラットフォーム")
+                Text("onboarding.welcome.subtitle")
                     .font(.subheadline)
                     .foregroundStyle(Color.clTextSecondary)
                     .multilineTextAlignment(.center)
