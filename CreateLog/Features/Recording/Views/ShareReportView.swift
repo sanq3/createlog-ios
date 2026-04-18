@@ -186,7 +186,7 @@ struct ShareReportView: View {
         .shadow(color: .black.opacity(0.1), radius: 20, y: 8)
     }
 
-    private func statColumn(value: String, label: String) -> some View {
+    private func statColumn(value: String, label: LocalizedStringKey) -> some View {
         VStack(spacing: 4) {
             Text(value)
                 .font(.system(size: 20, weight: .heavy, design: .rounded))

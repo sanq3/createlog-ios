@@ -170,7 +170,7 @@ struct SDProjectDetailView: View {
                     if let store = project.storeURL, !store.isEmpty {
                         linkRow(
                             icon: "arrow.up.right.square",
-                            title: storeLabel,
+                            title: LocalizedStringKey(storeLabel),
                             url: store,
                             color: Color.clAccent
                         )
@@ -204,7 +204,7 @@ struct SDProjectDetailView: View {
     }
 
     @ViewBuilder
-    private func linkRow(icon: String, title: String, url: String, color: Color) -> some View {
+    private func linkRow(icon: String, title: LocalizedStringKey, url: String, color: Color) -> some View {
         Button {
             if let destination = URL(string: url) {
                 openURL(destination)

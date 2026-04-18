@@ -341,7 +341,7 @@ struct PostDetailView: View {
         .padding(.bottom, 14)
     }
 
-    private func statItem(count: Int, label: String) -> some View {
+    private func statItem(count: Int, label: LocalizedStringKey) -> some View {
         HStack(spacing: 4) {
             Text("\(count)")
                 .font(.system(size: 15, weight: .bold))

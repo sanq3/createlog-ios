@@ -339,7 +339,7 @@ struct ProfileEditView: View {
 
     // MARK: - Helpers
 
-    private func fieldContainer<Content: View>(label: String, @ViewBuilder content: () -> Content) -> some View {
+    private func fieldContainer<Content: View>(label: LocalizedStringKey, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(label)
                 .font(.system(size: 13, weight: .medium))

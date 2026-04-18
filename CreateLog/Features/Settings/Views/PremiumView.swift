@@ -92,8 +92,8 @@ struct PremiumView: View {
 
     private func featureRow(
         icon: String,
-        title: String,
-        description: String,
+        title: LocalizedStringKey,
+        description: LocalizedStringKey,
         isLast: Bool = false
     ) -> some View {
         VStack(spacing: 0) {

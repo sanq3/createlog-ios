@@ -222,7 +222,7 @@ struct ProjectDetailView: View {
     }
 
     @ViewBuilder
-    private func linkRow(icon: String, title: String, url: String, color: Color) -> some View {
+    private func linkRow(icon: String, title: LocalizedStringKey, url: String, color: Color) -> some View {
         let destination = URL(string: url)
         Group {
             if let destination {
@@ -236,7 +236,7 @@ struct ProjectDetailView: View {
         .buttonStyle(.plain)
     }
 
-    private func linkRowContent(icon: String, title: String, url: String, color: Color) -> some View {
+    private func linkRowContent(icon: String, title: LocalizedStringKey, url: String, color: Color) -> some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 16, weight: .medium))

@@ -67,7 +67,7 @@ struct NotificationSettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    private func comingSoonRow(icon: String, title: String, subtitle: String) -> some View {
+    private func comingSoonRow(icon: String, title: LocalizedStringKey, subtitle: LocalizedStringKey) -> some View {
         HStack(spacing: 14) {
             Image(systemName: icon)
                 .font(.system(size: 16))

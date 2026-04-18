@@ -135,7 +135,7 @@ struct DiscoverFeedCard: View {
         }
     }
 
-    private func badgeView(icon: String, label: String) -> some View {
+    private func badgeView(icon: String, label: LocalizedStringKey) -> some View {
         HStack(spacing: 3) {
             Image(systemName: icon)
                 .font(.system(size: 8, weight: .bold))

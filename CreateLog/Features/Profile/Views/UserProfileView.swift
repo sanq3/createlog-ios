@@ -357,7 +357,7 @@ struct UserProfileView: View {
         .padding(.top, 20)
     }
 
-    private func profileStat(value: String, label: String) -> some View {
+    private func profileStat(value: String, label: LocalizedStringKey) -> some View {
         VStack(spacing: 2) {
             Text(value)
                 .font(.system(size: 17, weight: .semibold))
