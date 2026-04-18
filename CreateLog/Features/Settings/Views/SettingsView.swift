@@ -28,6 +28,8 @@ struct SettingsView: View {
     @AppStorage("appearanceMode") private var appearanceMode: String = AppearanceMode.system.rawValue
     @AppStorage("durationFormat") private var durationFormat: String = DurationFormat.system.rawValue
     @State private var showOnboarding = false
+    @State private var showLanguageRestartAlert = false
+    @State private var pendingLanguage: AppLanguage?
 
     private var selectedMode: AppearanceMode {
         AppearanceMode(rawValue: appearanceMode) ?? .system
@@ -133,7 +135,9 @@ struct SettingsView: View {
             Section {
                 ForEach(AppLanguage.allCases, id: \.self) { lang in
                     Button {
-                        localizationManager.setLanguage(lang)
+                        guard lang != localizationManager.appLanguage else { return }
+                        pendingLanguage = lang
+                        showLanguageRestartAlert = true
                         HapticManager.light()
                     } label: {
                         HStack {
@@ -211,6 +215,17 @@ struct SettingsView: View {
                 isPresented: $showOnboarding,
                 authViewModel: AuthViewModel(authService: dependencies.authService)
             )
+        }
+        .alert("settings.language.restart.title", isPresented: $showLanguageRestartAlert, presenting: pendingLanguage) { lang in
+            Button("common.cancel", role: .cancel) {
+                pendingLanguage = nil
+            }
+            Button("settings.language.restart.apply") {
+                localizationManager.setLanguage(lang)
+                pendingLanguage = nil
+            }
+        } message: { _ in
+            Text("settings.language.restart.message")
         }
     }
 

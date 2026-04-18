@@ -15,11 +15,11 @@ final class NotificationViewModel {
 
         var label: String {
             switch self {
-            case .all: "すべて"
-            case .like: "いいね"
-            case .follow: "フォロー"
-            case .mention: "メンション"
-            case .system: "システム"
+            case .all: String(localized: "notification.filter.all")
+            case .like: String(localized: "notification.filter.like")
+            case .follow: String(localized: "notification.filter.follow")
+            case .mention: String(localized: "notification.filter.mention")
+            case .system: String(localized: "notification.filter.system")
             }
         }
 

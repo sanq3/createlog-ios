@@ -404,9 +404,13 @@ final class OnboardingViewModel {
     }
 
     /// roleTag step (任意、複数選択されても occupation に先頭のみ保存)。未選択なら server 呼出 skip。
+    /// dot key (`onboarding.role.student` 等) は現在 locale の表示文字列 ("Student" / "学生") に
+    /// 解決してから保存する。`profiles.occupation` は bio と同じく free text カラムとして扱い、
+    /// 表示側で再 localize しない (ProfileEdit で自由編集する際の一貫性担保)。
     func saveRoleTag() async -> Bool {
-        guard let first = roleTags.sorted().first else { return true }
-        return await updateProfilePartial(ProfileUpdateDTO(occupation: first))
+        guard let firstKey = roleTags.sorted().first else { return true }
+        let localized = NSLocalizedString(firstKey, comment: "")
+        return await updateProfilePartial(ProfileUpdateDTO(occupation: localized))
     }
 
     /// 共通の部分更新ヘルパ。

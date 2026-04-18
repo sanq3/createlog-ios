@@ -52,7 +52,7 @@ struct OnboardingProfilePreviewCard: View {
             if !roleTags.isEmpty {
                 FlowLayout(spacing: 6) {
                     ForEach(roleTags, id: \.self) { tag in
-                        Text(tag)
+                        Text(LocalizedStringKey(tag))
                             .font(.system(size: 11, weight: .medium))
                             .foregroundStyle(Color.clAccent)
                             .padding(.horizontal, 10)
@@ -85,7 +85,7 @@ struct OnboardingProfilePreviewCard: View {
     }
 
     private var effectiveDisplayName: String {
-        displayName.isEmpty ? "あなたの名前" : displayName
+        displayName.isEmpty ? String(localized: "onboarding.preview.displayNamePlaceholder") : displayName
     }
 
     private var effectiveBio: String {

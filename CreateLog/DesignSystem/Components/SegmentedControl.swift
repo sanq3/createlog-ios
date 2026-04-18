@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CLSegmentedControl: View {
-    let items: [String]
+    let items: [LocalizedStringKey]
     @Binding var selection: Int
     @Namespace private var namespace
 

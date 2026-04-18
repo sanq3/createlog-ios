@@ -5,7 +5,11 @@ struct NotificationsView: View {
     @State private var viewModel: NotificationViewModel?
     @State private var filterIndex = 0
 
-    private let filterLabels = ["すべて", "いいね", "フォロー", "メンション", "システム"]
+    private let filterLabels: [LocalizedStringKey] = [
+        "notification.filter.all", "notification.filter.like",
+        "notification.filter.follow", "notification.filter.mention",
+        "notification.filter.system"
+    ]
 
     private var allNotifications: [NotificationItem] {
         viewModel?.notifications ?? []
