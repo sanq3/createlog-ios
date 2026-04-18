@@ -21,6 +21,15 @@ final class AuthViewModel {
         print("[AuthViewModel] 🔧 init: authService type = \(type(of: authService))")
     }
 
+    #if DEBUG
+    /// dev bypass: i18n 等の UI 検証で OAuth login せず MainTab を表示させるための強制 authenticated。
+    /// UserDefaults "devBypassAuth" = true で `observeAuthState()` 前に呼ぶ。Supabase session は無いので
+    /// データ fetch は 401 になるが画面レイアウト / 翻訳の検証には十分。
+    func devForceAuthenticated(userId: String = "00000000-0000-0000-0000-000000000dev") {
+        authState = .authenticated(userId: userId)
+    }
+    #endif
+
     // MARK: - Auth State Observation
 
     func observeAuthState() async {

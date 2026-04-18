@@ -48,7 +48,7 @@ struct TodayHeroView: View {
         }
     }
 
-    private func kpiItem(minutes: Int, referenceMinutes: Int, label: String) -> some View {
+    private func kpiItem(minutes: Int, referenceMinutes: Int, label: LocalizedStringKey) -> some View {
         return VStack(spacing: 3) {
             DurationKPIValueView(minutes: minutes, referenceMinutes: referenceMinutes)
 

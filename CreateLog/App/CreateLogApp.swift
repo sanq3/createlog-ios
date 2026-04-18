@@ -50,7 +50,15 @@ struct CreateLogApp: App {
         }
         let deps = DependencyContainer(modelContainer: modelContainer)
         dependencies = deps
-        _authViewModel = State(initialValue: AuthViewModel(authService: deps.authService))
+        let authVM = AuthViewModel(authService: deps.authService)
+        #if DEBUG
+        if UserDefaults.standard.bool(forKey: "devBypassAuth") {
+            authVM.devForceAuthenticated()
+            UserDefaults.standard.set(true, forKey: "onboardingCompleted")
+            print("[CreateLogApp] ⚠️ DEV BYPASS AUTH enabled — OAuth skipped, MainTab forced")
+        }
+        #endif
+        _authViewModel = State(initialValue: authVM)
         // PushNotificationService は init 内で NotificationCenter を observe するので
         // AppDelegateAdapter への明示的な参照設定は不要 (疎結合)。
         _pushService = State(initialValue: PushNotificationService(client: deps.supabaseClient))
@@ -85,7 +93,12 @@ struct CreateLogApp: App {
             }
             .environment(\.locale, localizationManager.currentLocale)
             .environment(localizationManager)
-            .task { await authViewModel.observeAuthState() }
+            .task {
+                #if DEBUG
+                if UserDefaults.standard.bool(forKey: "devBypassAuth") { return }
+                #endif
+                await authViewModel.observeAuthState()
+            }
         }
     }
 

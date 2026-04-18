@@ -214,7 +214,7 @@ struct ReportDashboardView: View {
         }
     }
 
-    private func kpiItem(hours: Double, label: String) -> some View {
+    private func kpiItem(hours: Double, label: LocalizedStringKey) -> some View {
         let minutes = Int(hours * 60)
         let h = minutes / 60
         let m = minutes % 60
