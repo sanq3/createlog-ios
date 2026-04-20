@@ -100,7 +100,10 @@ final class NotificationViewModel {
                     message: current.message,
                     timestamp: current.timestamp,
                     isRead: true,
-                    contentPreview: current.contentPreview
+                    contentPreview: current.contentPreview,
+                    postId: current.postId,
+                    actorId: current.actorId,
+                    actorHandle: current.actorHandle
                 )
                 unreadCount = max(0, unreadCount - 1)
             }
@@ -121,7 +124,10 @@ final class NotificationViewModel {
                     message: n.message,
                     timestamp: n.timestamp,
                     isRead: true,
-                    contentPreview: n.contentPreview
+                    contentPreview: n.contentPreview,
+                    postId: n.postId,
+                    actorId: n.actorId,
+                    actorHandle: n.actorHandle
                 )
             }
             unreadCount = 0

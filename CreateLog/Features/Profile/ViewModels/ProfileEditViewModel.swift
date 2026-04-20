@@ -6,6 +6,12 @@ final class ProfileEditViewModel {
     // MARK: - Dependencies
 
     @ObservationIgnored private let profileRepository: any ProfileRepositoryProtocol
+    /// save 成功時に `.profileUpdated` を publish し、Feed / Notifications / PostDetail / UserProfile
+    /// 等で保持する投稿者情報 (name / handle / avatarUrl) を client 側で即時 patch する。
+    /// server-side trigger (migration) による非正規化 column の propagation を待たず UX を向上させる。
+    @ObservationIgnored private let eventBus: DomainEventBus?
+    /// save 成功時に `currentProfile` を更新し、全 VM が最新 profile を参照できるようにする。
+    @ObservationIgnored private let domainContext: DomainContext?
 
     // MARK: - Editable State
 
@@ -78,9 +84,13 @@ final class ProfileEditViewModel {
 
     init(
         user: User,
-        profileRepository: any ProfileRepositoryProtocol = NoOpProfileRepository()
+        profileRepository: any ProfileRepositoryProtocol = NoOpProfileRepository(),
+        eventBus: DomainEventBus? = nil,
+        domainContext: DomainContext? = nil
     ) {
         self.profileRepository = profileRepository
+        self.eventBus = eventBus
+        self.domainContext = domainContext
 
         displayName = user.name
         handle = user.handle
@@ -156,7 +166,20 @@ final class ProfileEditViewModel {
         )
 
         do {
-            _ = try await profileRepository.updateProfile(updates)
+            let updatedDTO = try await profileRepository.updateProfile(updates)
+            // 2026-04-20 Phase 3: denormalize 伝播。client 側で即時に全 VM に broadcast し、
+            // Feed / Notifications / PostDetail / UserProfile 等の author 表示を patch させる。
+            // server-side trigger (migration) による posts.author_*/notifications.actor_* 更新と
+            // 二層防御: trigger 成立前でも UI は即反映される。
+            let updatedUser = User(from: updatedDTO)
+            domainContext?.currentProfile = updatedUser
+            eventBus?.publish(.profileUpdated(
+                userId: updatedDTO.id,
+                displayName: updatedUser.name,
+                handle: updatedUser.handle,
+                avatarUrl: updatedUser.avatarUrl,
+                bio: updatedUser.bio
+            ))
             didSaveSuccessfully = true
         } catch {
             errorMessage = String(localized: "profile.error.save")

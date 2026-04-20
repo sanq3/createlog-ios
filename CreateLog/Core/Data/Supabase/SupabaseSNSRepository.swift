@@ -93,10 +93,13 @@ final class SupabasePostRepository: PostRepositoryProtocol, Sendable {
     }
 
     func insertPost(_ post: PostInsertDTO) async throws -> PostDTO {
+        // 2026-04-20: `.postCreated` domain event publish 用に author 情報を JOIN で取得。
+        // 従来の `.select()` のみだと author_* が nil になり、Feed 即反映時に
+        // 投稿者名/handle/avatar が空欄表示される bug を修正。
         let result: PostDTO = try await client
             .from("posts")
             .insert(post)
-            .select()
+            .select(Self.feedSelectClause)
             .single()
             .execute()
             .value

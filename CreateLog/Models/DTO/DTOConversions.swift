@@ -56,7 +56,10 @@ extension NotificationItem {
             primaryActor: dto.actorDisplayName ?? dto.actorHandle ?? "someone",
             message: dto.message ?? "",
             timestamp: dto.createdAt,
-            isRead: dto.isRead
+            isRead: dto.isRead,
+            postId: dto.postId,
+            actorId: dto.actorId,
+            actorHandle: dto.actorHandle
         )
     }
 }

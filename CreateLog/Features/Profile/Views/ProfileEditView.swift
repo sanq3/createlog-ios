@@ -7,10 +7,17 @@ struct ProfileEditView: View {
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var avatarImage: Image?
 
-    init(user: User, profileRepository: any ProfileRepositoryProtocol) {
+    init(
+        user: User,
+        profileRepository: any ProfileRepositoryProtocol,
+        eventBus: DomainEventBus? = nil,
+        domainContext: DomainContext? = nil
+    ) {
         _viewModel = State(initialValue: ProfileEditViewModel(
             user: user,
-            profileRepository: profileRepository
+            profileRepository: profileRepository,
+            eventBus: eventBus,
+            domainContext: domainContext
         ))
     }
 

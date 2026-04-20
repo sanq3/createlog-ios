@@ -34,6 +34,13 @@ final class DependencyContainer: Sendable {
     /// CreateLogApp が認証成立後に `migrateLogMemoRemoteIds(userId:)` を kick する。
     let migrationService: MigrationService?
 
+    // MARK: - Domain event infra (2026-04-20)
+    /// Domain 横断イベントの publish/subscribe hub。
+    /// Repository が write 成功時に publish、各 VM が .task で subscribe。
+    let domainEventBus: DomainEventBus
+    /// App 全体で共有する domain state holder (currentProfile / blockedUserIDs 等)。
+    let domainContext: DomainContext
+
     /// 本番用: xcconfigから読み込んだSupabaseClientを使用
     static func live() -> DependencyContainer {
         DependencyContainer(client: SupabaseClientFactory.shared)
@@ -44,6 +51,9 @@ final class DependencyContainer: Sendable {
         modelContainer: ModelContainer? = nil
     ) {
         self.supabaseClient = client
+        // Domain event infra は全 Repository 生成前に用意 (将来の Repository 注入に備えて)。
+        self.domainEventBus = DomainEventBus()
+        self.domainContext = DomainContext()
         self.authService = SupabaseAuthService(client: client)
         let logRepo = SupabaseLogRepository(client: client)
         self.categoryRepository = SupabaseCategoryRepository(client: client)

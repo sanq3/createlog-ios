@@ -240,7 +240,12 @@ struct ProfileView: View {
             }
         }
         .sheet(isPresented: $showEditProfile) {
-            ProfileEditView(user: user, profileRepository: deps.profileRepository)
+            ProfileEditView(
+                user: user,
+                profileRepository: deps.profileRepository,
+                eventBus: deps.domainEventBus,
+                domainContext: deps.domainContext
+            )
         }
         .sheet(isPresented: $showShareSheet) {
             ProfileShareSheet(

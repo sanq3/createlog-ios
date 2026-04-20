@@ -98,6 +98,78 @@ struct PostDetailView: View {
         }
         .task {
             await loadInitial()
+            // 2026-04-20: DomainEvent subscribe。View lifecycle で .task 終了時に stream も終わる。
+            // 他 VM (FeedViewModel / ComposeViewModel 等) からの like/comment/delete 変更を受けて
+            // この画面の post/comments を in-place patch する。
+            await subscribeToEvents()
+        }
+    }
+
+    // MARK: - Event subscription (2026-04-20)
+
+    /// 他 VM からの DomainEvent を受けて自 state を patch。
+    /// 自分自身が publish した event も同 stream に来るが、idempotent な処理で副作用を出さない。
+    private func subscribeToEvents() async {
+        for await event in dependencies.domainEventBus.events() {
+            switch event {
+            case .likeToggled(let postId, let liked, let count) where postId == post.id:
+                // Feed で like → ここも同期。自身 toggleLike からの publish は同値 set で no-op。
+                if post.isLiked != liked { post.isLiked = liked }
+                if post.likes != count { post.likes = count }
+
+            case .commentDeleted(let postId, let commentId) where postId == post.id:
+                // 親 comment 削除
+                comments.removeAll(where: { $0.id == commentId })
+                // 返信 comment 削除 (parent.replies から除く)
+                comments = comments.map { parent in
+                    guard parent.replies.contains(where: { $0.id == commentId }) else { return parent }
+                    return Comment(
+                        id: parent.id,
+                        authorName: parent.authorName,
+                        authorHandle: parent.authorHandle,
+                        authorInitials: parent.authorInitials,
+                        authorAvatarUrl: parent.authorAvatarUrl,
+                        text: parent.text,
+                        timestamp: parent.timestamp,
+                        likes: parent.likes,
+                        isLiked: parent.isLiked,
+                        replies: parent.replies.filter { $0.id != commentId }
+                    )
+                }
+                post.comments = max(0, post.comments - 1)
+
+            case .postDeleted(let postId) where postId == post.id:
+                // 自分が開いている投稿自体が削除された → Navigation pop は View 側の dismiss で対応、
+                // v2.0 では @Environment(\.dismiss) を持ってないので no-op (navigation pop は呼出側の責務)。
+                // 代わりに comments を空にして UI 的に「消失」を示唆する。
+                comments = []
+
+            case .blockToggled(let targetUserId, let blocked) where blocked && targetUserId == post.userId:
+                // 自分が開いている投稿の投稿者をブロックした → comments 消して pop 期待 (View 側で上位 dismiss)
+                comments = []
+
+            case .profileUpdated(let userId, let name, let handle, let avatarUrl, _) where userId == post.userId:
+                // 投稿者プロフィール更新 → 表示 author 情報を in-place patch。
+                // avatarUrl: nil = 未変更と解釈、old を維持 (X 等大手 SNS は avatar 削除機能無し)。
+                post = Post(
+                    id: post.id,
+                    userId: post.userId,
+                    name: name,
+                    handle: handle,
+                    status: post.status,
+                    createdAt: post.createdAt,
+                    workMinutes: post.workMinutes,
+                    content: post.content,
+                    likes: post.likes,
+                    reposts: post.reposts,
+                    comments: post.comments,
+                    media: post.media,
+                    authorAvatarUrl: avatarUrl ?? post.authorAvatarUrl
+                )
+
+            default:
+                break
+            }
         }
     }
 
@@ -186,6 +258,15 @@ struct PostDetailView: View {
                 } else {
                     try await dependencies.likeRepository.like(postId: post.id)
                 }
+                // 成功確定 → Feed 等にも like state 反映。自身も subscribe 経路で受けるが
+                // idempotent (同値 set で no-op) なので副作用なし。
+                await MainActor.run {
+                    dependencies.domainEventBus.publish(.likeToggled(
+                        postId: post.id,
+                        liked: post.isLiked,
+                        count: post.likes
+                    ))
+                }
             } catch {
                 // rollback
                 await MainActor.run {
@@ -217,6 +298,13 @@ struct PostDetailView: View {
                 await MainActor.run {
                     appendComment(dto)
                     post.comments += 1
+                    // Feed 等に broadcast (post.comments count 更新のため)。
+                    // comment 本体は既に appendComment で反映済、受け手側は !contains(id) で重複回避。
+                    let newComment = commentFromDTO(dto)
+                    dependencies.domainEventBus.publish(.commentAdded(
+                        postId: post.id,
+                        comment: newComment
+                    ))
                 }
             } catch {
                 // 失敗時は入力と返信モードを復元

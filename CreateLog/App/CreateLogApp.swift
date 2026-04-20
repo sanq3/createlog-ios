@@ -55,7 +55,14 @@ struct CreateLogApp: App {
         }
         let deps = DependencyContainer(modelContainer: modelContainer)
         dependencies = deps
-        let authVM = AuthViewModel(authService: deps.authService)
+        // 2026-04-20: logout 時の cache clear + DomainContext reset + event publish を担う service。
+        // AuthViewModel に注入し、signOut / deleteAccount 成功時に同期的に cleanup を発火させる。
+        let cleanupService = AuthCleanupService(
+            domainContext: deps.domainContext,
+            domainEventBus: deps.domainEventBus,
+            modelContainer: modelContainer
+        )
+        let authVM = AuthViewModel(authService: deps.authService, cleanupService: cleanupService)
         #if DEBUG
         if UserDefaults.standard.bool(forKey: "devBypassAuth") {
             authVM.devForceAuthenticated()
@@ -105,6 +112,15 @@ struct CreateLogApp: App {
             }
             .environment(\.locale, localizationManager.currentLocale)
             .environment(localizationManager)
+            .onContinueUserActivity("NSUserActivityTypeBrowseWeb") { activity in
+                // Universal Links (https://createlog.app/...) を受け取り pendingLink に積む。
+                // cold start (アプリ未起動でリンクタップ) でもここに来る。
+                // 実消費は MainTabView 等の onChange(of: deepLinkHandler.pendingLink) で行う。
+                // NSUserActivityTypeBrowseWeb 定数は Swift で scope に出ないため文字列リテラル直書き (Apple 公式の許容パターン)。
+                if let url = activity.webpageURL {
+                    deepLinkHandler.handle(url)
+                }
+            }
             .task {
                 #if DEBUG
                 if UserDefaults.standard.bool(forKey: "devBypassAuth") { return }
@@ -151,6 +167,10 @@ struct CreateLogApp: App {
             .environment(\.dependencies, dependencies)
             .environment(deepLinkHandler)
             .environment(pushService)
+            // 2026-04-20: App scope AuthVM を全子 View に注入。AccountSettings 等が
+            // 局所生成せず、このシングル instance を Environment 経由で読む。
+            // logout 後の authState = .unauthenticated で rootView が即切替される。
+            .environment(authViewModel)
             .onAppear {
                 applyTheme(animated: false)
                 seedDefaultCategories()

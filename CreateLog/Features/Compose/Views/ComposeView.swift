@@ -87,7 +87,10 @@ struct ComposeView: View {
             }
             .task {
                 if viewModel == nil {
-                    viewModel = ComposeViewModel(postRepository: dependencies.postRepository)
+                    viewModel = ComposeViewModel(
+                        postRepository: dependencies.postRepository,
+                        eventBus: dependencies.domainEventBus
+                    )
                 }
                 // 現在ユーザーのプロフィール取得 (アバター表示用)
                 if let dto = try? await dependencies.profileRepository.fetchMyProfile() {

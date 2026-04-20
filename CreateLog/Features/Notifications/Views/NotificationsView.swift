@@ -2,6 +2,7 @@ import SwiftUI
 
 struct NotificationsView: View {
     @Environment(\.dependencies) private var deps
+    @Environment(DeepLinkHandler.self) private var deepLinkHandler
     @State private var viewModel: NotificationViewModel?
     @State private var filterIndex = 0
 
@@ -106,6 +107,12 @@ struct NotificationsView: View {
 
     private func notificationRow(_ notif: NotificationItem) -> some View {
         Button {
+            // 1. 先に deep link をセット (MainTabView の .onChange が pending を消化)。
+            //    markAsRead 完了待ちで遷移が遅延するのを避ける (大手 SNS の即時遷移踏襲)。
+            // 2. markAsRead は並行して firing (await 不要、遷移体験優先)。
+            if let link = notif.deepLink {
+                deepLinkHandler.pendingLink = link
+            }
             Task { await viewModel?.markAsRead(notif) }
         } label: {
             VStack(spacing: 0) {

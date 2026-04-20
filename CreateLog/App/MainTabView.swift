@@ -92,8 +92,10 @@ struct MainTabView: View {
             if feedViewModel == nil {
                 feedViewModel = FeedViewModel(
                     postRepository: dependencies.postRepository,
-                    likeRepository: dependencies.likeRepository
+                    likeRepository: dependencies.likeRepository,
+                    eventBus: dependencies.domainEventBus
                 )
+                feedViewModel?.startSubscribing()
             }
             if discoverViewModel == nil {
                 discoverViewModel = DiscoverViewModel(

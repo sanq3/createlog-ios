@@ -5,6 +5,12 @@ import Supabase
 final class SupabaseNotificationRepository: NotificationRepositoryProtocol, Sendable {
     private let client: SupabaseClient
 
+    /// 2026-04-20: actor (発信者) の profile 情報を JOIN で取得する select 句。
+    /// 従来の `.select()` のみだと actor_display_name / actor_handle が常に nil で、
+    /// UI で "someone" fallback になる既存 bug の根本修正。NotificationDTO の decoder が
+    /// nested `actor` を優先 decode する (PostDTO 同 pattern)。
+    private static let notificationSelectClause = "*, actor:profiles!notifications_actor_id_fkey(handle, display_name, avatar_url)"
+
     init(client: SupabaseClient) {
         self.client = client
     }
@@ -14,7 +20,7 @@ final class SupabaseNotificationRepository: NotificationRepositoryProtocol, Send
         if let cursor {
             let result: [NotificationDTO] = try await client
                 .from("notifications")
-                .select()
+                .select(Self.notificationSelectClause)
                 .lt("created_at", value: formatter.string(from: cursor))
                 .order("created_at", ascending: false)
                 .limit(limit)
@@ -24,7 +30,7 @@ final class SupabaseNotificationRepository: NotificationRepositoryProtocol, Send
         } else {
             let result: [NotificationDTO] = try await client
                 .from("notifications")
-                .select()
+                .select(Self.notificationSelectClause)
                 .order("created_at", ascending: false)
                 .limit(limit)
                 .execute()

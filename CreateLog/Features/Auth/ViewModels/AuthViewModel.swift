@@ -19,9 +19,19 @@ final class AuthViewModel {
 
     @ObservationIgnored private let authService: any AuthServiceProtocol
     @ObservationIgnored private var currentNonce: String?
+    /// logout / deleteAccount 成功時の SwiftData cache clear + DomainContext reset + event publish を担う。
+    /// preview/test で nil 注入可能 (cleanup skip)。
+    @ObservationIgnored private let cleanupService: AuthCleanupService?
 
-    init(authService: any AuthServiceProtocol) {
+    /// explicit `signOut()` / `deleteAccount()` 経由で cleanup を実行したら true。
+    /// Supabase SDK が遅れて authStateChanges の `.signedOut` を yield しても、
+    /// observeAuthState での補完 cleanup を 1 回だけ skip するフラグ。
+    /// 二重 `.sessionCleared` publish → Feed の posts 2 回 reset の race を防ぐ。
+    @ObservationIgnored private var skipNextAutoCleanup = false
+
+    init(authService: any AuthServiceProtocol, cleanupService: AuthCleanupService? = nil) {
         self.authService = authService
+        self.cleanupService = cleanupService
         Self.logger.debug("init: authService type = \(String(describing: type(of: authService)), privacy: .public)")
     }
 
@@ -38,8 +48,41 @@ final class AuthViewModel {
 
     func observeAuthState() async {
         authState = await authService.currentState
+        // 初回 state 取得時に currentUserId を set (既ログイン状態で起動した時の first paint 用)。
+        syncCurrentUserId(from: authState)
+
         for await state in authService.observeAuthChanges() {
+            let wasAuthenticated: Bool = {
+                if case .authenticated = authState { return true }
+                return false
+            }()
             authState = state
+
+            // authenticated 遷移時: currentUserId を set して全 VM に共有 (MEDIUM #8)。
+            syncCurrentUserId(from: state)
+
+            // session expiry 自動伝播 (HIGH): 明示的 signOut() を経由せず server 側で session が
+            // 切れた場合 (refresh token 失効など) のみ cleanup 補完する。
+            // 明示 signOut()/deleteAccount() で既に cleanup 済ならフラグ guard で skip し、
+            // .sessionCleared の二重 publish を防ぐ (HIGH #2)。
+            if wasAuthenticated, case .unauthenticated = state {
+                if skipNextAutoCleanup {
+                    skipNextAutoCleanup = false
+                } else {
+                    cleanupService?.performCleanup()
+                }
+            }
+        }
+    }
+
+    /// authState から UUID を取り出し DomainContext に反映。
+    private func syncCurrentUserId(from state: AuthState) {
+        switch state {
+        case .authenticated(let userIdString):
+            cleanupService?.setCurrentUserId(UUID(uuidString: userIdString))
+        case .unauthenticated, .unknown:
+            // unauthenticated は performCleanup 側で reset 済、unknown は初期化前なので触らない。
+            break
         }
     }
 
@@ -184,9 +227,18 @@ final class AuthViewModel {
 
     // MARK: - Sign Out
 
+    /// logout 成功時:
+    /// 1. SupabaseAuth から session 解除
+    /// 2. `cleanupService` が SwiftData cache 全削除 + DomainContext reset + `.sessionCleared` publish
+    /// 3. `authState = .unauthenticated` で rootView を即 onboarding に切替
+    ///    (observeAuthChanges の遅延を待たず同期切替、AccountSettings から残画面が残るバグを防ぐ)
+    /// 4. `skipNextAutoCleanup = true` で Supabase SDK 遅延 `.signedOut` yield 時の二重 cleanup を防止
     func signOut() async {
         do {
             try await authService.signOut()
+            skipNextAutoCleanup = true
+            cleanupService?.performCleanup()
+            authState = .unauthenticated
         } catch {
             errorMessage = mapErrorMessage(error)
         }
@@ -196,6 +248,7 @@ final class AuthViewModel {
 
     /// Edge Function 経由で auth.user + profile を cascade 削除し、最後に signOut する。
     /// 失敗時は errorMessage を立てて state は変えない (リトライ可能)。
+    /// 成功時は signOut と同様に cleanup + authState 更新で rootView を onboarding へ戻す。
     func deleteAccount() async {
         isLoading = true
         errorMessage = nil
@@ -203,6 +256,9 @@ final class AuthViewModel {
 
         do {
             try await authService.deleteAccount()
+            skipNextAutoCleanup = true
+            cleanupService?.performCleanup()
+            authState = .unauthenticated
         } catch {
             errorMessage = mapErrorMessage(error)
         }

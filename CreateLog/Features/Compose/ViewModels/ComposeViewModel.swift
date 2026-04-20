@@ -7,6 +7,8 @@ final class ComposeViewModel {
     // MARK: - Dependencies
 
     @ObservationIgnored private let postRepository: (any PostRepositoryProtocol)?
+    /// 投稿成功時に `.postCreated(post)` を publish し、Feed/Profile 側で即時反映させる。
+    @ObservationIgnored private let eventBus: DomainEventBus?
 
     // MARK: - State
 
@@ -25,8 +27,9 @@ final class ComposeViewModel {
 
     // MARK: - Init
 
-    init(postRepository: (any PostRepositoryProtocol)? = nil) {
+    init(postRepository: (any PostRepositoryProtocol)? = nil, eventBus: DomainEventBus? = nil) {
         self.postRepository = postRepository
+        self.eventBus = eventBus
     }
 
     // MARK: - Computed
@@ -117,7 +120,14 @@ final class ComposeViewModel {
         )
 
         do {
-            _ = try await postRepository?.insertPost(dto)
+            let insertedDTO = try await postRepository?.insertPost(dto)
+            // 2026-04-20: server insert 成功 → 即座に Feed/Profile 等へ broadcast。
+            // Post(from: PostDTO) で denormalize author 情報も埋まった状態で渡すので、
+            // 受け手 VM は `posts.insert(post, at: 0)` するだけで UI に反映される。
+            if let insertedDTO {
+                let post = Post(from: insertedDTO)
+                eventBus?.publish(.postCreated(post))
+            }
             didPost = true
             HapticManager.success()
         } catch {

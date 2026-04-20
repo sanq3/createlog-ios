@@ -27,6 +27,13 @@ struct NotificationItem: Identifiable, Sendable {
     let contentPreview: String?
     let avatarColor: Int
 
+    /// tap 時の遷移先識別用。`NotificationDTO.postId/actorId/actorHandle` から由来。
+    /// 2026-04-20: 大手 SNS 踏襲の tap→元コンテンツ遷移を実現するため追加。
+    /// MockData 経由は nil で OK。
+    let postId: UUID?
+    let actorId: UUID?
+    let actorHandle: String?
+
     init(
         id: UUID = UUID(),
         type: NotificationType,
@@ -35,7 +42,10 @@ struct NotificationItem: Identifiable, Sendable {
         message: String,
         timestamp: Date,
         isRead: Bool = false,
-        contentPreview: String? = nil
+        contentPreview: String? = nil,
+        postId: UUID? = nil,
+        actorId: UUID? = nil,
+        actorHandle: String? = nil
     ) {
         self.id = id
         self.type = type
@@ -45,8 +55,29 @@ struct NotificationItem: Identifiable, Sendable {
         self.timestamp = timestamp
         self.isRead = isRead
         self.contentPreview = contentPreview
+        self.postId = postId
+        self.actorId = actorId
+        self.actorHandle = actorHandle
         // 名前から決定的にカラーインデックスを生成
         self.avatarColor = abs(primaryActor.hashValue) % 6
+    }
+
+    /// tap 時に消化すべき DeepLink。type + 保持 ID から決定。
+    /// - like/comment/mention/repost: postId があれば .post(id:)
+    /// - follow: actorHandle があれば .profile(handle:)
+    /// - system: nil (静的バナー、遷移なし)
+    /// - 不足データ時は nil → tap は markAsRead のみ発火
+    var deepLink: DeepLink? {
+        switch type {
+        case .like, .comment, .mention, .repost:
+            guard let postId else { return nil }
+            return .post(id: postId)
+        case .follow:
+            guard let handle = actorHandle, !handle.isEmpty else { return nil }
+            return .profile(handle: handle)
+        case .system:
+            return nil
+        }
     }
 
     var isSystemNotification: Bool {

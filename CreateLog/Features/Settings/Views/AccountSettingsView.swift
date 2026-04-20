@@ -7,8 +7,10 @@ import SwiftUI
 ///   footer で「現在サポートしていません」と自認していた冗長表示のため削除。provider 情報が
 ///   必要になるのはアカウント削除や問い合わせ時で、別経路で提供する。
 struct AccountSettingsView: View {
-    @Environment(\.dependencies) private var dependencies
-    @State private var viewModel: AuthViewModel?
+    /// 2026-04-20: 局所 AuthVM 生成を破棄し、App scope の同一 instance を Environment 経由で受ける。
+    /// これにより signOut 成功時に rootView の authState が即 .unauthenticated に切り替わり、
+    /// このシート自体が OnboardingView へ dismiss される (大手 SNS の業界標準挙動)。
+    @Environment(AuthViewModel.self) private var viewModel
     @State private var showLogoutConfirm = false
     @State private var showDeleteConfirm = false
     @State private var deleteText = ""
@@ -44,7 +46,7 @@ struct AccountSettingsView: View {
                     .font(.clCaption)
             }
 
-            if let errorMessage = viewModel?.errorMessage {
+            if let errorMessage = viewModel.errorMessage {
                 Section {
                     Text(errorMessage)
                         .font(.clCaption)
@@ -56,15 +58,10 @@ struct AccountSettingsView: View {
         .background(Color.clBackground)
         .navigationTitle("settings.account.title")
         .navigationBarTitleDisplayMode(.inline)
-        .task {
-            if viewModel == nil {
-                viewModel = AuthViewModel(authService: dependencies.authService)
-            }
-        }
         .confirmationDialog("settings.logout.confirm", isPresented: $showLogoutConfirm, titleVisibility: .visible) {
             Button("settings.logout", role: .destructive) {
                 HapticManager.medium()
-                Task { await viewModel?.signOut() }
+                Task { await viewModel.signOut() }
             }
             Button("common.cancel", role: .cancel) {}
         }
@@ -73,7 +70,7 @@ struct AccountSettingsView: View {
             Button("common.delete", role: .destructive) {
                 HapticManager.error()
                 Task {
-                    await viewModel?.deleteAccount()
+                    await viewModel.deleteAccount()
                     deleteText = ""
                 }
             }
