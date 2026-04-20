@@ -3,14 +3,31 @@ import SwiftUI
 // MARK: - Report
 
 enum ReportReason: String, CaseIterable, Identifiable {
-    case spam = "スパム"
-    case inappropriate = "不適切なコンテンツ"
-    case harassment = "ハラスメント"
-    case copyright = "著作権侵害"
-    case impersonation = "なりすまし"
-    case other = "その他"
+    // rawValue は i18n dot key (display 用)。DB 保存は `code` (英語 enum) を使え。
+    // DB `reports_reason_check` は spam/harassment/inappropriate/misinformation/copyright/impersonation/other のみ許可。
+    case spam
+    case inappropriate
+    case harassment
+    case copyright
+    case impersonation
+    case other
 
     var id: String { rawValue }
+
+    /// DB insert 用の英語 enum code (reports_reason_check 準拠)。
+    var code: String { rawValue }
+
+    /// 表示名 (i18n dot key)。rawValue と独立させて lang 切替耐性を持たせる。
+    var displayKey: LocalizedStringKey {
+        switch self {
+        case .spam: "report.reason.spam"
+        case .inappropriate: "report.reason.inappropriate"
+        case .harassment: "report.reason.harassment"
+        case .copyright: "report.reason.copyright"
+        case .impersonation: "report.reason.impersonation"
+        case .other: "report.reason.other"
+        }
+    }
 
     var icon: String {
         switch self {
@@ -116,7 +133,7 @@ struct ReportSheet: View {
                         .foregroundStyle(isSelected ? Color.clAccent : Color.clTextTertiary)
                         .frame(width: 24)
 
-                    Text(reason.rawValue)
+                    Text(reason.displayKey)
                         .font(.system(size: 15))
                         .foregroundStyle(Color.clTextPrimary)
 

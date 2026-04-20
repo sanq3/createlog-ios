@@ -208,7 +208,7 @@ struct UserProfileView: View {
             try await dependencies.ugcRepository.reportContent(
                 targetId: user.id,
                 targetType: "user",
-                reason: reason.rawValue,
+                reason: reason.code,
                 detail: detail.isEmpty ? nil : detail
             )
         } catch {

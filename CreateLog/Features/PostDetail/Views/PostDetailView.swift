@@ -78,7 +78,7 @@ struct PostDetailView: View {
                     try? await dependencies.ugcRepository.reportContent(
                         targetId: post.id,
                         targetType: "post",
-                        reason: reason.rawValue,
+                        reason: reason.code,
                         detail: detail.isEmpty ? nil : detail
                     )
                 }

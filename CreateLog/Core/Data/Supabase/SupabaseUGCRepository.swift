@@ -18,7 +18,8 @@ final class SupabaseUGCRepository: UGCRepositoryProtocol, Sendable {
             "reason": reason
         ]
         if let detail, !detail.isEmpty {
-            params["detail"] = detail
+            // DB 側カラム名は `description` (reports table)。`detail` にすると silent に破棄される。
+            params["description"] = detail
         }
         try await client
             .from("reports")
