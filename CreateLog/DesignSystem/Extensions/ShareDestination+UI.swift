@@ -20,6 +20,8 @@ extension ShareDestination {
     var brandColor: Color { platform.brandColor }
     var iconForeground: Color { platform.iconForeground }
 
+    /// `UIApplication.shared` は Swift 6 で main-actor 隔離のため、呼び出しも main から行う。
+    @MainActor
     var isAvailable: Bool {
         guard let scheme = urlScheme,
               let url = URL(string: "\(scheme)://")
@@ -27,6 +29,7 @@ extension ShareDestination {
         return UIApplication.shared.canOpenURL(url)
     }
 
+    @MainActor
     func share(url: String) {
         let shareText = "CreateLogで繋がろう! \(url)"
         let urlString = shareURL(shareText)

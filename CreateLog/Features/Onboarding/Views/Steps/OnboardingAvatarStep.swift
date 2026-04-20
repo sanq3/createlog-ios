@@ -27,8 +27,19 @@ struct OnboardingAvatarStep: View {
                 onAdvance()
             },
             input: {
+                // PhotosPicker の label は @Sendable closure。main-actor VM property を
+                // 直接参照できないので Sendable value (String/Data?) を事前キャプチャ。
+                // `some View` 型の local capture も Sendable 違反になるため、View 構築は
+                // closure 内でインライン (helper struct 経由)。
+                let name = viewModel.displayName
+                let handle = viewModel.handleInput
+                let data = viewModel.avatarImageData
                 PhotosPicker(selection: $pickerItem, matching: .images, photoLibrary: .shared()) {
-                    avatarPreview
+                    OnboardingAvatarPreviewContent(
+                        displayName: name,
+                        handle: handle,
+                        avatarData: data
+                    )
                 }
                 .buttonStyle(.plain)
             },
@@ -52,15 +63,23 @@ struct OnboardingAvatarStep: View {
         }
     }
 
-    @ViewBuilder
-    private var avatarPreview: some View {
+}
+
+/// PhotosPicker の @Sendable label closure 内で安全に描画するため、独立した View 構造体
+/// として切り出す。init 引数は全て Sendable (String / Data?) のみ。
+private struct OnboardingAvatarPreviewContent: View {
+    let displayName: String
+    let handle: String
+    let avatarData: Data?
+
+    var body: some View {
         let gradientColors = [
-            OnboardingAccountPromptStep.iconColor(for: viewModel.displayName.isEmpty ? "You" : viewModel.displayName),
-            OnboardingAccountPromptStep.iconColor(for: viewModel.handleInput.isEmpty ? "Handle" : viewModel.handleInput).opacity(0.7),
+            OnboardingAccountPromptStep.iconColor(for: displayName.isEmpty ? "You" : displayName),
+            OnboardingAccountPromptStep.iconColor(for: handle.isEmpty ? "Handle" : handle).opacity(0.7),
         ]
 
         ZStack {
-            if let data = viewModel.avatarImageData, let uiImage = UIImage(data: data) {
+            if let avatarData, let uiImage = UIImage(data: avatarData) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFill()

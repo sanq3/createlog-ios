@@ -105,13 +105,17 @@ struct PostDetailView: View {
 
     /// 自分のプロフィール (コメント入力欄のアバター用) と投稿のコメント一覧を並列ロード。
     private func loadInitial() async {
+        // async let は nonisolated な子 task を spawn するため、main-actor @State `post` に
+        // 直接触れない。Sendable な値 (UUID/Bool) を事前キャプチャして渡す。
+        let capturedPostId = post.id
+        let capturedIsLiked = post.isLiked
         async let profile: ProfileDTO? = (try? await dependencies.profileRepository.fetchMyProfile())
         async let commentDTOs: [CommentDTO] = (try? await dependencies.commentRepository.fetchComments(
-            postId: post.id,
+            postId: capturedPostId,
             cursor: nil,
             limit: 50
         )) ?? []
-        async let likedState: Bool = (try? await dependencies.likeRepository.isLiked(postId: post.id)) ?? post.isLiked
+        async let likedState: Bool = (try? await dependencies.likeRepository.isLiked(postId: capturedPostId)) ?? capturedIsLiked
 
         let (myProfile, dtos, liked) = await (profile, commentDTOs, likedState)
 

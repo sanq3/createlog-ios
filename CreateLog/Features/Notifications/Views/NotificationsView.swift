@@ -199,7 +199,7 @@ struct NotificationsView: View {
         let messageText = Text(notif.message)
             .foregroundColor(Color.clTextSecondary)
 
-        (actorText + messageText)
+        Text("\(actorText)\(messageText)")
             .font(.clBody)
             .lineLimit(2)
     }

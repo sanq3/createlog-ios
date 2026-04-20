@@ -70,6 +70,24 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         CURRENT_PROJECT_VERSION: 1
         MARKETING_VERSION: "2.0.0"
+        # Xcode 16 / Swift 6.2 推奨設定 (2026-04-20 昇格):
+        # - SWIFT_VERSION 6.0: Swift 6 言語モード (strict concurrency デフォルト有効)
+        # - SWIFT_APPROACHABLE_CONCURRENCY: `nonisolated(nonsending)` デフォルト
+        #   (async 関数が caller の isolation を継承、Sendable 伝播ではなく)
+        # - ENABLE_USER_SCRIPT_SANDBOXING: build script security hardening
+        # - LOCALIZATION_PREFERS_STRING_CATALOGS: 新 string は .xcstrings 優先
+        # - STRING_CATALOG_GENERATE_SYMBOLS: Swift code gen で i18n key を型安全に参照
+        #
+        # SWIFT_DEFAULT_ACTOR_ISOLATION=MainActor は敢えて採用しない:
+        # sync 層 (OfflineQueueActor, LogCacheWriter 等の @ModelActor) や DTO 20 件が
+        # cross-actor で使われるため、global MainActor default にすると `nonisolated`
+        # 汚染が 30+ 箇所に広がる。ViewModel は既に `@MainActor @Observable` 明示済、
+        # View は protocol 経由で MainActor、必要な場所だけ明示する方針が優位。
+        SWIFT_VERSION: "6.0"
+        SWIFT_APPROACHABLE_CONCURRENCY: YES
+        ENABLE_USER_SCRIPT_SANDBOXING: YES
+        LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+        STRING_CATALOG_GENERATE_SYMBOLS: YES
     dependencies:
       - package: Supabase
         product: Supabase

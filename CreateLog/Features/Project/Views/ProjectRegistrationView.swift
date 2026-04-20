@@ -351,7 +351,7 @@ struct ProjectRegistrationView: View {
             Button {
                 HapticManager.light()
                 withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                    tags.remove(at: index)
+                    _ = tags.remove(at: index)
                 }
             } label: {
                 Image(systemName: "xmark")

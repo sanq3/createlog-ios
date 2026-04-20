@@ -25,8 +25,12 @@ struct OnboardingProjectIconStep: View {
                 onAdvance()
             },
             input: {
+                // PhotosPicker の label は @Sendable closure のため、main-actor VM を
+                // 直接参照不可。Sendable 値を事前キャプチャして helper struct に渡す。
+                let projectName = viewModel.projectName
+                let data = viewModel.iconImageData
                 PhotosPicker(selection: $pickerItem, matching: .images, photoLibrary: .shared()) {
-                    iconPreview
+                    OnboardingIconPreviewContent(projectName: projectName, iconData: data)
                 }
                 .buttonStyle(.plain)
             },
@@ -44,10 +48,28 @@ struct OnboardingProjectIconStep: View {
         }
     }
 
-    @ViewBuilder
-    private var iconPreview: some View {
+    private var productPreview: some View {
+        OnboardingProductPreviewCard(
+            projectName: viewModel.savedProjectName,
+            platform: viewModel.savedPlatforms.joined(separator: " / "),
+            iconData: viewModel.iconImageData,
+            storeURL: viewModel.storeURL,
+            githubURL: viewModel.githubURL,
+            appDescription: viewModel.appDescription,
+            status: nil
+        )
+    }
+}
+
+/// PhotosPicker の @Sendable label closure 内で描画するための subview。init 引数は
+/// 全て Sendable (String / Data?) のみで main-actor VM に依存しない。
+private struct OnboardingIconPreviewContent: View {
+    let projectName: String
+    let iconData: Data?
+
+    var body: some View {
         ZStack {
-            if let data = viewModel.iconImageData, let uiImage = UIImage(data: data) {
+            if let iconData, let uiImage = UIImage(data: iconData) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFill()
@@ -55,7 +77,7 @@ struct OnboardingProjectIconStep: View {
                     .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
             } else {
                 RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .fill(OnboardingAccountPromptStep.iconColor(for: viewModel.projectName.isEmpty ? "Project" : viewModel.projectName))
+                    .fill(OnboardingAccountPromptStep.iconColor(for: projectName.isEmpty ? "Project" : projectName))
                     .frame(width: 120, height: 120)
                     .overlay(
                         Image(systemName: "photo.fill")
@@ -79,17 +101,5 @@ struct OnboardingProjectIconStep: View {
             .frame(width: 120, height: 120)
         }
         .frame(maxWidth: .infinity)
-    }
-
-    private var productPreview: some View {
-        OnboardingProductPreviewCard(
-            projectName: viewModel.savedProjectName,
-            platform: viewModel.savedPlatforms.joined(separator: " / "),
-            iconData: viewModel.iconImageData,
-            storeURL: viewModel.storeURL,
-            githubURL: viewModel.githubURL,
-            appDescription: viewModel.appDescription,
-            status: nil
-        )
     }
 }

@@ -18,19 +18,22 @@ import Foundation
 enum SyncDateRounding {
     /// `Date` を 1 ミリ秒単位に丸める。
     /// timeIntervalSince1970 を 1000 倍 → round → 1000 で割って Date 化。
-    static func round1ms(_ date: Date) -> Date {
+    /// `nonisolated`: 純粋関数 (Date Sendable) のため、`@ModelActor` 等の
+    /// カスタム actor 文脈から同期呼び出し可能にする。`SWIFT_DEFAULT_ACTOR_ISOLATION=MainActor`
+    /// 下でも cross-actor error にならない。
+    nonisolated static func round1ms(_ date: Date) -> Date {
         let ms = (date.timeIntervalSince1970 * 1000.0).rounded()
         return Date(timeIntervalSince1970: ms / 1000.0)
     }
 
     /// 2 つの `Date` を 1ms 解像度で等価判定する。
-    static func equal1ms(_ lhs: Date, _ rhs: Date) -> Bool {
+    nonisolated static func equal1ms(_ lhs: Date, _ rhs: Date) -> Bool {
         round1ms(lhs) == round1ms(rhs)
     }
 
     /// `lhs` の方が `rhs` より厳密に新しい (1ms 解像度)。
     /// LWW 判定で「remote が local より新しい場合のみ cache を上書きする」に使う。
-    static func isNewer(_ lhs: Date, than rhs: Date) -> Bool {
+    nonisolated static func isNewer(_ lhs: Date, than rhs: Date) -> Bool {
         round1ms(lhs) > round1ms(rhs)
     }
 }

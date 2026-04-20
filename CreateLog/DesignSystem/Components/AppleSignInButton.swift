@@ -72,9 +72,13 @@ struct AppleSignInButton: View {
         }
 
         func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-            UIApplication.shared.connectedScenes
-                .compactMap { $0 as? UIWindowScene }
-                .first?.keyWindow ?? ASPresentationAnchor()
+            let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+            let activeScene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
+            guard let scene = activeScene else {
+                // Sign-in UI can only trigger with a foreground window scene; this branch is unreachable.
+                fatalError("AppleSignInButton: no UIWindowScene available for presentationAnchor")
+            }
+            return scene.keyWindow ?? UIWindow(windowScene: scene)
         }
     }
 }

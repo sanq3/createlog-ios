@@ -54,25 +54,34 @@ struct ProfileEditView: View {
 
     // MARK: - Avatar
 
+    /// PhotosPicker の label closure は Sendable として扱われるため、main-actor な
+    /// `@Observable` ViewModel の property を直接触れない。Sendable 値
+    /// (String / URL?) を label の外側で事前にキャプチャしてから使用する。
     private var avatarSection: some View {
-        PhotosPicker(
+        let displayInitial = viewModel.displayName.isEmpty
+            ? "?"
+            : String(viewModel.displayName.prefix(1))
+        let avatarURL = viewModel.currentAvatarUrl.flatMap(URL.init(string:))
+        let currentAvatarImage = avatarImage
+
+        return PhotosPicker(
             selection: $selectedPhoto,
             matching: .images,
             photoLibrary: .shared()
         ) {
             ZStack(alignment: .bottomTrailing) {
-                if let avatarImage {
-                    avatarImage
+                if let currentAvatarImage {
+                    currentAvatarImage
                         .resizable()
                         .scaledToFill()
                         .frame(width: 80, height: 80)
                         .clipShape(Circle())
                 } else {
                     AvatarView(
-                        initials: String(viewModel.displayName.prefix(1)),
+                        initials: displayInitial,
                         size: 80,
                         status: .offline,
-                        imageURL: viewModel.currentAvatarUrl.flatMap(URL.init(string:))
+                        imageURL: avatarURL
                     )
                 }
 

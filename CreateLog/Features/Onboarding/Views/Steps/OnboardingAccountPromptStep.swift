@@ -219,7 +219,9 @@ struct OnboardingAccountPromptStep: View {
 // MARK: - Icon Color
 
 extension OnboardingAccountPromptStep {
-    static func iconColor(for name: String) -> Color {
+    /// 純粋関数 (String → Color) のため `nonisolated` 明示。PhotosPicker の @Sendable label
+    /// closure などから呼べるように MainActor 隔離を外す。
+    nonisolated static func iconColor(for name: String) -> Color {
         let palette: [(Double, Double, Double)] = [
             (0.20, 0.25, 0.45), (0.25, 0.15, 0.35), (0.15, 0.20, 0.32),
             (0.18, 0.28, 0.25), (0.28, 0.18, 0.22), (0.22, 0.22, 0.35),

@@ -56,20 +56,21 @@ struct ComposeView: View {
             .toolbar(.visible, for: .bottomBar)
             .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
+                    // PhotosPicker の label は Sendable closure として扱われるため、
+                    // main-actor @Observable ViewModel の property を直接触れない。
+                    // Bool/Int を事前キャプチャしてから closure 内で使用する。
+                    let canAddImages = viewModel?.canAddImages ?? true
+                    let remainingSlots = viewModel?.remainingImageSlots ?? 4
                     PhotosPicker(
                         selection: $selectedPhotos,
-                        maxSelectionCount: viewModel?.remainingImageSlots ?? 4,
+                        maxSelectionCount: remainingSlots,
                         matching: .images
                     ) {
                         Image(systemName: "photo.on.rectangle.angled")
                             .font(.system(size: 18))
-                            .foregroundStyle(
-                                (viewModel?.canAddImages ?? true)
-                                    ? Color.clAccent
-                                    : Color.clTextTertiary
-                            )
+                            .foregroundStyle(canAddImages ? Color.clAccent : Color.clTextTertiary)
                     }
-                    .disabled(!(viewModel?.canAddImages ?? true))
+                    .disabled(!canAddImages)
 
                     Spacer()
 

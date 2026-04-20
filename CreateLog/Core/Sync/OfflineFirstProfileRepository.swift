@@ -293,11 +293,19 @@ private extension SDProfileCache {
 
         guard let data = try? JSONSerialization.data(withJSONObject: json) else { return nil }
         let decoder = JSONDecoder()
+        // ISO8601DateFormatter は非 Sendable のため、`.custom` の @Sendable closure に
+        // 外側 formatter を capture できない。closure 内で都度生成する (formatter 生成は
+        // 軽量で N+1 level perf 影響なし)。
         decoder.dateDecodingStrategy = .custom { decoder in
+            let fracFormatter = ISO8601DateFormatter()
+            fracFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let plainFormatter = ISO8601DateFormatter()
+            plainFormatter.formatOptions = [.withInternetDateTime]
+
             let container = try decoder.singleValueContainer()
             let string = try container.decode(String.self)
-            if let date = isoFormatter.date(from: string) { return date }
-            if let date = isoFormatterNoFrac.date(from: string) { return date }
+            if let date = fracFormatter.date(from: string) { return date }
+            if let date = plainFormatter.date(from: string) { return date }
             throw DecodingError.dataCorruptedError(
                 in: container,
                 debugDescription: "Invalid ISO8601 date: \(string)"

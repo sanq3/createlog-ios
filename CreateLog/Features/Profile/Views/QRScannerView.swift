@@ -1,5 +1,8 @@
 import SwiftUI
-import AVFoundation
+// AVFoundation は iOS 26 時点で Sendable 表記が不完全 (AVCaptureSession 等が Sendable 未宣言)。
+// @preconcurrency import で「Sendable 関連 error を warning に格下げ」して運用する。
+// Apple 側で annotation 完了したら外す。
+@preconcurrency import AVFoundation
 
 struct QRScannerView: View {
     @Environment(\.dismiss) private var dismiss
@@ -217,6 +220,10 @@ struct CameraPreview: UIViewRepresentable {
         Coordinator(scannedCode: $scannedCode)
     }
 
+    /// delegate callback は `output.setMetadataObjectsDelegate(delegate, queue: .main)` で
+    /// main queue に固定されているため @MainActor 化して安全。これで `sending self` data race
+    /// 警告と `scannedCode` Binding の main-actor access 違反が両方消える。
+    @MainActor
     final class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
         @Binding var scannedCode: String?
         private var hasScanned = false
@@ -225,18 +232,18 @@ struct CameraPreview: UIViewRepresentable {
             _scannedCode = scannedCode
         }
 
-        func metadataOutput(
+        nonisolated func metadataOutput(
             _ output: AVCaptureMetadataOutput,
             didOutput metadataObjects: [AVMetadataObject],
             from connection: AVCaptureConnection
         ) {
-            guard !hasScanned,
-                  let object = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
+            guard let object = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
                   let value = object.stringValue
             else { return }
 
-            hasScanned = true
             Task { @MainActor in
+                guard !hasScanned else { return }
+                hasScanned = true
                 scannedCode = value
             }
         }
@@ -290,8 +297,12 @@ final class CameraPreviewUIView: UIView {
         self.layer.addSublayer(layer)
         previewLayer = layer
 
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            self?.captureSession.startRunning()
+        // @Sendable closure 内から main-actor property `captureSession` を参照できないため、
+        // local 変数にキャプチャしてから background で起動する。AVCaptureSession は
+        // @preconcurrency import により Sendable 違反が warning 扱い化する。
+        let session = captureSession
+        DispatchQueue.global(qos: .userInitiated).async {
+            session.startRunning()
         }
     }
 
@@ -299,9 +310,15 @@ final class CameraPreviewUIView: UIView {
         // AVCaptureSession.stopRunning() は synchronous & blocking。
         // deinit は main thread で呼ばれる場合があり、そこで blocking すると UI が hang する。
         // session を capture して background queue で停止する (Apple docs 推奨パターン)。
-        let session = captureSession
-        DispatchQueue.global(qos: .userInitiated).async {
-            session.stopRunning()
+        //
+        // UIView subclass の deinit は UIKit の lifecycle 保証で main thread 上で実行される
+        // ため、`MainActor.assumeIsolated` で runtime assert してから main-actor property
+        // `captureSession` へアクセスする (Swift 6 の nonisolated deinit 制約回避)。
+        MainActor.assumeIsolated {
+            let session = captureSession
+            DispatchQueue.global(qos: .userInitiated).async {
+                session.stopRunning()
+            }
         }
     }
 }

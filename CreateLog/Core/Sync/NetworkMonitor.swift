@@ -96,7 +96,7 @@ final class NetworkMonitor: NetworkMonitorProtocol, @unchecked Sendable {
             continuation.yield(initialValue)
             continuation.onTermination = { [weak self] _ in
                 self?.lock.withLock { state in
-                    state.continuations.removeValue(forKey: id)
+                    _ = state.continuations.removeValue(forKey: id)
                 }
             }
         }
