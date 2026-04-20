@@ -70,6 +70,7 @@ final class OnboardingViewModel {
         case tooLong
         case mustStartWithLetter
         case invalidCharacters
+        case reserved
         case valid
 
         var isValid: Bool { self == .valid }
@@ -82,6 +83,7 @@ final class OnboardingViewModel {
             case .tooLong: return "15文字以下にしてください"
             case .mustStartWithLetter: return "先頭は英字で始めてください"
             case .invalidCharacters: return "英数字とアンダースコア (_) のみ使えます"
+            case .reserved: return "この handle は使用できません"
             }
         }
     }
@@ -643,6 +645,7 @@ final class OnboardingViewModel {
     /// - 3-15 文字
     /// - 先頭は英字 (`a-zA-Z`)
     /// - 2 文字目以降は英数字とアンダースコア
+    /// - `HandleValidator` の reserved list に含まれない (canonical `ReservedHandles.json`)
     static func validateHandle(_ raw: String) -> HandleValidation {
         let trimmed = raw.trimmingCharacters(in: .whitespaces)
         if trimmed.isEmpty { return .empty }
@@ -654,6 +657,7 @@ final class OnboardingViewModel {
         for scalar in scalars {
             guard scalar.isASCII, allowedSet.contains(scalar) else { return .invalidCharacters }
         }
+        if HandleValidator.isReserved(trimmed) { return .reserved }
         return .valid
     }
 

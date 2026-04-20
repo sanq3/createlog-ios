@@ -50,6 +50,10 @@ targets:
         aps-environment: development
         com.apple.developer.applesignin:
           - Default
+        com.apple.developer.associated-domains:
+          # apex + www 両方登録必須: 片方だけだと Universal Links が動かない (業界標準落とし穴)
+          - applinks:createlog.app
+          - applinks:www.createlog.app
     configFiles:
       Debug: Config/Debug.xcconfig
       Release: Config/Release.xcconfig

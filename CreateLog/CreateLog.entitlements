@@ -8,5 +8,10 @@
 	<array>
 		<string>Default</string>
 	</array>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:createlog.app</string>
+		<string>applinks:www.createlog.app</string>
+	</array>
 </dict>
 </plist>

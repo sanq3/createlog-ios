@@ -1,0 +1,80 @@
+# gitleaks config for createlog-ios.
+# 実行: `gitleaks git --verbose` or `gitleaks protect --staged` (pre-commit で使用)
+# 2026-04-21 追加。対応する過去 incident: supabase/.temp/ leak / project ref hardcode /
+# print で PII log / onboarding OAuth データロス時期に紛れ込んだ雑 dump。
+
+title = "createlog-ios gitleaks config"
+
+# 既定 rule に加えてプロジェクト固有 rule を追加
+[extend]
+useDefault = true
+
+# Supabase project pooler connection URL (過去 leak 同型)
+[[rules]]
+id = "supabase-pooler-url"
+description = "Supabase Postgres pooler URL (contains project ref, leaked previously in supabase/.temp/pooler-url)"
+regex = '''postgres(?:ql)?://postgres\.[a-z0-9]{20}@.*pooler\.supabase\.com'''
+tags = ["supabase", "connection-string"]
+
+# Supabase direct DB URL
+[[rules]]
+id = "supabase-direct-db-url"
+description = "Supabase direct Postgres URL"
+regex = '''postgres(?:ql)?://[^@]+@db\.[a-z0-9]{20}\.supabase\.co'''
+tags = ["supabase", "connection-string"]
+
+# Supabase anon key / service_role key (JWT form、先頭 `eyJ`)
+[[rules]]
+id = "supabase-jwt-key"
+description = "Supabase anon or service_role key (JWT)"
+regex = '''eyJ[A-Za-z0-9_=-]{30,}\.eyJ[A-Za-z0-9_=-]{30,}\.[A-Za-z0-9_=-]{30,}'''
+tags = ["supabase", "jwt"]
+
+# Supabase management API token
+[[rules]]
+id = "supabase-management-token"
+description = "Supabase management API token"
+regex = '''sbp_[a-zA-Z0-9]{40,}'''
+tags = ["supabase", "management-api"]
+
+# Apple team ID / signing key prefix (開発中の誤 leak)
+[[rules]]
+id = "apple-signing-key-header"
+description = "Apple private key PEM header"
+regex = '''-----BEGIN (?:EC |RSA )?PRIVATE KEY-----'''
+tags = ["apple", "signing-key"]
+
+# print で secret / token / email / session を出す auth 系 code pattern (再発防止)
+# gitleaks は secret value 専門で AST 解析は出来ないため、既知のアンチパターン文字列で検出
+[[rules]]
+id = "print-auth-token"
+description = "print()/NSLog で認証トークン / session 出力 (AuthViewModel / SupabaseAuthService の過去 anti-pattern)"
+regex = '''\b(?:print|NSLog)\s*\([^)]*(?:accessToken|refreshToken|idToken|session\.user\.email|session\.accessToken)'''
+tags = ["pii", "log-hygiene"]
+
+# Scan 除外: 設定ファイル / 翻訳 / test fixture / doc
+[allowlist]
+description = "Scan 除外 path"
+paths = [
+    '''\.gitleaks\.toml''',
+    '''\.mcp\.json\.example''',
+    '''Localizable\.xcstrings''',
+    '''Package\.resolved''',
+    # migrations は service_role 文字列 (値ではなく role 名) を含むため個別 rule のみ適用
+    '''supabase/migrations/''',
+    '''supabase/migrations_v1_backup/''',
+    # test の dummy credential (明示の plain placeholder) は除外
+    '''CreateLogTests/.*\.swift''',
+    # docs の説明文 / rules
+    '''\.claude/rules/''',
+    '''docs/''',
+    '''supabase/baseline_audit\.md''',
+    '''supabase/README\.md''',
+]
+
+# gitleaks 既定 rule の誤検知回避 (project-specific placeholder 文字列)
+regexes = [
+    '''YOUR_PROJECT_REF''',
+    '''unconfigured\.supabase\.co''',
+    '''\$\(SUPABASE_''',
+]

@@ -67,7 +67,9 @@ final class ProfileEditViewModel {
 
     var isHandleValid: Bool {
         let pattern = /^[a-zA-Z0-9_]{3,15}$/
-        return handle.wholeMatch(of: pattern) != nil
+        guard handle.wholeMatch(of: pattern) != nil else { return false }
+        // canonical ReservedHandles.json と照合 (`docs/reserved-handles.md` 参照)
+        return !HandleValidator.isReserved(handle)
     }
 
     var canSave: Bool {
