@@ -1,4 +1,5 @@
 {
+  "_comment": "copy this file to .mcp.json and replace YOUR_PROJECT_REF with your actual Supabase project reference",
   "mcpServers": {
     "supabase": {
       "command": "npx",
@@ -6,7 +7,7 @@
         "-y",
         "@supabase/mcp-server-supabase@latest",
         "--read-only",
-        "--project-ref=aeycoojfugzzuvrpfjhj"
+        "--project-ref=YOUR_PROJECT_REF"
       ]
     }
   }

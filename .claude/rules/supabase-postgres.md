@@ -49,6 +49,6 @@ globs: ["**/*.sql", "**/supabase/**", "**/migrations/**", "docs/supabase-schema.
 ## Supabase操作ルール
 
 - Supabaseの操作（テーブル確認、マイグレーション、Auth設定、API設定等）はダッシュボードではなく `supabase` CLIから行え
-- プロジェクトref: `aeycoojfugzzuvrpfjhj`（リンク済み）
+- プロジェクト ref は `supabase link` 済、`supabase projects list` で確認可能 (コミットにハードコードしない)
 - service_roleキーをクライアントコード・コミットに含めるな。anon keyのみ使用可
 - スキーマ変更はマイグレーションファイル経由で行え。手動SQL実行禁止

@@ -1,10 +1,14 @@
 import Foundation
 import AuthenticationServices
 import CryptoKit
+import OSLog
 
 /// 認証画面のViewModel
 @MainActor @Observable
 final class AuthViewModel {
+    @ObservationIgnored
+    private static let logger = Logger(subsystem: "com.sanq3.createlog", category: "Auth")
+
     // MARK: - State
 
     var authState: AuthState = .unknown
@@ -18,7 +22,7 @@ final class AuthViewModel {
 
     init(authService: any AuthServiceProtocol) {
         self.authService = authService
-        print("[AuthViewModel] 🔧 init: authService type = \(type(of: authService))")
+        Self.logger.debug("init: authService type = \(String(describing: type(of: authService)), privacy: .public)")
     }
 
     #if DEBUG
@@ -70,7 +74,7 @@ final class AuthViewModel {
             do {
                 let userId = try await authService.signInWithApple(idToken: idToken, nonce: nonce)
                 authState = .authenticated(userId: userId)
-                print("[AuthViewModel] ✅ Apple sign in success: userId=\(userId)")
+                Self.logger.info("Apple sign in success (user.id=\(userId, privacy: .private))")
                 guard await verifySessionEstablished(provider: "apple") else {
                     try? await authService.signOut()
                     authState = .unauthenticated
@@ -79,7 +83,7 @@ final class AuthViewModel {
                 }
                 return true
             } catch {
-                print("[AuthViewModel] ❌ Apple sign in failed: \(error)")
+                Self.logger.error("Apple sign in failed: \(error.localizedDescription, privacy: .private)")
                 errorMessage = mapErrorMessage(error)
                 return false
             }
@@ -87,7 +91,7 @@ final class AuthViewModel {
             if (error as NSError).code == ASAuthorizationError.canceled.rawValue {
                 return false
             }
-            print("[AuthViewModel] ❌ Apple authorization failed: \(error)")
+            Self.logger.error("Apple authorization failed: \(error.localizedDescription, privacy: .private)")
             errorMessage = String(localized: "auth.error.appleFailed")
             return false
         }
@@ -100,12 +104,12 @@ final class AuthViewModel {
         for attempt in 0..<12 {
             let state = await authService.currentState
             if case .authenticated = state {
-                print("[AuthViewModel] ✅ Session verified after \(attempt) retries (provider=\(provider))")
+                Self.logger.info("Session verified after \(attempt, privacy: .public) retries (provider=\(provider, privacy: .public))")
                 return true
             }
             try? await Task.sleep(nanoseconds: 250_000_000)
         }
-        print("[AuthViewModel] ⚠️ Session NOT established after 3s (provider=\(provider)). 次 step で Auth session missing の可能性あり")
+        Self.logger.warning("Session NOT established after 3s (provider=\(provider, privacy: .public))")
         return false
     }
 
@@ -123,7 +127,7 @@ final class AuthViewModel {
         do {
             let userId = try await authService.signInWithGoogleOAuth()
             authState = .authenticated(userId: userId)
-            print("[AuthViewModel] ✅ Google sign in success: userId=\(userId)")
+            Self.logger.info("Google sign in success (user.id=\(userId, privacy: .private))")
             guard await verifySessionEstablished(provider: "google") else {
                 try? await authService.signOut()
                 authState = .unauthenticated
@@ -133,7 +137,7 @@ final class AuthViewModel {
             return true
         } catch {
             if Self.isUserCancel(error) { return false }
-            print("[AuthViewModel] ❌ Google sign in failed: \(error)")
+            Self.logger.error("Google sign in failed: \(error.localizedDescription, privacy: .private)")
             errorMessage = mapErrorMessage(error)
             return false
         }
@@ -152,7 +156,7 @@ final class AuthViewModel {
         do {
             let userId = try await authService.signInWithGitHub()
             authState = .authenticated(userId: userId)
-            print("[AuthViewModel] ✅ GitHub sign in success: userId=\(userId)")
+            Self.logger.info("GitHub sign in success (user.id=\(userId, privacy: .private))")
             guard await verifySessionEstablished(provider: "github") else {
                 try? await authService.signOut()
                 authState = .unauthenticated
@@ -162,7 +166,7 @@ final class AuthViewModel {
             return true
         } catch {
             if Self.isUserCancel(error) { return false }
-            print("[AuthViewModel] ❌ GitHub sign in failed: \(error)")
+            Self.logger.error("GitHub sign in failed: \(error.localizedDescription, privacy: .private)")
             errorMessage = mapErrorMessage(error)
             return false
         }

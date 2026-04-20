@@ -1,8 +1,10 @@
 import Foundation
 import Supabase
+import OSLog
 
 /// ProfileRepositoryProtocol の Supabase実装
 final class SupabaseProfileRepository: ProfileRepositoryProtocol, Sendable {
+    private static let logger = Logger(subsystem: "com.sanq3.createlog", category: "ProfileRepo")
     private let client: SupabaseClient
 
     init(client: SupabaseClient) {
@@ -12,24 +14,26 @@ final class SupabaseProfileRepository: ProfileRepositoryProtocol, Sendable {
     /// Sign In 直後は SDK の session storage 書込みが遅延することがあり
     /// `client.auth.session` が `Auth session missing` を投げる。500ms 間隔で最大 10 回 (計 5 秒) retry する。
     /// (2026-04-14 displayName step の保存失敗を追跡して追加 + 粘り強く拡張)
+    ///
+    /// 2026-04-20 (security): print → os.Logger。error 内容は privacy: .private で redacted。
     private func currentSession() async throws -> Session {
         var lastError: Error?
         for attempt in 0..<10 {
             do {
                 let session = try await client.auth.session
                 if attempt > 0 {
-                    print("[SupabaseProfileRepository] ✅ session obtained after \(attempt) retries")
+                    Self.logger.info("session obtained after \(attempt, privacy: .public) retries")
                 }
                 return session
             } catch {
                 lastError = error
-                print("[SupabaseProfileRepository] ⏳ session attempt \(attempt + 1) failed: \(error.localizedDescription)")
+                Self.logger.debug("session attempt \(attempt + 1, privacy: .public) failed: \(error.localizedDescription, privacy: .private)")
                 if attempt < 9 {
                     try? await Task.sleep(nanoseconds: 500_000_000)
                 }
             }
         }
-        print("[SupabaseProfileRepository] ❌ session unavailable after 10 retries (5s)")
+        Self.logger.error("session unavailable after 10 retries (5s)")
         throw lastError ?? AuthError.unknown("Session unavailable after retries")
     }
 

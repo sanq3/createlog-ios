@@ -2,9 +2,11 @@ import Foundation
 import Supabase
 import Auth
 import AuthenticationServices
+import OSLog
 
 /// Supabaseを使った認証サービスの実装
 final class SupabaseAuthService: AuthServiceProtocol, Sendable {
+    private static let logger = Logger(subsystem: "com.sanq3.createlog", category: "Auth")
     private let client: SupabaseClient
 
     init(client: SupabaseClient) {
@@ -14,26 +16,29 @@ final class SupabaseAuthService: AuthServiceProtocol, Sendable {
     /// `signInWithIdToken` / `signInWithOAuth` が Session を返しても、
     /// まれに SDK storage 反映が読めないことがあるため最後に明示的に検証する。
     /// 初回失敗時は返却された token から `setSession` を再実行して復旧を試みる。
+    ///
+    /// 2026-04-20 (security): print → os.Logger、user.id / session 内容は `privacy: .private` で
+    /// redacted。token / email は一切 log しない (production stderr / syslog / MDM から見えるため)。
     private func ensureSessionEstablished(
         from session: Session,
         provider: String
     ) async {
         for attempt in 0..<4 {
             do {
-                let verified = try await client.auth.session
-                print("[SupabaseAuthService] ✅ persisted session verified (provider=\(provider), attempt=\(attempt), user.id=\(verified.user.id.uuidString))")
+                _ = try await client.auth.session
+                Self.logger.info("persisted session verified (provider=\(provider, privacy: .public), attempt=\(attempt, privacy: .public))")
                 return
             } catch {
-                print("[SupabaseAuthService] ⚠️ persisted session verify failed (provider=\(provider), attempt=\(attempt + 1)): \(error)")
+                Self.logger.warning("persisted session verify failed (provider=\(provider, privacy: .public), attempt=\(attempt + 1, privacy: .public)): \(error.localizedDescription, privacy: .private)")
                 if attempt == 0 {
                     do {
-                        let restored = try await client.auth.setSession(
+                        _ = try await client.auth.setSession(
                             accessToken: session.accessToken,
                             refreshToken: session.refreshToken
                         )
-                        print("[SupabaseAuthService] 🔁 setSession recovery succeeded (provider=\(provider), user.id=\(restored.user.id.uuidString))")
+                        Self.logger.info("setSession recovery succeeded (provider=\(provider, privacy: .public))")
                     } catch {
-                        print("[SupabaseAuthService] 🚨 setSession recovery failed (provider=\(provider)): \(error)")
+                        Self.logger.error("setSession recovery failed (provider=\(provider, privacy: .public)): \(error.localizedDescription, privacy: .private)")
                     }
                 }
 
@@ -43,7 +48,7 @@ final class SupabaseAuthService: AuthServiceProtocol, Sendable {
             }
         }
 
-        print("[SupabaseAuthService] 🚨 persisted session unavailable after recovery attempts (provider=\(provider))")
+        Self.logger.error("persisted session unavailable after recovery attempts (provider=\(provider, privacy: .public))")
     }
 
     var currentState: AuthState {
@@ -70,27 +75,27 @@ final class SupabaseAuthService: AuthServiceProtocol, Sendable {
     }
 
     func signInWithApple(idToken: String, nonce: String) async throws -> String {
-        print("[SupabaseAuthService] ▶️ signInWithApple called (idToken.len=\(idToken.count), nonce.len=\(nonce.count))")
+        Self.logger.info("signInWithApple called")
         do {
             let session = try await client.auth.signInWithIdToken(
                 credentials: .init(provider: .apple, idToken: idToken, nonce: nonce)
             )
             let userIdStr = session.user.id.uuidString
-            print("[SupabaseAuthService] ◀️ signInWithIdToken returned: accessToken.len=\(session.accessToken.count), refreshToken.len=\(session.refreshToken.count), user.id=\(userIdStr)(len=\(userIdStr.count)), user.email=\(session.user.email ?? "<nil>"), expiresAt=\(session.expiresAt)")
+            Self.logger.info("signInWithIdToken returned (provider=apple, user.id=\(userIdStr, privacy: .private))")
 
-            // 明示的に session を storage に書き込めているか即時検証
+            // session storage 反映の即時検証
             do {
-                let verify = try await client.auth.session
-                print("[SupabaseAuthService] ✅ post-signIn session verify: user.id=\(verify.user.id.uuidString) accessToken matches=\(verify.accessToken == session.accessToken)")
+                _ = try await client.auth.session
+                Self.logger.info("post-signIn session verify OK")
             } catch {
-                print("[SupabaseAuthService] 🚨 post-signIn session verify FAILED: \(error)")
+                Self.logger.error("post-signIn session verify failed: \(error.localizedDescription, privacy: .private)")
             }
 
             await ensureSessionEstablished(from: session, provider: "apple")
 
             return userIdStr
         } catch {
-            print("[SupabaseAuthService] ❌ signInWithIdToken threw: \(type(of: error)) — \(error.localizedDescription) — \(String(describing: error))")
+            Self.logger.error("signInWithIdToken threw \(String(describing: type(of: error)), privacy: .public): \(error.localizedDescription, privacy: .private)")
             throw mapError(error)
         }
     }

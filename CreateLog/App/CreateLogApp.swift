@@ -60,7 +60,7 @@ struct CreateLogApp: App {
         if UserDefaults.standard.bool(forKey: "devBypassAuth") {
             authVM.devForceAuthenticated()
             UserDefaults.standard.set(true, forKey: "onboardingCompleted")
-            print("[CreateLogApp] ⚠️ DEV BYPASS AUTH enabled — OAuth skipped, MainTab forced")
+            appLogger.warning("DEV BYPASS AUTH enabled — OAuth skipped, MainTab forced")
         }
         #endif
         _authViewModel = State(initialValue: authVM)

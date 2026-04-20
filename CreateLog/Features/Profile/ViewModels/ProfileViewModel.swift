@@ -1,5 +1,8 @@
 import Foundation
 import SwiftData
+import OSLog
+
+private let profileVMLogger = Logger(subsystem: "com.sanq3.createlog", category: "ProfileViewModel")
 
 /// プロフィール画面のViewModel
 @MainActor @Observable
@@ -184,7 +187,7 @@ final class ProfileViewModel {
             project.remoteIconUrl = iconURLString
             return true
         } catch {
-            print("[ProfileViewModel] syncOneProject failed: \(error.localizedDescription)")
+            profileVMLogger.warning("syncOneProject failed: \(error.localizedDescription, privacy: .private)")
             return false
         }
     }

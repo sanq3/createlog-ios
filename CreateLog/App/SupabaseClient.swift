@@ -36,14 +36,17 @@ enum SupabaseClientFactory {
     /// ダミークライアントを返す (SwiftUI Preview/CI環境でのクラッシュ回避)。
     /// ダミークライアントで実際のネットワーク呼び出しを行うとエラーになる。
     static let shared: SupabaseClient = {
-        print("[SupabaseClientFactory] 🔧 factory invoked (build=\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"))")
+        // 2026-04-20 (security): print → os.Logger。SUPABASE_URL (project ref を含む) /
+        // anonKey.count を平文 stdout に吐くと Console.app / MDM ツールから見えてしまうため、
+        // privacy: .private で redacted。URL 設定の有無は bool だけ log する。
+        let buildVersion = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
+        logger.debug("factory invoked (build=\(buildVersion, privacy: .public))")
         guard let urlString = Bundle.main.infoDictionary?["SUPABASE_URL"] as? String,
               let url = URL(string: urlString),
               let anonKey = Bundle.main.infoDictionary?["SUPABASE_ANON_KEY"] as? String,
               !anonKey.isEmpty
         else {
-            print("[SupabaseClientFactory] 🚨 DUMMY client — xcconfig not loaded. urlString=\(String(describing: Bundle.main.infoDictionary?["SUPABASE_URL"])) anonKey.present=\((Bundle.main.infoDictionary?["SUPABASE_ANON_KEY"] as? String)?.isEmpty == false)")
-            logger.warning("SUPABASE_URL / SUPABASE_ANON_KEY not configured. Returning dummy client (network calls will fail).")
+            logger.error("DUMMY client — xcconfig not loaded. urlConfigured=\((Bundle.main.infoDictionary?["SUPABASE_URL"] as? String)?.isEmpty == false, privacy: .public) anonKeyPresent=\((Bundle.main.infoDictionary?["SUPABASE_ANON_KEY"] as? String)?.isEmpty == false, privacy: .public)")
             return SupabaseClient(
                 supabaseURL: URL(string: "https://unconfigured.supabase.co")!,
                 supabaseKey: "dummy-key-unconfigured",
@@ -51,7 +54,7 @@ enum SupabaseClientFactory {
             )
         }
 
-        print("[SupabaseClientFactory] ✅ real client — url=\(url.absoluteString) anonKey.len=\(anonKey.count)")
+        logger.info("real client configured (url=\(url.absoluteString, privacy: .private))")
         return SupabaseClient(
             supabaseURL: url,
             supabaseKey: anonKey,

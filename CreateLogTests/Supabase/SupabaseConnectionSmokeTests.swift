@@ -40,7 +40,7 @@ struct SupabaseConnectionSmokeTests {
     // MARK: - 値の妥当性
 
     /// SUPABASE_URL が dummy fallback (`unconfigured.supabase.co`) でないこと。
-    /// fail する場合: xcconfig に `SUPABASE_URL = https://aeycoojfugzzuvrpfjhj.supabase.co` を追加
+    /// fail する場合: xcconfig (`Config/Debug.xcconfig`) に `SUPABASE_URL` が設定されているか確認。
     @Test("SUPABASE_URL が dummy fallback でない")
     func testSupabaseURLIsNotDummy() {
         let urlString = Bundle.main.infoDictionary?["SUPABASE_URL"] as? String ?? ""
@@ -54,16 +54,20 @@ struct SupabaseConnectionSmokeTests {
         )
     }
 
-    /// SUPABASE_URL が本プロジェクトの project ref を含むこと。
-    /// project ref は固定: `aeycoojfugzzuvrpfjhj`
-    @Test("SUPABASE_URL が期待する project ref を含む")
-    func testSupabaseURLMatchesProjectRef() {
+    /// SUPABASE_URL が Supabase 形式 (`https://<project-ref>.supabase.co`) で妥当な project ref を
+    /// 持っていること。特定 project ref の hardcode は避ける (public repo に ref を文字列で
+    /// 露出させないため、2026-04-20 セキュリティ整理)。
+    @Test("SUPABASE_URL が Supabase project 形式")
+    func testSupabaseURLMatchesProjectFormat() {
         let urlString = Bundle.main.infoDictionary?["SUPABASE_URL"] as? String ?? ""
         // 未設定時は skip (dummy fallback は別 test で catch)
         guard !urlString.isEmpty, !urlString.contains("unconfigured") else { return }
+        // project ref は 20 文字の lowercase alnum + `.supabase.co` で終わる
+        let regex = try? NSRegularExpression(pattern: #"^https://[a-z0-9]{20}\.supabase\.co/?$"#)
+        let range = NSRange(location: 0, length: urlString.utf16.count)
         #expect(
-            urlString.contains("aeycoojfugzzuvrpfjhj"),
-            "SUPABASE_URL の project ref が一致しません。期待値: aeycoojfugzzuvrpfjhj"
+            regex?.firstMatch(in: urlString, range: range) != nil,
+            "SUPABASE_URL が Supabase 形式でない (期待形式: https://<20-char-ref>.supabase.co)"
         )
     }
 

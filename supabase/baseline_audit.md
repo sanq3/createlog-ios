@@ -2,7 +2,7 @@
 
 - 実施日: 2026-04-11
 - 担当: swift-implementer (createlog-dev チーム)
-- 対象 project ref: `aeycoojfugzzuvrpfjhj`
+- 対象 project ref: (linked project — see `supabase link` output、secrets 管理方針に従い hardcode しない)
 - 対象スキーマ: `public`
 - 基準ファイル: `supabase/migrations/20260410152527_remote_baseline.sql` (3,483 行)
 - DB は読み取りのみ (`pg_dump --schema-only`)、一切の変更を加えていない

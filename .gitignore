@@ -35,3 +35,6 @@ HANDOFF.md
 
 # Serena MCP tool cache
 .serena/
+
+# MCP server config (contains project ref)
+.mcp.json
