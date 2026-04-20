@@ -40,6 +40,12 @@ final class SDProject {
     var category: SDCategory?
     var createdAt: Date = Date()
 
+    /// Onboarding 中に local で発行する安定 ID。OAuth 中断や app 完全 kill された後でも
+    /// `OnboardingViewModel.restoreFromDefaults()` で UserDefaults に保存した UUID と突合して
+    /// この SDProject を再特定できる (persistentModelID は UserDefaults に保存不可のため)。
+    /// onboarding 完走後の後続画面では使わない (remoteAppId で紐付けするため)。
+    var localId: UUID = UUID()
+
     // Onboarding projectDetail (2026-04-14)
     var appDescription: String = ""
     var storeURL: String?
@@ -67,13 +73,15 @@ final class SDProject {
         iconImageData: Data? = nil,
         status: ProjectStatus = .draft,
         remoteAppId: UUID? = nil,
-        remoteIconUrl: String? = nil
+        remoteIconUrl: String? = nil,
+        localId: UUID = UUID()
     ) {
         self.name = name
         self.platforms = platforms
         self.techStack = techStack
         self.category = category
         self.createdAt = Date()
+        self.localId = localId
         self.appDescription = appDescription
         self.storeURL = storeURL
         self.githubURL = githubURL

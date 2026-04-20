@@ -15,15 +15,18 @@ import os
 /// - 失敗は warning log、移行続行 (best-effort)
 ///
 /// ## 呼び出しタイミング
-/// `CreateLogApp.init()` で 1 回だけ kick (起動時、認証状態に関わらず)。
-/// ModelContainer 未初期化時は呼ばれない (guard let で早期 return)。
+/// 2026-04-20: 認証完了後に呼ぶ (以前は App init 即時実行で userId 不明のため UUID() 暫定値を入れていた)。
+/// `CreateLogApp` の authState が `.authenticated` になったタイミングで 1 回だけ kick。
+/// 未認証時は呼ばない (anon UUID を SDLogCache.userId に埋める silent 破綻を防止)。
 @ModelActor
 actor MigrationService {
     private static let logger = Logger(subsystem: "com.sanq3.createlog", category: "MigrationService")
     private static let migrationKey = "migratedLogMemoRemoteIds"
 
     /// memo ハック migration を実行する。2 回目以降は no-op。
-    func migrateLogMemoRemoteIds() {
+    /// - Parameter userId: 認証済みユーザーの Supabase auth UID。
+    ///   SDLogCache.userId に設定する。将来 userId 別の cache filter を追加した際の整合性担保。
+    func migrateLogMemoRemoteIds(userId: UUID) {
         guard !UserDefaults.standard.bool(forKey: Self.migrationKey) else {
             Self.logger.debug("migrateLogMemoRemoteIds: already migrated, skipping")
             return
@@ -51,7 +54,7 @@ actor MigrationService {
                 // SDLogCache 生成 (最小限、remote fetch で後から上書きされる)
                 let cache = SDLogCache(
                     remoteId: remoteId,
-                    userId: UUID(), // 暫定 — 初回 sync で上書き
+                    userId: userId,
                     title: entry.projectName,
                     categoryId: UUID(), // categoryName → UUID 解決は sync 時
                     startedAt: entry.startDate,
@@ -68,7 +71,7 @@ actor MigrationService {
 
             if migratedCount > 0 {
                 try modelContext.save()
-                Self.logger.info("migrateLogMemoRemoteIds: migrated \(migratedCount) entries")
+                Self.logger.info("migrateLogMemoRemoteIds: migrated \(migratedCount) entries for user \(userId)")
             }
 
             UserDefaults.standard.set(true, forKey: Self.migrationKey)

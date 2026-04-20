@@ -9,28 +9,16 @@ import SwiftData
 struct OnboardingView: View {
     @Binding var isPresented: Bool
     var authViewModel: AuthViewModel
-    @Environment(\.modelContext) private var modelContext
-    @Environment(\.dependencies) private var dependencies
-
-    @State private var viewModel: OnboardingViewModel?
+    /// App scope (CreateLogApp) で生成された ViewModel を inject する。
+    /// 2026-04-20: View 内 @State から lift up。rootView の switch branch 変化 (authState 遷移時) で
+    /// OnboardingView の identity が壊れても、ViewModel が CreateLogApp 側で保持されているため
+    /// in-memory state (savedProjectID / currentStep etc.) が失われない。
+    @Bindable var viewModel: OnboardingViewModel
 
     var body: some View {
         ZStack {
             Color.clBackground.ignoresSafeArea()
-
-            if let viewModel {
-                content(for: viewModel)
-            }
-        }
-        .task {
-            if viewModel == nil {
-                viewModel = OnboardingViewModel(
-                    modelContext: modelContext,
-                    profileRepository: dependencies.profileRepository,
-                    appRepository: dependencies.appRepository,
-                    authService: dependencies.authService
-                )
-            }
+            content(for: viewModel)
         }
     }
 

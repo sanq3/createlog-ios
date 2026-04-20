@@ -30,6 +30,9 @@ final class DependencyContainer: Sendable {
     let monthlyRevenueRepository: any MonthlyRevenueRepositoryProtocol
     let hashtagRepository: any HashtagRepositoryProtocol
     let autoTrackingRepository: any AutoTrackingRepositoryProtocol
+    /// T7b memo ハック migration。preview / 未初期化時は nil。
+    /// CreateLogApp が認証成立後に `migrateLogMemoRemoteIds(userId:)` を kick する。
+    let migrationService: MigrationService?
 
     /// 本番用: xcconfigから読み込んだSupabaseClientを使用
     static func live() -> DependencyContainer {
@@ -126,9 +129,9 @@ final class DependencyContainer: Sendable {
                 syncService: sync
             )
 
-            // T7b: memo ハック migration (起動時 1 回限り、best-effort)
-            let migrationService = MigrationService(modelContainer: modelContainer)
-            Task { await migrationService.migrateLogMemoRemoteIds() }
+            // T7b: memo ハック migration actor を expose (CreateLogApp が auth 成立後に kick)。
+            // 2026-04-20: userId を real auth UID で渡すため app init 即時実行から post-auth 実行へ移動。
+            self.migrationService = MigrationService(modelContainer: modelContainer)
 
             // T7c: SNS Decorator Repositories (SDPostCache / Like / Follow / Comment / Notification)
             // 2026-04-16: Post / Comment Decorator に profileRepository を注入。
@@ -181,6 +184,7 @@ final class DependencyContainer: Sendable {
             self.commentRepository = supabaseCommentRepo
             self.notificationRepository = supabaseNotificationRepo
             self.syncService = NoOpSyncService()
+            self.migrationService = nil
         }
     }
 }

@@ -18,6 +18,11 @@ struct CreateLogApp: App {
     @State private var pushService: PushNotificationService
     @State private var localizationManager = LocalizationManager()
     @State private var splashFinished = false
+    /// 2026-04-20: OnboardingViewModel を App scope に lift。
+    /// rootView の switch branch 遷移 (.unauthenticated → .authenticated + !onboardingCompleted) で
+    /// OnboardingView の identity が壊れても ViewModel 本体は App struct が保持し続けるため、
+    /// saving step で確定した SDProject 紐付けや入力値を失わない。
+    @State private var onboardingViewModel: OnboardingViewModel
 
     init() {
         let schema = Schema([
@@ -62,6 +67,13 @@ struct CreateLogApp: App {
         // PushNotificationService は init 内で NotificationCenter を observe するので
         // AppDelegateAdapter への明示的な参照設定は不要 (疎結合)。
         _pushService = State(initialValue: PushNotificationService(client: deps.supabaseClient))
+        // 2026-04-20: OnboardingViewModel を App scope で init。View 再生成で state 失わない。
+        _onboardingViewModel = State(initialValue: OnboardingViewModel(
+            modelContext: modelContainer.mainContext,
+            profileRepository: deps.profileRepository,
+            appRepository: deps.appRepository,
+            authService: deps.authService
+        ))
     }
 
     var body: some Scene {
@@ -98,6 +110,16 @@ struct CreateLogApp: App {
                 if UserDefaults.standard.bool(forKey: "devBypassAuth") { return }
                 #endif
                 await authViewModel.observeAuthState()
+            }
+            .onChange(of: authViewModel.authState) { _, newValue in
+                // 2026-04-20: 認証成立直後に T7b memo ハック migration を kick。
+                // 以前は App init 即時で userId 不明なため `UUID()` 暫定値を入れていたが、
+                // auth 完了後に real UID で migrate する形に正規化。
+                if case .authenticated(let userIdString) = newValue,
+                   let userId = UUID(uuidString: userIdString),
+                   let migrationService = dependencies.migrationService {
+                    Task { await migrationService.migrateLogMemoRemoteIds(userId: userId) }
+                }
             }
         }
     }
@@ -154,7 +176,8 @@ struct CreateLogApp: App {
                 get: { !onboardingCompleted },
                 set: { if !$0 { onboardingCompleted = true } }
             ),
-            authViewModel: authViewModel
+            authViewModel: authViewModel,
+            viewModel: onboardingViewModel
         )
         .modelContainer(modelContainer)
         .environment(\.dependencies, dependencies)

@@ -24,6 +24,7 @@ enum AppearanceMode: String, CaseIterable {
 
 struct SettingsView: View {
     @Environment(\.dependencies) private var dependencies
+    @Environment(\.modelContext) private var modelContext
     @Environment(LocalizationManager.self) private var localizationManager
     @AppStorage("appearanceMode") private var appearanceMode: String = AppearanceMode.system.rawValue
     @AppStorage("durationFormat") private var durationFormat: String = DurationFormat.system.rawValue
@@ -211,9 +212,18 @@ struct SettingsView: View {
         .navigationTitle(Text("settings.title"))
         .navigationBarTitleDisplayMode(.inline)
         .fullScreenCover(isPresented: $showOnboarding) {
+            // Settings から再 onboarding を起動する導線 (開発/QA 用)。
+            // 通常フローの App-scope ViewModel と独立して fresh な ViewModel を生成し、
+            // 元の onboarding 進行状況を壊さない。
             OnboardingView(
                 isPresented: $showOnboarding,
-                authViewModel: AuthViewModel(authService: dependencies.authService)
+                authViewModel: AuthViewModel(authService: dependencies.authService),
+                viewModel: OnboardingViewModel(
+                    modelContext: modelContext,
+                    profileRepository: dependencies.profileRepository,
+                    appRepository: dependencies.appRepository,
+                    authService: dependencies.authService
+                )
             )
         }
         .alert("settings.language.restart.title", isPresented: $showLanguageRestartAlert, presenting: pendingLanguage) { lang in

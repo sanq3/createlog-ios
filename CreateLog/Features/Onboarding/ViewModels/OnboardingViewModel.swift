@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import OSLog
 
 /// オンボーディング 20 画面フロー (2026-04-14 再設計、1 画面 1 質問粒度)。
 /// 前半 (accountPrompt 含む 9 step) はアカウント作成前、後半 11 step は作成後に下部
@@ -11,6 +12,9 @@ import SwiftData
 @MainActor
 @Observable
 final class OnboardingViewModel {
+    @ObservationIgnored
+    private static let logger = Logger(subsystem: "com.sanq3.createlog", category: "OnboardingViewModel")
+
     enum Step: Int, CaseIterable {
         case welcome = 0
         case appShowcase = 1
@@ -155,6 +159,13 @@ final class OnboardingViewModel {
         static let storeURL = "onboarding.storeURL"
         static let githubURL = "onboarding.githubURL"
         static let releaseStatus = "onboarding.releaseStatus"
+        // 2026-04-20: saving step で確定した SDProject 紐付け情報。
+        // OAuth 後に root view identity が変化して viewModel が再生成されても、
+        // localId (UUID) から SDProject を refetch して savedProjectID を復元できるようにする。
+        static let savedProjectName = "onboarding.savedProjectName"
+        static let savedPlatforms = "onboarding.savedPlatforms"
+        static let isSaved = "onboarding.isSaved"
+        static let savedProjectLocalId = "onboarding.savedProjectLocalId"
     }
 
     init(
@@ -218,6 +229,29 @@ final class OnboardingViewModel {
            let status = ProjectStatus(rawValue: raw) {
             releaseStatus = status
         }
+        // 2026-04-20: saving step 以降の SDProject 紐付けを復元。
+        // UserDefaults に残っている localId (UUID string) で SDProject を refetch する。
+        savedProjectName = d.string(forKey: DefaultsKey.savedProjectName) ?? ""
+        savedPlatforms = (d.array(forKey: DefaultsKey.savedPlatforms) as? [String]) ?? []
+        isSaved = d.bool(forKey: DefaultsKey.isSaved)
+        if isSaved,
+           let uuidString = d.string(forKey: DefaultsKey.savedProjectLocalId),
+           let localId = UUID(uuidString: uuidString) {
+            let descriptor = FetchDescriptor<SDProject>(
+                predicate: #Predicate<SDProject> { $0.localId == localId }
+            )
+            if let project = try? modelContext.fetch(descriptor).first {
+                savedProjectID = project.persistentModelID
+            } else {
+                // SDProject が見つからない (ユーザが storage 掃除した / DB 破損) →
+                // isSaved フラグも剥がして saving step からやり直させる (silent data loss 回避)
+                isSaved = false
+                savedProjectName = ""
+                savedPlatforms = []
+                d.removeObject(forKey: DefaultsKey.savedProjectLocalId)
+                d.set(false, forKey: DefaultsKey.isSaved)
+            }
+        }
     }
 
     /// 現在の state を UserDefaults に保存する。
@@ -237,6 +271,11 @@ final class OnboardingViewModel {
         d.set(storeURL, forKey: DefaultsKey.storeURL)
         d.set(githubURL, forKey: DefaultsKey.githubURL)
         d.set(releaseStatus.rawValue, forKey: DefaultsKey.releaseStatus)
+        // 2026-04-20: 紐付け再現用
+        d.set(savedProjectName, forKey: DefaultsKey.savedProjectName)
+        d.set(savedPlatforms, forKey: DefaultsKey.savedPlatforms)
+        d.set(isSaved, forKey: DefaultsKey.isSaved)
+        // savedProjectLocalId は performSave() で個別に書く (persistentModelID → UUID 取得不可のため)
     }
 
     /// onboarding 完走時に呼ぶ。UserDefaults の全 key を消して次 user のために clean。
@@ -248,7 +287,9 @@ final class OnboardingViewModel {
                     DefaultsKey.projectName, DefaultsKey.displayName, DefaultsKey.bio,
                     DefaultsKey.handleInput, DefaultsKey.roleTags,
                     DefaultsKey.appDescription, DefaultsKey.storeURL, DefaultsKey.githubURL,
-                    DefaultsKey.releaseStatus]
+                    DefaultsKey.releaseStatus,
+                    DefaultsKey.savedProjectName, DefaultsKey.savedPlatforms,
+                    DefaultsKey.isSaved, DefaultsKey.savedProjectLocalId]
         for key in keys { d.removeObject(forKey: key) }
         // in-memory state も reset (次に OnboardingView 出た時に fresh)
         currentStep = .welcome
@@ -264,6 +305,10 @@ final class OnboardingViewModel {
         storeURL = ""
         githubURL = ""
         releaseStatus = .draft
+        savedProjectID = nil
+        savedProjectName = ""
+        savedPlatforms = []
+        isSaved = false
     }
 
     // MARK: - Derived
@@ -337,6 +382,9 @@ final class OnboardingViewModel {
     /// saving step に入った瞬間に呼ばれる (アカウント作成前)。
     /// SDProject (name/platforms/techStack) のみローカル保存する。
     /// 詳細 (icon/URL/GitHub/description/status) はアカウント作成後に projectXxx step で逐次 update。
+    ///
+    /// 2026-04-20: OAuth 後 viewModel 再生成や app kill でも紐付けを失わないため、
+    /// `project.localId` (UUID) を UserDefaults に保存する。restoreFromDefaults が refetch に使う。
     func performSave() {
         guard !isSaved else { return }
 
@@ -357,14 +405,47 @@ final class OnboardingViewModel {
         savedProjectName = finalName
         savedPlatforms = platforms
         isSaved = true
+
+        // OAuth / app kill 跨ぎの再紐付け用に UUID を UserDefaults へ。
+        UserDefaults.standard.set(project.localId.uuidString, forKey: DefaultsKey.savedProjectLocalId)
+        persist()
     }
 
     /// saving step で insert した SDProject を後から fetch して update する。
+    ///
+    /// 2026-04-20: silent data loss 対策。savedProjectID が万一 nil の場合は
+    /// UserDefaults に残る localId から SDProject を再特定して復旧を試みる。
+    /// それでも失敗する場合は os.Logger に error level で出して可視化
+    /// (silent guard で呼び出し元が false success と誤認することを禁ず)。
     private func updateSavedProject(_ mutation: (SDProject) -> Void) {
-        guard let id = savedProjectID else { return }
-        if let project = modelContext.model(for: id) as? SDProject {
-            mutation(project)
-            try? modelContext.save()
+        if savedProjectID == nil {
+            recoverSavedProjectIDFromLocalId()
+        }
+        guard let id = savedProjectID,
+              let project = modelContext.model(for: id) as? SDProject else {
+            Self.logger.error("updateSavedProject: no SDProject to update (savedProjectID nil, recovery failed). currentStep=\(self.currentStep.rawValue)")
+            return
+        }
+        mutation(project)
+        do {
+            try modelContext.save()
+        } catch {
+            Self.logger.error("updateSavedProject: save failed: \(error.localizedDescription)")
+        }
+    }
+
+    /// UserDefaults の `savedProjectLocalId` から SDProject を再 fetch して savedProjectID を張り直す。
+    /// OnboardingView が再生成された後の defense-in-depth リカバリ
+    /// (A: root-view identity 保持 / B: UserDefaults 永続化 の両輪で通常は不要、万一の保険)。
+    private func recoverSavedProjectIDFromLocalId() {
+        guard let uuidString = UserDefaults.standard.string(forKey: DefaultsKey.savedProjectLocalId),
+              let localId = UUID(uuidString: uuidString) else { return }
+        let descriptor = FetchDescriptor<SDProject>(
+            predicate: #Predicate<SDProject> { $0.localId == localId }
+        )
+        if let project = try? modelContext.fetch(descriptor).first {
+            savedProjectID = project.persistentModelID
+            Self.logger.info("updateSavedProject: recovered savedProjectID via localId after in-memory loss")
         }
     }
 
@@ -464,12 +545,26 @@ final class OnboardingViewModel {
     /// 1. icon があれば Storage upload → URL 取得
     /// 2. AppInsertDTO 構築して insertApp
     /// 3. 成功時 SDProject.remoteAppId / remoteIconUrl を保存 (ProfileView の重複表示防止)
-    /// 4. 失敗時 silent fail (ローカル SDProject は残るので次回機会で retry)
+    /// 4. 失敗時 silent fail ではなく os.Logger で warning 出力 (ローカル SDProject は残るので次回機会で retry)
     /// 既に同期済 (remoteAppId != nil) ならスキップ。完全に冪等。
+    ///
+    /// 2026-04-20: savedProjectID が nil の場合は UserDefaults 経由で localId 復旧を試みる。
     func syncProjectToRemote() async {
-        guard let appRepository else { return }
-        guard let id = savedProjectID else { return }
-        guard let project = modelContext.model(for: id) as? SDProject else { return }
+        guard let appRepository else {
+            Self.logger.warning("syncProjectToRemote: appRepository unavailable, skipped")
+            return
+        }
+        if savedProjectID == nil {
+            recoverSavedProjectIDFromLocalId()
+        }
+        guard let id = savedProjectID else {
+            Self.logger.error("syncProjectToRemote: savedProjectID nil even after recovery, skipped")
+            return
+        }
+        guard let project = modelContext.model(for: id) as? SDProject else {
+            Self.logger.error("syncProjectToRemote: SDProject not found for id, skipped")
+            return
+        }
         guard project.remoteAppId == nil else { return }
 
         let snapshot = ProjectSyncSnapshot(from: project)
@@ -507,7 +602,7 @@ final class OnboardingViewModel {
                 }
             }
         } catch {
-            print("[OnboardingViewModel] ❌ syncProjectToRemote failed: \(error.localizedDescription)")
+            Self.logger.warning("syncProjectToRemote failed (best-effort, retry on next run): \(error.localizedDescription)")
         }
     }
 

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HomeView: View {
     @Environment(\.dependencies) private var deps
+    @Environment(\.modelContext) private var modelContext
     @State private var viewModel: FeedViewModel?
     @State private var segmentIndex = 0
 
@@ -132,9 +133,18 @@ struct HomeView: View {
             ComposeView()
         }
         .fullScreenCover(isPresented: $showOnboarding) {
+            // DEBUG reset: App-scope viewModel と独立した fresh ViewModel で onboarding を表示。
+            // 通常フロー (unauthenticated → CreateLogApp.onboardingScreen) では App-scope の
+            // OnboardingViewModel が使われる。この cover は開発中の動作確認専用。
             OnboardingView(
                 isPresented: $showOnboarding,
-                authViewModel: AuthViewModel(authService: deps.authService)
+                authViewModel: AuthViewModel(authService: deps.authService),
+                viewModel: OnboardingViewModel(
+                    modelContext: modelContext,
+                    profileRepository: deps.profileRepository,
+                    appRepository: deps.appRepository,
+                    authService: deps.authService
+                )
             )
         }
         .errorBanner(Binding(
