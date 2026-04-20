@@ -2,11 +2,11 @@ import SwiftUI
 import SwiftData
 
 struct RecordingView: View {
+    /// 2026-04-20: MainTabView @State から inject される。tab 切替で identity 破壊されない。
+    @Bindable var viewModel: RecordingViewModel
     @Binding var tabBarOffset: CGFloat
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dependencies) private var deps
-
-    @State private var viewModel: RecordingViewModel?
 
     var body: some View {
         ZStack {
@@ -16,91 +16,75 @@ struct RecordingView: View {
         .navigationTitle("recording.title")
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            if viewModel == nil {
-                let vm = RecordingViewModel(
-                    modelContext: modelContext,
-                    logRepository: deps.logRepository,
-                    categoryRepository: deps.categoryRepository
-                )
-                viewModel = vm
-                vm.loadData()
-                await vm.syncWithRemote()
-            } else {
-                viewModel?.loadData()
-            }
+            // 初回: サーバ同期を実行。再訪時は local 再読み込みのみ。
+            viewModel.loadData()
+            await viewModel.syncWithRemote()
         }
     }
 
     private var mainContent: some View {
         ScrollView {
             VStack(spacing: 0) {
-                if let vm = viewModel {
-                    // Stats + integrated picker wheels
-                    TodayHeroView(
-                        metrics: vm.heroMetrics,
-                        pickerHours: Binding(get: { vm.pickerHours }, set: { vm.pickerHours = $0 }),
-                        pickerMinutes: Binding(get: { vm.pickerMinutes }, set: { vm.pickerMinutes = $0 })
-                    )
+                // Stats + integrated picker wheels
+                TodayHeroView(
+                    metrics: viewModel.heroMetrics,
+                    pickerHours: Binding(get: { viewModel.pickerHours }, set: { viewModel.pickerHours = $0 }),
+                    pickerMinutes: Binding(get: { viewModel.pickerMinutes }, set: { viewModel.pickerMinutes = $0 })
+                )
+                .padding(.horizontal, 16)
+
+                // Active timer
+                if viewModel.isTimerRunning {
+                    timerBanner(viewModel)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 12)
+                }
+
+                // Tag + record button
+                TimePickerSection(viewModel: viewModel)
                     .padding(.horizontal, 16)
+                    .padding(.top, 8)
 
-                    // Active timer
-                    if vm.isTimerRunning {
-                        timerBanner(vm)
-                            .padding(.horizontal, 16)
-                            .padding(.top, 12)
-                    }
+                // Tags
+                TagChipsView(
+                    tags: viewModel.tags,
+                    selectedTag: viewModel.selectedTag,
+                    onTagTapped: { viewModel.selectTag($0) },
+                    onTagLongPressed: { viewModel.startTimer(for: $0) },
+                    onAddTapped: { viewModel.startCreateTag() }
+                )
+                .padding(.top, 20)
 
-                    // Tag + record button
-                    TimePickerSection(viewModel: vm)
+                if viewModel.tags.isEmpty {
+                    emptyTagsHint
                         .padding(.horizontal, 16)
                         .padding(.top, 8)
-
-                    // Tags
-                    TagChipsView(
-                        tags: vm.tags,
-                        selectedTag: vm.selectedTag,
-                        onTagTapped: { vm.selectTag($0) },
-                        onTagLongPressed: { vm.startTimer(for: $0) },
-                        onAddTapped: { vm.startCreateTag() }
-                    )
-                    .padding(.top, 20)
-
-                    if vm.tags.isEmpty {
-                        emptyTagsHint
-                            .padding(.horizontal, 16)
-                            .padding(.top, 8)
-                    }
-
-                    // History
-                    RecentHistoryView(entries: vm.recentEntries)
-                        .padding(.top, 20)
-                        .padding(.horizontal, 16)
-                } else {
-                    TodayHeroView(metrics: nil)
-                        .padding(.horizontal, 16)
                 }
+
+                // History
+                RecentHistoryView(entries: viewModel.recentEntries)
+                    .padding(.top, 20)
+                    .padding(.horizontal, 16)
 
                 Spacer(minLength: 100)
             }
         }
         .scrollIndicators(.hidden)
         .sheet(isPresented: showCreateTagBinding) {
-            if let vm = viewModel {
-                TagCreationWizard(viewModel: vm)
-                    .presentationDetents([.medium])
-                    .presentationDragIndicator(.visible)
-            }
+            TagCreationWizard(viewModel: viewModel)
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
         }
         .errorBanner(Binding(
-            get: { viewModel?.errorMessage },
-            set: { viewModel?.errorMessage = $0 }
+            get: { viewModel.errorMessage },
+            set: { viewModel.errorMessage = $0 }
         ))
     }
 
     private var showCreateTagBinding: Binding<Bool> {
         Binding(
-            get: { viewModel?.showCreateTag ?? false },
-            set: { newValue in viewModel?.showCreateTag = newValue }
+            get: { viewModel.showCreateTag },
+            set: { newValue in viewModel.showCreateTag = newValue }
         )
     }
 

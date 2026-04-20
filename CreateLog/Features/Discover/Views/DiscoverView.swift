@@ -4,7 +4,8 @@ import SwiftUI
 
 struct DiscoverView: View {
     @Environment(\.dependencies) private var deps
-    @State private var viewModel: DiscoverViewModel?
+    /// 2026-04-20: MainTabView @State から inject される。tab 切替で identity 破壊されない。
+    @Bindable var viewModel: DiscoverViewModel
     @Binding var tabBarOffset: CGFloat
     let reselectCount: Int
 
@@ -22,17 +23,15 @@ struct DiscoverView: View {
                         .padding(.top, headerHeight + 16)
                 }
 
-                if let viewModel {
-                    if viewModel.isShowingResults {
-                        searchResultsSection(viewModel: viewModel)
-                            .padding(.top, headerHeight + 8)
-                            .padding(.bottom, 100)
-                    } else {
-                        feedSection(viewModel: viewModel)
-                            .padding(.horizontal, 12)
-                            .padding(.top, headerHeight + 8)
-                            .padding(.bottom, 100)
-                    }
+                if viewModel.isShowingResults {
+                    searchResultsSection(viewModel: viewModel)
+                        .padding(.top, headerHeight + 8)
+                        .padding(.bottom, 100)
+                } else {
+                    feedSection(viewModel: viewModel)
+                        .padding(.horizontal, 12)
+                        .padding(.top, headerHeight + 8)
+                        .padding(.bottom, 100)
                 }
             }
             .scrollPosition($scrollPosition)
@@ -44,7 +43,7 @@ struct DiscoverView: View {
                 isAtTop = newValue <= 5
             }
             .refreshable {
-                await viewModel?.refreshFeed()
+                await viewModel.refreshFeed()
             }
 
             searchHeader
@@ -53,15 +52,9 @@ struct DiscoverView: View {
         .background(Color.clBackground)
         .toolbar(.hidden, for: .navigationBar)
         .task {
-            if viewModel == nil {
-                viewModel = DiscoverViewModel(
-                    searchRepository: deps.searchRepository,
-                    postRepository: deps.postRepository,
-                    appRepository: deps.appRepository
-                )
-            }
-            if viewModel?.feedItems.isEmpty == true {
-                await viewModel?.loadFeed()
+            // viewModel は MainTabView @State から inject。tab 初回可視時のみロード。
+            if viewModel.feedItems.isEmpty {
+                await viewModel.loadFeed()
             }
         }
         .onChange(of: reselectCount) {
@@ -69,7 +62,7 @@ struct DiscoverView: View {
                 isRefreshing = true
                 HapticManager.light()
                 Task {
-                    await viewModel?.refreshFeed()
+                    await viewModel.refreshFeed()
                     isRefreshing = false
                 }
             } else {
@@ -202,21 +195,21 @@ struct DiscoverView: View {
             TextField(
                 "profile.search.placeholder",
                 text: Binding(
-                    get: { viewModel?.searchQuery ?? "" },
-                    set: { viewModel?.searchQuery = $0 }
+                    get: { viewModel.searchQuery },
+                    set: { viewModel.searchQuery = $0 }
                 )
             )
             .font(.clBody)
             .textInputAutocapitalization(.never)
             .submitLabel(.search)
             .onSubmit {
-                Task { await viewModel?.search() }
+                Task { await viewModel.search() }
             }
 
-            if let query = viewModel?.searchQuery, !query.isEmpty {
+            if !viewModel.searchQuery.isEmpty {
                 Button {
-                    viewModel?.searchQuery = ""
-                    viewModel?.searchResults = nil
+                    viewModel.searchQuery = ""
+                    viewModel.searchResults = nil
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundStyle(Color.clTextTertiary)

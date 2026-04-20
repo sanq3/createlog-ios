@@ -14,10 +14,11 @@ struct ProfileView: View {
         order: .reverse
     )
     private var localProjects: [SDProject]
-    /// 2026-04-16: 非 optional 化 (SWR + cache-first rendering)。init で dependencies を受け取り、
-    /// `ProfileViewModel.init` 内で `SDProfileCache` から同期的に profile を fetch する。
-    /// これで View 初回描画時に `User(name:"", handle:"")` の空 User が見える flicker を根絶。
-    @State private var viewModel: ProfileViewModel
+    /// 2026-04-20: MainTabView @State から inject される。tab 切替で identity 破壊されない。
+    /// 以前は init(dependencies:) 内で @State 初期値として VM を作っていたが、
+    /// switch selectedTab branch 変化で init が再実行され、scroll position や
+    /// fetched profile cache がリセットされていた。
+    @Bindable var viewModel: ProfileViewModel
     @State private var showShareSheet = false
     @State private var showEditProfile = false
     /// 自分のプロフィールでのみ表示するタブ (投稿 / いいね / ブックマーク)。
@@ -28,18 +29,6 @@ struct ProfileView: View {
         case posts = "投稿"
         case likes = "いいね"
         case bookmarks = "ブックマーク"
-    }
-
-    init(dependencies: DependencyContainer) {
-        _viewModel = State(initialValue: ProfileViewModel(
-            profileRepository: dependencies.profileRepository,
-            postRepository: dependencies.postRepository,
-            appRepository: dependencies.appRepository,
-            followRepository: dependencies.followRepository,
-            statsRepository: dependencies.statsRepository,
-            likeRepository: dependencies.likeRepository,
-            bookmarkRepository: dependencies.bookmarkRepository
-        ))
     }
 
     /// profile 未 load (cold cache 初回) の場合は空文字 User を返し、body 側で `.redacted(.placeholder)`

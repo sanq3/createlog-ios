@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @Environment(\.dependencies) private var dependencies
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     @Environment(DeepLinkHandler.self) private var deepLinkHandler
     @State private var selectedTab = 0
@@ -10,6 +11,17 @@ struct MainTabView: View {
     @State private var discoverReselectCount = 0
     @State private var deepLinkedUser: User?
     @State private var showDeepLinkedUser = false
+    /// 2026-04-20: 各 tab の ViewModel を MainTabView @State に lift。
+    /// 以前は各 tab View 内 @State Optional で `.task` 初期化していたが、
+    /// `switch selectedTab` branch 遷移で tab View の identity が毎回破壊され、
+    /// 戻ってきた時に ViewModel が再生成されて in-memory state (scroll position /
+    /// segment selection / cursor 等) が失われる構造だった。MainTabView 自身は
+    /// 認証済 session 中は identity 保持されるので、ここに @State を置くことで
+    /// tab 切替を跨いで state が保たれる。
+    @State private var feedViewModel: FeedViewModel?
+    @State private var discoverViewModel: DiscoverViewModel?
+    @State private var recordingViewModel: RecordingViewModel?
+    @State private var profileViewModel: ProfileViewModel?
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -20,15 +32,32 @@ struct MainTabView: View {
                 switch selectedTab {
                 case 0:
                     tabNavigationStack {
-                        HomeView(tabBarOffset: $tabBarOffset, reselectCount: homeReselectCount)
+                        if let feedViewModel {
+                            HomeView(
+                                viewModel: feedViewModel,
+                                tabBarOffset: $tabBarOffset,
+                                reselectCount: homeReselectCount
+                            )
+                        }
                     }
                 case 1:
                     tabNavigationStack {
-                        DiscoverView(tabBarOffset: $tabBarOffset, reselectCount: discoverReselectCount)
+                        if let discoverViewModel {
+                            DiscoverView(
+                                viewModel: discoverViewModel,
+                                tabBarOffset: $tabBarOffset,
+                                reselectCount: discoverReselectCount
+                            )
+                        }
                     }
                 case 2:
                     tabNavigationStack {
-                        RecordingTabView(tabBarOffset: $tabBarOffset)
+                        if let recordingViewModel {
+                            RecordingTabView(
+                                viewModel: recordingViewModel,
+                                tabBarOffset: $tabBarOffset
+                            )
+                        }
                     }
                 case 3:
                     tabNavigationStack {
@@ -36,7 +65,9 @@ struct MainTabView: View {
                     }
                 case 4:
                     tabNavigationStack {
-                        ProfileView(dependencies: dependencies)
+                        if let profileViewModel {
+                            ProfileView(viewModel: profileViewModel)
+                        }
                     }
                 default: EmptyView()
                 }
@@ -53,6 +84,43 @@ struct MainTabView: View {
             .offset(y: tabBarOffset)
         }
         .offlineBadge(networkMonitor: dependencies.networkMonitor)
+        .task {
+            // 2026-04-20: 各 tab の ViewModel を lazy init (initially nil guard で二重生成防止)。
+            // MainTabView 自身が stable identity を保つため、以降の tab 切替で ViewModel が
+            // 再生成されなくなり、scroll position / segment selection / cursor 等の
+            // in-memory state が session 通して保持される。
+            if feedViewModel == nil {
+                feedViewModel = FeedViewModel(
+                    postRepository: dependencies.postRepository,
+                    likeRepository: dependencies.likeRepository
+                )
+            }
+            if discoverViewModel == nil {
+                discoverViewModel = DiscoverViewModel(
+                    searchRepository: dependencies.searchRepository,
+                    postRepository: dependencies.postRepository,
+                    appRepository: dependencies.appRepository
+                )
+            }
+            if recordingViewModel == nil {
+                recordingViewModel = RecordingViewModel(
+                    modelContext: modelContext,
+                    logRepository: dependencies.logRepository,
+                    categoryRepository: dependencies.categoryRepository
+                )
+            }
+            if profileViewModel == nil {
+                profileViewModel = ProfileViewModel(
+                    profileRepository: dependencies.profileRepository,
+                    postRepository: dependencies.postRepository,
+                    appRepository: dependencies.appRepository,
+                    followRepository: dependencies.followRepository,
+                    statsRepository: dependencies.statsRepository,
+                    likeRepository: dependencies.likeRepository,
+                    bookmarkRepository: dependencies.bookmarkRepository
+                )
+            }
+        }
         .task {
             // T7a-2: NetworkMonitor 起動 (アプリ生存中に 1 回だけ)。
             // 既存 CreateLogApp の `.task { authViewModel.observeAuthState() }` とは

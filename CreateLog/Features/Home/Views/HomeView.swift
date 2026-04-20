@@ -3,12 +3,13 @@ import SwiftUI
 struct HomeView: View {
     @Environment(\.dependencies) private var deps
     @Environment(\.modelContext) private var modelContext
-    @State private var viewModel: FeedViewModel?
+    /// 2026-04-20: MainTabView @State から inject される。tab 切替で identity 破壊されない。
+    @Bindable var viewModel: FeedViewModel
     @State private var segmentIndex = 0
 
     /// ViewModel から実データを返す。MockData fallback は排除 (2026-04-13 v2.0 接続)。
     private var posts: [Post] {
-        viewModel?.posts ?? []
+        viewModel.posts
     }
     @Binding var tabBarOffset: CGFloat
     let reselectCount: Int
@@ -148,22 +149,20 @@ struct HomeView: View {
             )
         }
         .errorBanner(Binding(
-            get: { viewModel?.errorMessage },
-            set: { viewModel?.errorMessage = $0 }
+            get: { viewModel.errorMessage },
+            set: { viewModel.errorMessage = $0 }
         ))
         .toolbar(.hidden, for: .navigationBar)
         .task {
-            if viewModel == nil {
-                viewModel = FeedViewModel(
-                    postRepository: deps.postRepository,
-                    likeRepository: deps.likeRepository
-                )
+            // viewModel は MainTabView @State から inject されるため init 不要。
+            // tab が選択された時の初回データロード (feed 未取得ならロード)。
+            if viewModel.posts.isEmpty {
+                await viewModel.loadFeed()
             }
-            await viewModel?.loadFeed()
         }
         .onChange(of: segmentIndex) { _, _ in
-            viewModel?.segment = segmentIndex == 0 ? .timeline : .following
-            Task { await viewModel?.onSegmentChange() }
+            viewModel.segment = segmentIndex == 0 ? .timeline : .following
+            Task { await viewModel.onSegmentChange() }
         }
         .onChange(of: reselectCount) {
             if isAtTop {
@@ -171,7 +170,7 @@ struct HomeView: View {
                 isRefreshing = true
                 HapticManager.light()
                 Task {
-                    await viewModel?.refresh()
+                    await viewModel.refresh()
                     isRefreshing = false
                 }
             } else {
@@ -202,12 +201,12 @@ struct HomeView: View {
     private func feedPage(for pagePosts: [Post]) -> some View {
         ScrollView {
             LazyVStack(spacing: 12) {
-                if isRefreshing || (viewModel?.isLoading == true && pagePosts.isEmpty) {
+                if isRefreshing || (viewModel.isLoading && pagePosts.isEmpty) {
                     ProgressView()
                         .padding(.top, 8)
                 }
 
-                if pagePosts.isEmpty, viewModel?.isLoading == false {
+                if pagePosts.isEmpty, !viewModel.isLoading {
                     emptyFeedState
                         .padding(.top, 80)
                 }
@@ -222,12 +221,12 @@ struct HomeView: View {
                     .onAppear {
                         // 末尾の数件に到達したら次ページを読み込む
                         if index >= pagePosts.count - 3 {
-                            Task { await viewModel?.loadMore() }
+                            Task { await viewModel.loadMore() }
                         }
                     }
                 }
 
-                if viewModel?.isLoadingMore == true {
+                if viewModel.isLoadingMore {
                     ProgressView()
                         .padding(.vertical, 12)
                 }
