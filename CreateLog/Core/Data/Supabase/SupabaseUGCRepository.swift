@@ -61,4 +61,40 @@ final class SupabaseUGCRepository: UGCRepositoryProtocol, Sendable {
             .value
         return !result.isEmpty
     }
+
+    func fetchBlockedUsers() async throws -> [BlockedUserRow] {
+        let session = try await client.auth.session
+
+        // blocks を時系列 desc で取得して blocked_id を profiles と JOIN。
+        // PostgREST nested select で 1 round-trip で済ませる (N+1 回避)。
+        struct Row: Decodable {
+            let blocked_id: UUID
+            let blocked: Blocked?
+            struct Blocked: Decodable {
+                let id: UUID
+                let display_name: String?
+                let handle: String?
+                let avatar_url: String?
+            }
+        }
+
+        let rows: [Row] = try await client
+            .from("blocks")
+            .select("blocked_id, blocked:profiles!blocks_blocked_id_fkey(id, display_name, handle, avatar_url)")
+            .eq("blocker_id", value: session.user.id.uuidString)
+            .order("created_at", ascending: false)
+            .execute()
+            .value
+
+        // profile 取得失敗した row (ユーザー削除済み等) は placeholder として最低限の表示で残す。
+        // 解除 UI を出すために id だけは必ず保持する。
+        return rows.map { row in
+            BlockedUserRow(
+                id: row.blocked?.id ?? row.blocked_id,
+                displayName: row.blocked?.display_name ?? "Unknown",
+                handle: row.blocked?.handle,
+                avatarUrl: row.blocked?.avatar_url
+            )
+        }
+    }
 }

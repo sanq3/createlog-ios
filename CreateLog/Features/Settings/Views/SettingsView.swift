@@ -68,6 +68,12 @@ struct SettingsView: View {
                 }
 
                 NavigationLink {
+                    BlockedUsersView()
+                } label: {
+                    settingsRow(icon: "nosign", title: "settings.privacy.blockedUsers")
+                }
+
+                NavigationLink {
                     NotificationSettingsView()
                 } label: {
                     settingsRow(icon: "bell", title: "settings.notifications")
